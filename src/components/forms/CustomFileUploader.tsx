@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, useEffect, type ChangeEvent } from "react";
 
 interface FileUploaderProps {
   maxSizeMB: number;

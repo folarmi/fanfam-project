@@ -1,7 +1,5 @@
-import React from "react";
 import verify from "@/public/icons/verify.svg";
 import horizontalMore from "@/public/icons/horizontalMore.svg";
-import Image from "next/image";
 import Typography from "../forms/Typography";
 
 type SuggestionProps = {
@@ -11,10 +9,10 @@ type SuggestionProps = {
 const Suggestion = ({ isLive, img }: SuggestionProps) => {
   return (
     <div className="relative rounded-lg mb-3 overflow-hidden">
-      <Image src={img} alt="randomPicture" className="w-full h-auto" />
+      <img src={img} alt="randomPicture" className="w-full h-auto" />
 
       <div className="absolute top-3 right-3 z-10">
-        <Image src={horizontalMore} alt="horizontalMore" />
+        <img src={horizontalMore} alt="horizontalMore" />
       </div>
 
       <div className="bg-custom-gradient absolute bottom-0 w-full p-4 z-20">
@@ -22,7 +20,7 @@ const Suggestion = ({ isLive, img }: SuggestionProps) => {
           <Typography variant="titleTwo" className="text-white pr-1">
             Priscilia yummy
           </Typography>
-          <Image src={verify} alt="verify" />
+          <img src={verify} alt="verify" />
         </div>
 
         <div className="flex items-center">

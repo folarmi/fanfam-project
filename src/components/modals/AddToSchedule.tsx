@@ -1,4 +1,3 @@
-import React from "react";
 import Typography from "../forms/Typography";
 import BlueBorderedButton from "../forms/BlueBorderedButton";
 import CustomButton from "../forms/CustomButton";

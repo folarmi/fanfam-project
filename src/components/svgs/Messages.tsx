@@ -1,5 +1,3 @@
-import React from "react";
-
 const Messages = () => (
   <svg
     width="24"

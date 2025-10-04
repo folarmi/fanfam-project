@@ -1,5 +1,3 @@
-import React from "react";
-
 const Pay = () => (
   <svg
     width="24"

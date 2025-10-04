@@ -1,5 +1,3 @@
-import React from "react";
-
 const ProfileLike = () => (
   <svg
     width="20"

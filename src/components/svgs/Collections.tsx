@@ -1,5 +1,3 @@
-import React from "react";
-
 const Collections = () => (
   <svg
     width="24"

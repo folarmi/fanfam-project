@@ -1,4 +1,3 @@
-import React from "react";
 import CollectionRadioButton from "../forms/CollectionRadioButton";
 
 const CollectionSortingOptionsModal = () => {

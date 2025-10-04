@@ -153,7 +153,7 @@ export const useCustomMutation = <
       } else if (data?.statusCode === 991 || data === "") {
         // Standard success logic
         if (successMessage) {
-          toast.success(successMessage(data));
+          toast.success(successMessage(data) ?? "Operation successful");
         }
         if (onSuccessCallback) {
           onSuccessCallback(data);

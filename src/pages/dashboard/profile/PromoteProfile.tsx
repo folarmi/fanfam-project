@@ -123,12 +123,12 @@ const PromoteProfile = () => {
           </div>
 
           <div className="flex flex-wrap justify-between mt-4 ">
-            {continents.map(({ id, name, img }) => (
+            {continents.map(({ id, name, image }) => (
               <div
                 className="border border-grey_10 rounded-lg p-[10px] m-2"
                 key={id}
               >
-                <img src={img} alt={name} />
+                <img src={image} alt={name} />
                 <Typography
                   variant="p2"
                   className="text-grey_900 w-[43px] text-center"
@@ -148,13 +148,13 @@ const PromoteProfile = () => {
           </div>
 
           <div className="mt-4">
-            {countriesSample.map(({ id, name, img }) => (
+            {countriesSample.map(({ id, name, image }) => (
               <div
                 className="m-2 flex items-center justify-between border-b border-grey_20 pb-2"
                 key={id}
               >
                 <div className="flex items-center">
-                  <img src={img} alt="name" />
+                  <img src={image} alt="name" />
                   <Typography variant="p2" className="text-grey_900 pl-2">
                     {name}
                   </Typography>

@@ -1,7 +1,8 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 type IconAndNumberProp = {
-  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  // Icon: React.ComponentType<React.SVGProps<SVGSVGElement>> ;
+  Icon: any;
   number?: number;
   numberColor?: string;
   className?: string;

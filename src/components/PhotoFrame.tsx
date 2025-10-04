@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import photoOne from "@/public/paradise.svg";
 import imageOne from "@/public/imageOne.svg";
 import imageTwo from "@/public/imageTwo.svg";
@@ -37,7 +36,7 @@ const PhotoFrame = () => {
       <div className="relative w-96 h-96 overflow-hidden">
         <div className="absolute grid grid-cols-3 grid-rows-2 gap-2 w-full h-full">
           {images[currentSetIndex].map((image, index) => (
-            <Image
+            <img
               key={index}
               src={image}
               alt={`Slide ${index + 1}`}

@@ -1,5 +1,3 @@
-import React from "react";
-
 const Comment = () => (
   <svg
     width="24"

@@ -98,7 +98,8 @@ const SubscribedCard = ({
           onClick={toggleModal}
         >
           <div className="" onClick={(e) => e.stopPropagation()}>
-            <SubscribedModal toggleModal={toggleModal} />
+            {/* <SubscribedModal toggleModal={toggleModal} /> */}
+            <SubscribedModal />
           </div>
         </div>
       )}
