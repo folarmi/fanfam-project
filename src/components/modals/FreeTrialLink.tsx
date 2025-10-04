@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomButton from "../forms/CustomButton";
 import Typography from "../forms/Typography";
 import { useForm } from "react-hook-form";

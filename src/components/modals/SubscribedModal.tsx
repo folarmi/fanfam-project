@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import Typography from "../forms/Typography";
 import verifyTwo from "@assets/icons/verifyTwo.svg";
@@ -9,7 +8,7 @@ import suggestionOne from "@/assets/suggestionOne.svg";
 import defaultAvatar from "@/assets/defaultAvatar.svg";
 import { subOptions } from "../../data";
 
-const SubscribedModal = ({ toggleModal }: any) => {
+const SubscribedModal = () => {
   const [isOptionsShown, setIsOptionsShown] = useState(false);
   const [showRenewalInfo, setShowRenewalInfo] = useState(false);
 

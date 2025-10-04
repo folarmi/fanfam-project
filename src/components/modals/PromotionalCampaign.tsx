@@ -1,4 +1,5 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Typography from "../forms/Typography";
 import Tag from "../molecules/Tag";
 import CustomSelect from "../forms/CustomSelect";

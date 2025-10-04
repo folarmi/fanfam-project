@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { type AxiosInstance } from "axios";
 // import https from "https";
 // const https = require("https");
@@ -17,8 +18,8 @@ const api: AxiosInstance = axios.create({
   // }),
 });
 
-const EAONCREDENTIALVALUE = import.meta.env.VITE_PUBLIC_EAONCREDENTIALVALUE;
-const EAONCREDENTIALKEY = import.meta.env.VITE_PUBLIC_EAONCREDENTIALKEY;
+// const EAONCREDENTIALVALUE = import.meta.env.VITE_PUBLIC_EAONCREDENTIALVALUE;
+// const EAONCREDENTIALKEY = import.meta.env.VITE_PUBLIC_EAONCREDENTIALKEY;
 
 let isRefreshing = false;
 let refreshSubscribers: Array<(token: string) => void> = [];

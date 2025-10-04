@@ -1,5 +1,3 @@
-import React from "react";
-import Typography from "../forms/Typography";
 import ModalContent from "./ModalContent";
 
 const PersonPostModal = () => {

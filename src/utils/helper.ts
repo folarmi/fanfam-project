@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UAParser } from "ua-parser-js";
 import {
@@ -85,8 +86,14 @@ export const fetchDeviceIP = async (): Promise<string> => {
   }
 };
 export const getPlatform = (): string => {
-  if ("userAgentData" in navigator && navigator.userAgentData?.platform) {
-    return navigator.userAgentData.platform;
+  if (
+    "userAgentData" in navigator &&
+    typeof navigator.userAgentData === "object" &&
+    navigator.userAgentData !== null &&
+    "platform" in navigator.userAgentData
+  ) {
+    // Type assertion to access platform safely
+    return (navigator.userAgentData as { platform: string }).platform;
   }
   // Fallback for older browsers
   return navigator.platform || "Unknown platform";

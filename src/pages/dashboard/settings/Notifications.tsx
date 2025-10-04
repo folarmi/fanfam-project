@@ -4,13 +4,13 @@ import AccountBackButton from "@/components/forms/AccountBackButton";
 import CustomSwitchButton from "@/components/forms/CustomSwitchButton";
 import Typography from "@/components/forms/Typography";
 import { notificationsSettings } from "@/data";
-import { useGetData } from "@/hooks/apiCalls";
+// import { useGetData } from "@/hooks/apiCalls";
 
 const NotificationsSettings = () => {
-  const { data: displaySettingsData, isLoading } = useGetData({
-    url: `/profile/settings/view/display`,
-    queryKey: ["ViewDisplaySettings"],
-  });
+  // const { data: displaySettingsData, isLoading } = useGetData({
+  //   url: `/profile/settings/view/display`,
+  //   queryKey: ["ViewDisplaySettings"],
+  // });
 
   return (
     <div>

@@ -71,7 +71,7 @@ const Profile = () => {
   ]);
   const [isActiveTab, setIsActiveTab] = useState("Post");
   const [commentModal, setCommentModal] = useState(false);
-  const [linkToProfileModal, setLinkToProfileModal] = useState(false);
+  // const [linkToProfileModal, setLinkToProfileModal] = useState(false);
   const [subscription] = useState(false);
   const [tipModal, setTipModal] = useState(false);
   const [addUserToList, setAddUserToList] = useState(false);
@@ -106,9 +106,9 @@ const Profile = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const toggleLinkToProfile = () => {
-    setLinkToProfileModal(!linkToProfileModal);
-  };
+  // const toggleLinkToProfile = () => {
+  //   setLinkToProfileModal(!linkToProfileModal);
+  // };
 
   const toggleAddUserToList = () => {
     setAddUserToList(!addUserToList);

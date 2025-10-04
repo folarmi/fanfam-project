@@ -2,7 +2,7 @@ import AccountBackButton from "@components/forms/AccountBackButton";
 import CustomSwitchButton from "@components/forms/CustomSwitchButton";
 import Typography from "@components/forms/Typography";
 import { privacyAndSafety, privacyAndSafetyItems } from "@/data";
-import { useGetData } from "@/hooks/apiCalls";
+// import { useGetData } from "@/hooks/apiCalls";
 import rightArrow from "@/assets/icons/rightAshArrow.svg";
 
 import { useState } from "react";
@@ -10,10 +10,10 @@ import { Link } from "react-router-dom";
 
 const Privacy = () => {
   const [checkedBox, setCheckedBox] = useState(true);
-  const { data: privacyAndSafetyData, isLoading } = useGetData({
-    url: `/profile/settings/view/privacy-safety`,
-    queryKey: ["ViewPrivacySafety"],
-  });
+  // const { data: privacyAndSafetyData, isLoading } = useGetData({
+  //   url: `/profile/settings/view/privacy-safety`,
+  //   queryKey: ["ViewPrivacySafety"],
+  // });
 
   const toggleChange = () => {
     setCheckedBox(!checkedBox);

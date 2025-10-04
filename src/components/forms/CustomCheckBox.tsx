@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 type CheckBoxProps = {
   iflabel?: boolean;

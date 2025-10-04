@@ -14,7 +14,7 @@ const GroupChatInterface = ({
   isEmpty,
   areParticipantSelected,
 }: any) => {
-  const [showModal, setShowModal] = useState(false);
+  // const [showModal, setShowModal] = useState(false);
 
   const [generalTabs] = useState([
     {
@@ -51,9 +51,9 @@ const GroupChatInterface = ({
   const [isActiveTab, setIsActiveTab] = useState("");
   const [isActiveMediaTab, setIsActiveMediaTab] = useState("All");
 
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
+  // const toggleModal = () => {
+  //   setShowModal(!showModal);
+  // };
 
   return (
     <>

@@ -1,4 +1,5 @@
-import React, { HTMLAttributes, ReactNode } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { type HTMLAttributes, type ReactNode } from "react";
 
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
   variant:

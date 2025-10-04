@@ -17,8 +17,8 @@ const CommentBox = ({
   ifRecord = true,
   setIfUserIsCreatingPoll,
 }: CommentBoxProps) => {
-  const [text, setText] = useState("");
-  const [buttonType, setButtonType] = useState("disabled");
+  // const [text, setText] = useState("");
+  // const [buttonType, setButtonType] = useState("disabled");
   const [isActive, setIsActive] = useState(false);
 
   const handleFocus = () => {

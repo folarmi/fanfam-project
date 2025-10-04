@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Typography from "../forms/Typography";
 import CustomButton from "../forms/CustomButton";
 import CollectionRadioButton from "../forms/CollectionRadioButton";

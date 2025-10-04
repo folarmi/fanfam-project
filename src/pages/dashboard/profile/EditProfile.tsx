@@ -26,7 +26,7 @@ import CustomTextBox from "../../../components/forms/CustomTextBox";
 
 const EditProfile = () => {
   const queryClient = useQueryClient();
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [, setUploadedFile] = useState<File | null>(null);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { profileDetails } = useAppSelector(
     (state: RootState) => state.profile
@@ -54,7 +54,7 @@ const EditProfile = () => {
     errorMessage: (error: any) => {
       toast.error(error.data.message);
     },
-    onSuccessCallback: (data) => {
+    onSuccessCallback: () => {
       const formValues = {
         ...getValues(),
       };
@@ -86,7 +86,7 @@ const EditProfile = () => {
     errorMessage: (error: any) => {
       toast.error(error);
     },
-    onSuccessCallback: (data) => {
+    onSuccessCallback: () => {
       queryClient.invalidateQueries({
         queryKey: ["/profile/view"],
         exact: false,

@@ -13,7 +13,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   acceptFormats,
   onFileUpload,
 }) => {
-  const [preview, setPreview] = useState<string | null>(null);
+  const [, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {

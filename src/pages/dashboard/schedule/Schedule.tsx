@@ -2,8 +2,8 @@ import { useState } from "react";
 import calendar from "../../../assets/icons/calendar.svg";
 import backArrow from "../../../assets/icons/backArrow.svg";
 import plus from "../../../assets/icons/plus.svg";
-import { useAppSelector } from "../../../lib/hook";
-import type { RootState } from "../../../lib/store";
+// import { useAppSelector } from "../../../lib/hook";
+// import type { RootState } from "../../../lib/store";
 import Typography from "../../../components/forms/Typography";
 import AddToScheduleButton from "../../../components/forms/AddToScheduleButtton";
 import Tabs from "../../../components/forms/Tabs";
@@ -45,9 +45,9 @@ const Schedule = () => {
   const [showPostModal, setShowPostModal] = useState(false);
   const [showSchedulePost, setShowSchedulePost] = useState(false);
   const [currentModal, setCurrentModal] = useState(0);
-  const { showScheduleOnMobile } = useAppSelector(
-    (state: RootState) => state.settingMobile
-  );
+  // const { showScheduleOnMobile } = useAppSelector(
+  //   (state: RootState) => state.settingMobile
+  // );
 
   const toggleModal = () => {
     setShowModal(!showModal);

@@ -18,23 +18,23 @@ type pollProps = {
 
 const Poll = ({
   pollOptions,
-  setPollOptions,
+  // setPollOptions,
   activePoll,
-  setActivePoll,
-}: pollProps) => {
+}: // setActivePoll,
+pollProps) => {
   const [isPollAnswered, setIsPollAnswered] = useState(false);
 
-  const handleDragEnd = (result: {
-    destination: { index: number };
-    source: { index: number };
-  }) => {
-    if (!result.destination) return;
-    console.log("zxcvbn");
-    const items = Array.from(pollOptions);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setPollOptions(items);
-  };
+  // const handleDragEnd = (result: {
+  //   destination: { index: number };
+  //   source: { index: number };
+  // }) => {
+  //   if (!result.destination) return;
+  //   console.log("zxcvbn");
+  //   const items = Array.from(pollOptions);
+  //   const [reorderedItem] = items.splice(result.source.index, 1);
+  //   items.splice(result.destination.index, 0, reorderedItem);
+  //   setPollOptions(items);
+  // };
   const changeIfPollIsAnswered = () => {
     setIsPollAnswered(true);
   };

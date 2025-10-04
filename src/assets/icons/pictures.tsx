@@ -1,6 +1,4 @@
-import React from "react";
-
-const Pictures = (props: any) => {
+const Pictures = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
