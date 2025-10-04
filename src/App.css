@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.custom-background {
+  background-image: url("../src/assets/signUp.svg");
+  /* Optionally, you can specify background size, position, etc. */
+  background-size: cover;
+  background-position: center;
+}
