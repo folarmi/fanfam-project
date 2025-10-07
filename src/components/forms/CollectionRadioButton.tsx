@@ -5,9 +5,9 @@ import Typography from "./Typography";
 interface CollectionRadioButtonProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
-  control: any;
-  value: string;
-  label: string;
+  control?: any;
+  value?: string;
+  label?: string;
   rules?: UseControllerProps["rules"];
   className?: string;
 }

@@ -10,11 +10,11 @@ const ReportUser = ({ toggleModal }: any) => {
         Report user
       </Typography>
 
-      <CollectionRadioButton label="Violates FanFam Terms of Service" />
-      <CollectionRadioButton label="Contains copyrighted material" />
-      <CollectionRadioButton label="Child Sexual Abuse Material" />
-      <CollectionRadioButton label="Report Spam" />
-      <CollectionRadioButton label="Report Abuse" />
+      <CollectionRadioButton name="" label="Violates FanFam Terms of Service" />
+      <CollectionRadioButton name="" label="Contains copyrighted material" />
+      <CollectionRadioButton name="" label="Child Sexual Abuse Material" />
+      <CollectionRadioButton name="" label="Report Spam" />
+      <CollectionRadioButton name="" label="Report Abuse" />
 
       <div className="ml-[128px] flex items-center mb-6 mt-8">
         <CustomButton

@@ -30,8 +30,7 @@ const AccountSettings = () => {
       enabled: !!userObject.email, // Only run if user data exists
     });
   };
-  const { data, isLoading } = useFetchAccountSettings(userObject);
-
+  const { isLoading } = useFetchAccountSettings(userObject);
   return (
     <>
       {isLoading ? (

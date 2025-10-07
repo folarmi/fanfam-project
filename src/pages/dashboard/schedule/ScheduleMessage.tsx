@@ -49,7 +49,7 @@ const ScheduleMessage = ({
                 </div>
               </div>
 
-              <CollectionRadioButton />
+              <CollectionRadioButton name="" />
             </div>
           );
         })}

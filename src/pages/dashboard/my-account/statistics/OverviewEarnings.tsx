@@ -41,7 +41,7 @@ const OverviewEarnings = () => {
               className="flex items-center py-2 justify-between border-b border-grey_10"
             >
               <div className="flex items-center min-w-[110px]">
-                <CollectionRadioButton />
+                <CollectionRadioButton name="" />
                 <Typography variant="p2" className="text-grey_600">
                   {earningsType}
                 </Typography>
