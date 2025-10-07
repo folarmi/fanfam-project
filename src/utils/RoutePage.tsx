@@ -60,7 +60,7 @@ const RoutePage = () => {
         <Route element={<DashboardLayout />}>
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="edit-profile" element={<EditProfile />} />
+          <Route path="profile/edit-profile" element={<EditProfile />} />
           <Route path="promote-profile" element={<PromoteProfile />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>

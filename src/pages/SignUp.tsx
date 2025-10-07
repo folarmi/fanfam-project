@@ -17,6 +17,7 @@ import {
 import { phoneRegex } from "../utils/helper";
 import { useCustomMutation } from "../hooks/apiCalls";
 import { Link, useNavigate } from "react-router-dom";
+import { UserRole } from "@/data";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const Signup = () => {
   const signUpMutation = useCustomMutation({
     endpoint: "auth/register",
     successMessage: (data: any) => data?.data?.message,
-    errorMessage: (error: any) => error,
+    // errorMessage: (error: any) => error,
     onSuccessCallback: (data) => {
       toast("Kindly check your email for a verification link");
       dispatch(updateUserEmail(data?.data?.email));
@@ -40,7 +41,7 @@ const Signup = () => {
       email: data?.email,
       password: data?.password,
       phoneNumber: data?.phoneNumber,
-      role: "CREATOR",
+      role: UserRole.viewer,
     };
     signUpMutation.mutate(formValues);
   };

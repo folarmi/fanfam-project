@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 // import api from "../lib/axios";
@@ -9,6 +10,7 @@ import Typography from "../components/forms/Typography";
 import { useAppSelector } from "../lib/hook";
 // import { useMutation } from "@tanstack/react-query";
 import type { RootState } from "../lib/store";
+import withAuth from "@/hoc/withAuth";
 
 const DashboardLayout = () => {
   // const navigate = useNavigate();
@@ -71,5 +73,4 @@ const DashboardLayout = () => {
   );
 };
 
-// export default withAuth(DashboardLayout);
-export default DashboardLayout;
+export default withAuth(DashboardLayout);

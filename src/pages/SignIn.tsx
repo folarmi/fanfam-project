@@ -12,7 +12,6 @@ import {
 } from "../utils/helper";
 import { useEffect, useState } from "react";
 import { useCustomMutation } from "../hooks/apiCalls";
-import { toast } from "react-toastify";
 import { updateUserObject } from "../lib/features/auth/authSlice";
 import AuthLayout from "../layouts/AuthLayout";
 import CustomInput from "../components/forms/CustomInput";
@@ -50,9 +49,6 @@ const SignIn = () => {
   const signInMutation = useCustomMutation({
     endpoint: `auth/login`,
     successMessage: (data: any) => data?.message,
-    errorMessage: (error: any) => {
-      toast.error(error);
-    },
     onSuccessCallback: (data) => {
       const userObject = {
         email: data?.data?.email,

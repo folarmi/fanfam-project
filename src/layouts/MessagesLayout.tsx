@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+import withAuth from "@/hoc/withAuth";
 import Sidebar from "../components/molecules/Sidebar";
 // import withAuth from "../hoc/withAuth";
 import { Outlet } from "react-router-dom";
@@ -13,5 +15,4 @@ const MessagesLayout = () => {
   );
 };
 
-// export default withAuth(MessagesLayout);
-export default MessagesLayout;
+export default withAuth(MessagesLayout);

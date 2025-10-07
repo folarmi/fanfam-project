@@ -13,8 +13,6 @@ const EmailSent = () => {
     (state: RootState) => state.auth
   );
 
-  console.log(userEmail);
-
   const resendVerificationLinkMutation = useCustomMutation({
     endpoint: `auth/resend-verification-link?email=${userEmail}`,
     successMessage: (data: any) => data?.message,

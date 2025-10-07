@@ -5,11 +5,9 @@ import { useForm } from "react-hook-form";
 import CustomButton from "../components/forms/CustomButton";
 import AuthLayout from "../layouts/AuthLayout";
 import Typography from "../components/forms/Typography";
-import { useMutation } from "@tanstack/react-query";
-import api from "../lib/axios";
-import { toast } from "react-toastify";
 import { handleCopy, handleCut, handlePaste } from "../utils/helper";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useCustomMutation } from "@/hooks/apiCalls";
 
 const ResetPassword = () => {
   //   const navigate = useNavigate();
@@ -27,28 +25,40 @@ const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams(); // Extracted to be inside Suspense
   const { control, handleSubmit, getValues } = useForm();
 
-  const resetPasswordMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await api.post(
-        `auth/reset-password?mafanf=${searchParams.get(
-          "mafanf"
-        )}&fanfam=${searchParams.get("fanfam")}`,
-        data
-      );
-      return response;
-    },
-    onSuccess: (data) => {
-      if (data?.data?.statusCode === 991) {
-        localStorage.setItem("token", data?.data?.data?.accessToken);
-        localStorage.setItem("refreshToken", data?.data?.data?.refreshToken);
-        navigate("/dashboard");
-      } else if (data?.data?.statusCode === -991) {
-        toast.error(data?.data?.message);
-      }
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.data?.message);
-      console.log(error);
+  // const resetPasswordMutation = useMutation({
+  //   mutationFn: async (data: any) => {
+  //     const response = await api.post(
+  // `auth/reset-password?mafanf=${searchParams.get(
+  //   "mafanf"
+  // )}&fanfam=${searchParams.get("fanfam")}`,
+  //       data
+  //     );
+  //     return response;
+  //   },
+  //   onSuccess: (data) => {
+  //     if (data?.data?.statusCode === 991) {
+  // localStorage.setItem("token", data?.data?.data?.accessToken);
+  // localStorage.setItem("refreshToken", data?.data?.data?.refreshToken);
+  // navigate("/dashboard");
+  //     } else if (data?.data?.statusCode === -991) {
+  //       toast.error(data?.data?.message);
+  //     }
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error?.response?.data?.data?.message);
+  //     console.log(error);
+  //   },
+  // });
+
+  const resetPasswordMutation = useCustomMutation({
+    endpoint: `auth/reset-password?mafanf=${searchParams.get(
+      "mafanf"
+    )}&fanfam=${searchParams.get("fanfam")}`,
+    successMessage: (data: any) => data?.message,
+    onSuccessCallback: (data) => {
+      localStorage.setItem("token", data?.data?.data?.accessToken);
+      localStorage.setItem("refreshToken", data?.data?.data?.refreshToken);
+      navigate("/dashboard");
     },
   });
 

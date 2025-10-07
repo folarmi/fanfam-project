@@ -66,7 +66,6 @@ const VerifyEmailForm = () => {
       "mafanf"
     )}&fanfam=${searchParams.get("fanfam")}`,
     successMessage: (data: any) => data?.message,
-    errorMessage: (error: any) => error,
     onSuccessCallback: (data) => {
       localStorage.setItem("token", data?.data?.accessToken);
       localStorage.setItem("refreshToken", data?.data?.refreshToken);

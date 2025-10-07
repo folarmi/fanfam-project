@@ -40,6 +40,7 @@ import copy from "../../../assets/copy.svg";
 import defaultAvatar from "../../../assets/defaultAvatar.svg";
 import verifyBlue from "../../../assets/icons/verifyBlue.svg";
 import blueGift from "../../../assets/icons/blueGift.svg";
+import { Loader } from "@/components/molecules/Loader";
 
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -93,7 +94,6 @@ const Profile = () => {
       usid: userObject.usid,
     });
   }, []);
-
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -126,11 +126,9 @@ const Profile = () => {
   };
 
   return (
-    // {getUserProfileUserMutation.isPending ? "" : <>
-    //   </>}
     <>
-      {!getUserProfileUserMutation.isPending ? (
-        <p>Loading....</p>
+      {getUserProfileUserMutation.isPending ? (
+        <Loader />
       ) : (
         <div>
           <SearchInput ifBlur={false} />

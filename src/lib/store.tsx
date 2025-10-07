@@ -1,8 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
-import rootReducer from "./reducers"; // Assuming you have a `reducers` file
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistStore,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+} from "redux-persist";
+import rootReducer from "./reducers";
 import storage from "redux-persist/lib/storage";
 import persistReducer from "redux-persist/es/persistReducer";
-import { persistStore } from "redux-persist";
 
 // Persist configuration
 const persistConfig = {
@@ -16,17 +24,34 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // Create a single store instance
-const store = configureStore({
-  reducer: persistedReducer,
-});
+// const store = configureStore({
+//   reducer: persistedReducer,
+// });
 
-// Create a single persistor instance
-export const persistor = persistStore(store);
+// // Create a single persistor instance
+// export const persistor = persistStore(store);
 
-// Export the store
-export default store;
+// // Export the store
+// export default store;
+
+export const makeStore = () => {
+  const store = configureStore({
+    reducer: persistedReducer,
+    devTools: import.meta.env.MODE === "development",
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
+  });
+
+  const persistor = persistStore(store);
+
+  return { store, persistor };
+};
 
 // Define and export the store type
-export type AppStore = typeof store; // Add this to define the store type
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type AppStore = ReturnType<typeof makeStore>["store"];
+export type RootState = ReturnType<AppStore["getState"]>;
+export type AppDispatch = AppStore["dispatch"];

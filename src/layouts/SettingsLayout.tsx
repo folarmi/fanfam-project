@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { settingsModule } from "@/data";
 import { useState } from "react";
 import Typography from "@components/forms/Typography";
@@ -8,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { updateShowOnMobile } from "@/lib/features/mobileView/settingMobileViewSlice";
 import type { RootState } from "@/lib/store";
 import { Link, Outlet } from "react-router-dom";
+import withAuth from "@/hoc/withAuth";
 
 const SettingLayout = () => {
   const dispatch = useDispatch();
@@ -70,5 +72,4 @@ const SettingLayout = () => {
   );
 };
 
-// export default withAuth(SettingLayout);
-export default SettingLayout;
+export default withAuth(SettingLayout);

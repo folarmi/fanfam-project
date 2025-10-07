@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import editIcon from "../../../assets/icons/editIcon.svg";
+// import editIcon from "../../../assets/icons/editIcon.svg";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from "../../../lib/hook";
 import type { RootState } from "../../../lib/store";
@@ -10,23 +10,19 @@ import { toast } from "react-toastify";
 import CustomFileUploader from "../../../components/forms/CustomFileUploader";
 import Typography from "../../../components/forms/Typography";
 import CustomInput from "../../../components/forms/CustomInput";
-import moreIcon from "../../../assets/icons/moreIcon.svg";
+// import moreIcon from "../../../assets/icons/moreIcon.svg";
 import CustomTextBox from "../../../components/forms/CustomTextBox";
-// import Image from "next/image";
-// import CustomInput from "@/app/components/forms/CustomInput";
-// import { useForm } from "react-hook-form";
-// import CustomTextBox from "@/app/components/forms/CustomTextBox";
-// import Typography from "@/app/components/forms/Typography";
-// import { useAppSelector } from "@/app/lib/hook";
-// import { RootState } from "@/app/lib/store";
-// import { useCustomMutation } from "@/app/hooks/apiCalls";
-// import { toast } from "react-toastify";
-// import { useQueryClient } from "@tanstack/react-query";
-// import CustomFileUploader from "@/app/components/forms/CustomFileUploader";
+import { Camera, MoreVertical } from "lucide-react";
 
 const EditProfile = () => {
   const queryClient = useQueryClient();
   const [, setUploadedFile] = useState<File | null>(null);
+  const [bannerImage] = useState(
+    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=400&fit=crop"
+  );
+  const [profileImage] = useState(
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
+  );
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { profileDetails } = useAppSelector(
     (state: RootState) => state.profile
@@ -66,10 +62,10 @@ const EditProfile = () => {
     endpoint: `profile/upload-picture`,
     contentType: "multipart/form-data",
     successMessage: (data: any) => data?.message,
-    errorMessage: (error: any) => {
-      toast.error(error.data.error);
-      console.log(error);
-    },
+    // errorMessage: (error: any) => {
+    //   toast.error(error.data.error);
+    //   console.log(error);
+    // },
     onSuccessCallback: (data) => {
       console.log(data);
       const formValues = {
@@ -83,9 +79,9 @@ const EditProfile = () => {
     endpoint: `profile/update-user`,
     method: "put",
     successMessage: (data: any) => data?.message,
-    errorMessage: (error: any) => {
-      toast.error(error);
-    },
+    // errorMessage: (error: any) => {
+    //   toast.error(error);
+    // },
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
         queryKey: ["/profile/view"],
@@ -99,36 +95,30 @@ const EditProfile = () => {
       email: getValues().email,
       username: getValues().username,
     };
+    // console.log(userNameFormValues);
     setUsernameMutation.mutate(userNameFormValues);
   };
 
   return (
     <div className="mb-2">
-      <div className=" relative">
+      {/* <div className=" relative">
         <div className="relative w-full h-[174px]">
-          {" "}
-          {/* Parent container with fixed height */}
-          <img
-            src={profileDetails?.profilePic}
-            alt="demo"
-            style={{ objectFit: "contain" }}
-          />
+          <img src={profileDetails?.profilePic} alt="demo" />
         </div>
         <div className="absolute inset-0 flex items-center justify-center">
           <img src={editIcon} alt="demo" className="w-6 h-6" />
         </div>
-      </div>
+      </div> */}
 
-      <div className="relative flex items-center justify-between px-4 bg-grey_20 drop-shadow-4xl cursor-pointer">
+      {/* <div className="relative flex items-center justify-between px-4 bg-grey_20 drop-shadow-4xl cursor-pointer">
         <CustomFileUploader
           maxSizeMB={1}
           acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
           onFileUpload={handleFileUpload}
-          // defaultFile={selectedState?.image}
         />
-        {/* <div className="absolute inset-0 flex items-center justify-start mx-14">
-          <Image src={editIcon} alt="demo" className="w-6 h-6" />
-        </div> */}
+        <div className="absolute inset-0 flex items-center justify-start mx-14">
+          <img src={editIcon} alt="demo" className="w-6 h-6" />
+        </div>
         <button
           className="flex items-center cursor-pointer z-10"
           disabled={setUsernameMutation.isPending}
@@ -137,16 +127,9 @@ const EditProfile = () => {
             onClick={() => submitForm()}
             className="border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white cursor-pointer"
           >
-            {/* <Typography
-              variant="subtitle3"
-              className="text-blue_500 cursor-pointer"
-            >
-              Save profile
-            </Typography> */}
             {setUsernameMutation.isPending ||
             uploadPictureMutation.isPending ? (
               <div className="flex items-center">
-                {/* Loader */}
                 <span className="loader mr-2"></span>
                 <Typography
                   variant="subtitle3"
@@ -172,6 +155,201 @@ const EditProfile = () => {
             loading="lazy"
           />
         </button>
+      </div> */}
+      {/* End of one */}
+
+      {/* <div className="max-w-4xl mx-auto bg-white">
+        <div className="relative">
+          <div className="relative w-full h-[174px] overflow-hidden">
+            <img
+              src={bannerImage}
+              alt="Banner"
+              className="w-full h-full object-cover"
+            />
+
+            <label
+              htmlFor="banner-upload"
+              className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <div className="bg-white/90 rounded-full p-3 backdrop-blur-sm">
+                <Camera className="w-6 h-6 text-gray-700" />
+              </div>
+              <input
+                id="banner-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                // onChange={handleBannerUpload}
+              />
+            </label>
+          </div>
+
+     
+          <div className="absolute -bottom-16 left-6">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+      
+              <label
+                htmlFor="profile-upload"
+                className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
+              >
+                <div className="bg-white/90 rounded-full p-2 backdrop-blur-sm">
+                  <Camera className="w-5 h-5 text-gray-700" />
+                </div>
+                <input
+                  id="profile-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  // onChange={handleProfileUpload}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+
+ 
+        <div className="flex items-center justify-end px-6 py-4 mt-16 bg-gray-50 border-b">
+          <div className="flex items-center gap-3">
+            <button
+              // onClick={handleSave}
+              // disabled={isLoading}
+              className="px-6 py-2 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-500 text-blue-600 rounded-full font-medium hover:from-blue-100 hover:to-blue-200 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {setUsernameMutation.isPending ||
+              uploadPictureMutation.isPending ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Saving...</span>
+                </>
+              ) : (
+                "Save profile"
+              )}
+            </button>
+
+            <button className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+              <MoreVertical className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
+      </div> */}
+
+      <div className="max-w-4xl mx-auto bg-white">
+        {/* Banner Section */}
+        <div className="relative">
+          <div className="relative w-full h-[174px] overflow-hidden bg-gray-200">
+            <img
+              src={bannerImage}
+              alt="Banner"
+              className="w-full h-full object-cover"
+            />
+
+            {/* Banner Edit Overlay with CustomFileUploader */}
+            <CustomFileUploader
+              maxSizeMB={5}
+              acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
+              onFileUpload={handleFileUpload}
+              defaultFile={bannerImage}
+              showPreview={false}
+              renderTrigger={(onClick) => (
+                <div
+                  onClick={onClick}
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <div className="bg-white/90 rounded-full p-3 backdrop-blur-sm">
+                    <Camera className="w-6 h-6 text-gray-700" />
+                  </div>
+                </div>
+              )}
+            />
+          </div>
+
+          {/* Profile Picture - Overlapping Banner */}
+          <div className="absolute -bottom-16 left-6">
+            <div className="relative w-32 h-32">
+              {/* Profile Image Display */}
+              <div className="w-full h-full rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
+                <img
+                  src={profileDetails?.profilePic}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Profile Picture Edit Overlay with CustomFileUploader */}
+              <CustomFileUploader
+                maxSizeMB={1}
+                acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
+                onFileUpload={handleFileUpload}
+                defaultFile={profileImage}
+                showPreview={false}
+                renderTrigger={(onClick) => (
+                  <div
+                    onClick={onClick}
+                    className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
+                  >
+                    <div className="bg-white/90 rounded-full p-2 backdrop-blur-sm">
+                      <Camera className="w-5 h-5 text-gray-700" />
+                    </div>
+                  </div>
+                )}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Action Bar */}
+        <div className="flex items-center justify-end px-6 py-4 bg-gray-50 border-b">
+          <div className="flex items-center gap-3">
+            <button
+              className="flex items-center cursor-pointer z-10"
+              disabled={setUsernameMutation.isPending}
+            >
+              <div
+                onClick={() => submitForm()}
+                className="border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white cursor-pointer"
+              >
+                {setUsernameMutation.isPending ||
+                uploadPictureMutation.isPending ? (
+                  <div className="flex items-center">
+                    <span className="loader mr-2"></span>
+                    <Typography
+                      variant="subtitle3"
+                      className="text-blue_500 cursor-not-allowed"
+                    >
+                      Saving...
+                    </Typography>
+                  </div>
+                ) : (
+                  <Typography
+                    variant="subtitle3"
+                    className="text-blue_500 cursor-pointer"
+                  >
+                    Save profile
+                  </Typography>
+                )}
+              </div>
+
+              {/* <img
+                src={moreIcon}
+                alt="horizontalMore"
+                className="cursor-pointer"
+                loading="lazy"
+              /> */}
+            </button>
+
+            <button className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+              <MoreVertical className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
       </div>
 
       <form className="bg-grey_20 drop-shadow-4xl pt-8 px-4 pb-[61px]">
@@ -193,7 +371,7 @@ const EditProfile = () => {
           label="User name"
           name="username"
           control={control}
-          readOnly
+          // readOnly
           // rules={{ required: "Password is required" }}
         />
 

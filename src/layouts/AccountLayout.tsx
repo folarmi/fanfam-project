@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useState } from "react";
 import rightAshArrow from "../assets/icons/rightAshArrow.svg";
 import { Link, Outlet } from "react-router-dom";
@@ -7,6 +8,7 @@ import { updateAccountShowOnMobile } from "../lib/features/mobileView/settingMob
 import { subscriptionMenu, UserRole } from "../data";
 import Sidebar from "../components/molecules/Sidebar";
 import Typography from "../components/forms/Typography";
+import withAuth from "@/hoc/withAuth";
 
 const AccountLayout = () => {
   const dispatch = useAppDispatch();
@@ -86,5 +88,4 @@ const AccountLayout = () => {
   );
 };
 
-// export default withAuth(SubscriptionLayout);
-export default AccountLayout;
+export default withAuth(AccountLayout);
