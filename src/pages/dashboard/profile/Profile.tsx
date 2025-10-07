@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useForm } from "react-hook-form";
@@ -80,8 +79,8 @@ const Profile = () => {
 
   const getUserProfileUserMutation = useCustomMutation({
     endpoint: `/profile/view`,
-    successMessage: (data: any) => data?.message,
-    errorMessage: (error: any) => error,
+    // successMessage: (data: any) => data?.message,
+    // errorMessage: (error: any) => error,
     onSuccessCallback: (data) => {
       dispatch(updateProfileObject(data?.data));
     },

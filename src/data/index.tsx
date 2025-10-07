@@ -50,6 +50,7 @@ import videoEmoji from "../assets/icons/videoEmoji.svg";
 import blurEmoji from "../assets/icons/blurEmoji.svg";
 import galleryEmoji from "../assets/icons/galleryEmoji.svg";
 import { SettingsIcon } from "../components/svgs/Settings";
+import type { DisplayObject } from "@/lib/types";
 // import { UserRoleType } from "../lib/types";
 
 export const sideBarItems = [
@@ -590,42 +591,62 @@ export const notificationsSettings = [
   },
 ];
 
-export const displaySettings = [
-  {
-    groupName: "Language",
-    items: [
-      {
-        id: 1,
-        name: "English",
-      },
-      {
-        id: 2,
-        name: "French",
-      },
-      {
-        id: 3,
-        name: "Spanish",
-      },
-    ],
-  },
-  {
-    groupName: "Theme",
-    items: [
-      {
-        id: 1,
-        name: "Light",
-      },
-      {
-        id: 2,
-        name: "Dark",
-      },
-      {
-        id: 3,
-        name: "System",
-      },
-    ],
-  },
-];
+export function transformDisplaySettings(settings: DisplayObject) {
+  return [
+    {
+      groupName: "Language",
+      items: [
+        {
+          id: 1,
+          name: "English",
+          value: settings.englishLanguage,
+        },
+        {
+          id: 2,
+          name: "French",
+          value: settings.frenchLanguage,
+        },
+        {
+          id: 3,
+          name: "Spanish",
+          value: settings.spanishLanguage,
+        },
+      ],
+    },
+    {
+      groupName: "Theme",
+      items: [
+        {
+          id: 1,
+          name: "Light",
+          value: settings.lightTheme,
+        },
+        {
+          id: 2,
+          name: "Dark",
+          value: settings.darkTheme,
+        },
+        {
+          id: 3,
+          name: "System",
+          value: settings.systemTheme,
+        },
+      ],
+    },
+  ];
+}
+
+export function extractDefaults(data: DisplayObject) {
+  let theme = "Light";
+  if (data.darkTheme) theme = "Dark";
+  else if (data.systemTheme) theme = "System";
+
+  let language = "English";
+  if (data.frenchLanguage) language = "French";
+  else if (data.spanishLanguage) language = "Spanish";
+
+  return { Theme: theme, Language: language };
+}
 
 export const subscriptionSettings = [
   {

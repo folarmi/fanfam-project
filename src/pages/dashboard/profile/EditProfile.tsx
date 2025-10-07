@@ -101,146 +101,6 @@ const EditProfile = () => {
 
   return (
     <div className="mb-2">
-      {/* <div className=" relative">
-        <div className="relative w-full h-[174px]">
-          <img src={profileDetails?.profilePic} alt="demo" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <img src={editIcon} alt="demo" className="w-6 h-6" />
-        </div>
-      </div> */}
-
-      {/* <div className="relative flex items-center justify-between px-4 bg-grey_20 drop-shadow-4xl cursor-pointer">
-        <CustomFileUploader
-          maxSizeMB={1}
-          acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
-          onFileUpload={handleFileUpload}
-        />
-        <div className="absolute inset-0 flex items-center justify-start mx-14">
-          <img src={editIcon} alt="demo" className="w-6 h-6" />
-        </div>
-        <button
-          className="flex items-center cursor-pointer z-10"
-          disabled={setUsernameMutation.isPending}
-        >
-          <div
-            onClick={() => submitForm()}
-            className="border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white cursor-pointer"
-          >
-            {setUsernameMutation.isPending ||
-            uploadPictureMutation.isPending ? (
-              <div className="flex items-center">
-                <span className="loader mr-2"></span>
-                <Typography
-                  variant="subtitle3"
-                  className="text-blue_500 cursor-not-allowed"
-                >
-                  Saving...
-                </Typography>
-              </div>
-            ) : (
-              <Typography
-                variant="subtitle3"
-                className="text-blue_500 cursor-pointer"
-              >
-                Save profile
-              </Typography>
-            )}
-          </div>
-
-          <img
-            src={moreIcon}
-            alt="horizontalMore"
-            className="cursor-pointer"
-            loading="lazy"
-          />
-        </button>
-      </div> */}
-      {/* End of one */}
-
-      {/* <div className="max-w-4xl mx-auto bg-white">
-        <div className="relative">
-          <div className="relative w-full h-[174px] overflow-hidden">
-            <img
-              src={bannerImage}
-              alt="Banner"
-              className="w-full h-full object-cover"
-            />
-
-            <label
-              htmlFor="banner-upload"
-              className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
-            >
-              <div className="bg-white/90 rounded-full p-3 backdrop-blur-sm">
-                <Camera className="w-6 h-6 text-gray-700" />
-              </div>
-              <input
-                id="banner-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                // onChange={handleBannerUpload}
-              />
-            </label>
-          </div>
-
-     
-          <div className="absolute -bottom-16 left-6">
-            <div className="relative">
-              <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
-                <img
-                  src={profileImage}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-      
-              <label
-                htmlFor="profile-upload"
-                className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
-              >
-                <div className="bg-white/90 rounded-full p-2 backdrop-blur-sm">
-                  <Camera className="w-5 h-5 text-gray-700" />
-                </div>
-                <input
-                  id="profile-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  // onChange={handleProfileUpload}
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-
- 
-        <div className="flex items-center justify-end px-6 py-4 mt-16 bg-gray-50 border-b">
-          <div className="flex items-center gap-3">
-            <button
-              // onClick={handleSave}
-              // disabled={isLoading}
-              className="px-6 py-2 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-500 text-blue-600 rounded-full font-medium hover:from-blue-100 hover:to-blue-200 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {setUsernameMutation.isPending ||
-              uploadPictureMutation.isPending ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Saving...</span>
-                </>
-              ) : (
-                "Save profile"
-              )}
-            </button>
-
-            <button className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-              <MoreVertical className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
-        </div>
-      </div> */}
-
       <div className="max-w-4xl mx-auto bg-white">
         {/* Banner Section */}
         <div className="relative">
@@ -306,7 +166,7 @@ const EditProfile = () => {
         </div>
 
         {/* Action Bar */}
-        <div className="flex items-center justify-end px-6 py-4 bg-gray-50 border-b">
+        <div className="flex items-center justify-end px-6 py-8 bg-gray-50 border-b">
           <div className="flex items-center gap-3">
             <button
               className="flex items-center cursor-pointer z-10"
@@ -336,23 +196,16 @@ const EditProfile = () => {
                   </Typography>
                 )}
               </div>
-
-              {/* <img
-                src={moreIcon}
-                alt="horizontalMore"
-                className="cursor-pointer"
-                loading="lazy"
-              /> */}
             </button>
 
             <button className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-              <MoreVertical className="w-5 h-5 text-gray-600" />
+              <MoreVertical className="w-6 h-6 text-gray-600" />
             </button>
           </div>
         </div>
       </div>
 
-      <form className="bg-grey_20 drop-shadow-4xl pt-8 px-4 pb-[61px]">
+      <form className="bg-grey_20 drop-shadow-4xl pt-8 px-4 pb-[61px] mt-3">
         <CustomInput
           label="Full Name"
           name="fullName"
