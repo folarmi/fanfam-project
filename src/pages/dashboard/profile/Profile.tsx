@@ -40,7 +40,7 @@ import { useFetchProfile } from "@/hooks/apiHooks";
 // testUserNamed
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
-  const { data, isLoading, error } = useFetchProfile(userObject);
+  const { data, isLoading } = useFetchProfile(userObject);
 
   console.log(data);
 

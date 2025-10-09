@@ -44,10 +44,10 @@ const Privacy = () => {
     const theme = formData.Theme?.toUpperCase();
     const language = formData.Language?.toUpperCase();
 
-    const modifiedFormData = {
-      theme,
-      language,
-    };
+    // const modifiedFormData = {
+    //   theme,
+    //   language,
+    // };
 
     updateNotificationsMutation.mutate({
       body: {
