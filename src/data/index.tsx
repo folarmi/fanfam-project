@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import profile from "../assets/icons/profile.svg";
 import defaultAvatar from "../assets/defaultAvatar.svg";
 import defaultAvatarTwo from "../assets/icons/defaultAvatarTwo.svg";
@@ -50,7 +51,11 @@ import videoEmoji from "../assets/icons/videoEmoji.svg";
 import blurEmoji from "../assets/icons/blurEmoji.svg";
 import galleryEmoji from "../assets/icons/galleryEmoji.svg";
 import { SettingsIcon } from "../components/svgs/Settings";
-import type { DisplayObject } from "@/lib/types";
+import type {
+  DisplayObject,
+  NotificationObject,
+  PrivacyAndSafetyData,
+} from "@/lib/types";
 // import { UserRoleType } from "../lib/types";
 
 export const sideBarItems = [
@@ -573,23 +578,31 @@ export const sampleTwoFactor = [
   },
 ];
 
-export const notificationsSettings = [
+const notificationDescriptions: Record<string, { name: string; desc: string }> =
   {
-    id: 1,
-    name: "Push notifications",
-    desc: "Get push notifications to find out what’s going on when you’re not on OnlyFans. You can turn them off anytime.",
-  },
-  {
-    id: 2,
-    name: "Mentions",
-    desc: "When OFF you will be notified when a friend mentions you",
-  },
-  {
-    id: 3,
-    name: "Email notification",
-    desc: "Get emails to find out what’s going on when you’re not on OnlyFans. You can turn them off anytime.",
-  },
-];
+    email: {
+      name: "Email notification",
+      desc: "Get emails to find out what’s going on when you’re not on Fanfam. You can turn them off anytime.",
+    },
+    inAppNotification: {
+      name: "Push notifications",
+      desc: "Get push notifications to find out what’s going on when you’re not on Fanfam. You can turn them off anytime.",
+    },
+    mentioned: {
+      name: "Mentions",
+      desc: "When ON you will be notified when a friend mentions you.",
+    },
+  };
+
+export const buildNotificationSettings = (settings: NotificationObject) => {
+  return Object.entries(settings).map(([key, value], index) => ({
+    id: index + 1,
+    key,
+    name: notificationDescriptions[key]?.name ?? key,
+    desc: notificationDescriptions[key]?.desc ?? "",
+    value, // taken directly from the input object
+  }));
+};
 
 export function transformDisplaySettings(settings: DisplayObject) {
   return [
@@ -647,6 +660,28 @@ export function extractDefaults(data: DisplayObject) {
 
   return { Theme: theme, Language: language };
 }
+
+// utils/formDefaults.ts
+export const buildFormDefaults = (data: Record<string, any>) => {
+  const defaults: Record<string, boolean> = {};
+
+  const traverse = (obj: Record<string, any>) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (typeof value === "boolean") {
+        defaults[key] = value;
+      } else if (
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        value !== null
+      ) {
+        traverse(value); // go deeper for nested objects
+      }
+    });
+  };
+
+  traverse(data);
+  return defaults;
+};
 
 export const subscriptionSettings = [
   {
@@ -727,6 +762,55 @@ export const subBundles = [
     duration: "6 months",
   },
 ];
+
+const labels = {
+  profile: {
+    activityStatus: "Show activity status",
+    fansCountOnProfile: "Show fans count on profile",
+    mediaCountOnYourProfile: "Show media count on your profile",
+    friendsList: "Public friends list",
+    password: "Password",
+  },
+  discoverability: {
+    optOutOfSuggestion: "Opt out of suggestions",
+  },
+  post: {
+    posts: "Enable posts",
+    allowCommentsFromSubscribers:
+      "Allow comments only from subscribers who spent $1 or more",
+    postTipsSum: "Show post tips sum",
+  },
+  watermark: {
+    pictures: "Pictures",
+    videos: "Videos",
+  },
+};
+
+const groupDisplayNames: Record<keyof PrivacyAndSafetyData, string> = {
+  profile: "Profile",
+  discoverability: "Discoverability",
+  post: "Posts",
+  watermark: "Watermarks",
+  safety: "Safety",
+  drmVideoProtection: "DRM Video Protection",
+};
+
+export const buildPrivacyAndSafetyItems = (data: PrivacyAndSafetyData) => {
+  // Filter only the keys we care about (boolean or object of booleans)
+  return (Object?.keys(data) as (keyof PrivacyAndSafetyData)[])
+    ?.filter((section) => typeof data[section] === "object")
+    ?.map((section) => ({
+      groupName: groupDisplayNames[section],
+      items: Object.entries(data[section] as Record<string, any>)
+        ?.filter(([, value]) => typeof value === "boolean")
+        ?.map(([key, value], index) => ({
+          id: index + 1,
+          key,
+          name: (labels as Partial<Record<string, any>>)[section]?.[key] ?? key,
+          isOn: value,
+        })),
+    }));
+};
 
 export const privacyAndSafetyItems = [
   {

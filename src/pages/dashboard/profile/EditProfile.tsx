@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import CustomFileUploader from "../../../components/forms/CustomFileUploader";
 import Typography from "../../../components/forms/Typography";
 import CustomInput from "../../../components/forms/CustomInput";
-// import moreIcon from "../../../assets/icons/moreIcon.svg";
+import { useDebouncedCallback } from "use-debounce";
 import CustomTextBox from "../../../components/forms/CustomTextBox";
 import { Camera, MoreVertical } from "lucide-react";
 
@@ -46,28 +46,19 @@ const EditProfile = () => {
 
   const setUsernameMutation = useCustomMutation({
     endpoint: `auth/set-username`,
-    successMessage: (data: any) => data?.message,
+    successMessage: () => "Username set successfully",
     errorMessage: (error: any) => {
       toast.error(error.data.message);
     },
-    onSuccessCallback: () => {
-      const formValues = {
-        ...getValues(),
-      };
-      updateCreatorProfileMutation.mutate(formValues);
-    },
+    // onSuccessCallback: () => {
+    // },
   });
 
   const uploadPictureMutation = useCustomMutation({
     endpoint: `profile/upload-picture`,
     contentType: "multipart/form-data",
     successMessage: (data: any) => data?.message,
-    // errorMessage: (error: any) => {
-    //   toast.error(error.data.error);
-    //   console.log(error);
-    // },
-    onSuccessCallback: (data) => {
-      console.log(data);
+    onSuccessCallback: () => {
       const formValues = {
         ...getValues(),
       };
@@ -79,9 +70,6 @@ const EditProfile = () => {
     endpoint: `profile/update-user`,
     method: "put",
     successMessage: (data: any) => data?.message,
-    // errorMessage: (error: any) => {
-    //   toast.error(error);
-    // },
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
         queryKey: ["/profile/view"],
@@ -91,13 +79,23 @@ const EditProfile = () => {
   });
 
   const submitForm = () => {
-    const userNameFormValues = {
-      email: getValues().email,
-      username: getValues().username,
+    // const userNameFormValues = {
+    //   email: getValues().email,
+    //   username: getValues().username,
+    // };
+
+    const formValues = {
+      ...getValues(),
     };
     // console.log(userNameFormValues);
-    setUsernameMutation.mutate(userNameFormValues);
+    // setUsernameMutation.mutate(userNameFormValues);
+    updateCreatorProfileMutation.mutate(formValues);
   };
+
+  const handleUserNameBlur = useDebouncedCallback(() => {
+    const values = getValues(["email", "username"]);
+    setUsernameMutation.mutate({ email: values[0], username: values[1] });
+  }, 500);
 
   return (
     <div className="mb-2">
@@ -170,13 +168,13 @@ const EditProfile = () => {
           <div className="flex items-center gap-3">
             <button
               className="flex items-center cursor-pointer z-10"
-              disabled={setUsernameMutation.isPending}
+              disabled={updateCreatorProfileMutation.isPending}
             >
               <div
                 onClick={() => submitForm()}
                 className="border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white cursor-pointer"
               >
-                {setUsernameMutation.isPending ||
+                {updateCreatorProfileMutation.isPending ||
                 uploadPictureMutation.isPending ? (
                   <div className="flex items-center">
                     <span className="loader mr-2"></span>
@@ -224,8 +222,8 @@ const EditProfile = () => {
           label="User name"
           name="username"
           control={control}
-          // readOnly
-          // rules={{ required: "Password is required" }}
+          onBlur={handleUserNameBlur}
+          placeholder="This is your unique username"
         />
 
         <CustomInput

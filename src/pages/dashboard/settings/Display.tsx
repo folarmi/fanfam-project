@@ -3,63 +3,38 @@ import AccountBackButton from "@components/forms/AccountBackButton";
 import CollectionRadioButton from "@components/forms/CollectionRadioButton";
 import Typography from "@components/forms/Typography";
 import { extractDefaults, transformDisplaySettings } from "@/data";
-import { useCustomMutation } from "@/hooks/apiCalls";
 import { useAppSelector } from "@/lib/hook";
-
 import type { RootState } from "@/lib/store";
-import type { DisplayObject, UserObject } from "@/lib/types";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { DisplayObject } from "@/lib/types";
 import { Loader } from "@/components/molecules/Loader";
 import { useForm } from "react-hook-form";
 import BlueBorderedButton from "@/components/forms/BlueBorderedButton";
+import { useFetchDisplaySettings } from "@/hooks/apiHooks";
+import { useEffect } from "react";
+import { useSettingsMutation } from "@/hooks/useSettingsMutation";
 
 const Display = () => {
-  const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
-  const useFetchDisplaySettings = (userObject: UserObject) => {
-    const mutation = useCustomMutation({
-      endpoint: "/profile/settings/display/view",
-      onSuccessCallback: () => {},
-    });
+  const { data, isLoading, error } = useFetchDisplaySettings(userObject);
 
-    return useQuery({
-      queryKey: ["displaySettings", userObject.email, userObject.usid],
-      queryFn: () =>
-        mutation.mutateAsync({
-          email: userObject.email,
-          role: userObject.role,
-          usid: userObject.usid,
-        }),
-      enabled: !!userObject.email,
-    });
-  };
-
-  const { data, isLoading } = useFetchDisplaySettings(userObject);
-
-  const defaultValues = extractDefaults(
-    (data?.data as unknown as DisplayObject) || {
-      lightTheme: true,
-      darkTheme: false,
-      systemTheme: false,
-      englishLanguage: true,
-      frenchLanguage: false,
-      spanishLanguage: false,
-    }
-  );
-  const { control, handleSubmit } = useForm({ defaultValues });
-
-  const updateDisplaySettingsMutation = useCustomMutation({
-    endpoint: `profile/settings/display/update`,
-    method: "put",
-    useQueryParams: true,
-    successMessage: (data: any) => data?.message,
-    onSuccessCallback: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["displaySettings", userObject.email, userObject.usid],
-        exact: false,
-      });
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      Theme: "",
+      Language: "",
     },
+  });
+
+  useEffect(() => {
+    if (data?.data) {
+      const defaults = extractDefaults(data.data as DisplayObject);
+      reset(defaults);
+    }
+  }, [data?.data, reset]);
+
+  const updateDisplaySettingsMutation = useSettingsMutation({
+    settingsPath: "display",
+    queryKeyPrefix: "displaySettings",
   });
 
   const onSubmit = (formData: any) => {
@@ -80,6 +55,25 @@ const Display = () => {
       },
     });
   };
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded">
+        <Typography variant="subtitle2" className="text-red-700 mb-1">
+          Failed to load settings
+        </Typography>
+        <Typography variant="p3" className="text-red-600 mb-3">
+          {error?.message || "An unexpected error occurred"}
+        </Typography>
+        <button
+          // onClick={() => refetch()}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>

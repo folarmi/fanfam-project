@@ -14,8 +14,10 @@ import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import { SubscriptionHeader } from "../settings/SubscriptionHeader";
 import CustomButton from "@/components/forms/CustomButton";
+import { useForm } from "react-hook-form";
 
 const Wallet = () => {
+  const { control } = useForm();
   const [isEmpty] = useState(false);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
@@ -61,7 +63,7 @@ const Wallet = () => {
                     {name}
                   </Typography>
 
-                  <CustomSwitchButton isChecked />
+                  <CustomSwitchButton name="" control={control} label="" />
                 </div>
               );
             })}

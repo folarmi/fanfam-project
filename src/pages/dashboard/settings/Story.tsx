@@ -1,8 +1,10 @@
 import AccountBackButton from "@components/forms/AccountBackButton";
 import CustomSwitchButton from "@components/forms/CustomSwitchButton";
 import Typography from "@components/forms/Typography";
+import { useForm } from "react-hook-form";
 
 const StorySettings = () => {
+  const { control } = useForm();
   return (
     <div>
       <AccountBackButton showBack={false} showMobileBack moduleName="Story" />
@@ -18,7 +20,7 @@ const StorySettings = () => {
           </Typography>
         </div>
 
-        <CustomSwitchButton />
+        <CustomSwitchButton name="email" control={control} label="" />
       </div>
     </div>
   );

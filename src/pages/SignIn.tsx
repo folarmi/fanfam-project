@@ -42,8 +42,14 @@ const SignIn = () => {
 
   useEffect(() => {
     getReadableLocation()
-      .then((location) => setLocation(location))
-      .catch((err) => setError(err.message));
+      .then((result) => {
+        if (result.success && result.location) {
+          setLocation(result.location);
+        } else {
+          setError(result.error || "Failed to get location");
+        }
+      })
+      .catch((err) => setError(err.message || "An unexpected error occurred"));
   }, []);
 
   const signInMutation = useCustomMutation({

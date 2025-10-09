@@ -1,8 +1,10 @@
 import AccountBackButton from "@components/forms/AccountBackButton";
 import CustomSwitchButton from "@components/forms/CustomSwitchButton";
 import Typography from "@components/forms/Typography";
+import { useForm } from "react-hook-form";
 
 const CollectionSettings = () => {
+  const { control } = useForm();
   return (
     <div>
       <AccountBackButton
@@ -15,14 +17,14 @@ const CollectionSettings = () => {
         <Typography variant="p2" className="text-grey_800">
           Auto follow back my fans
         </Typography>
-        <CustomSwitchButton />
+        <CustomSwitchButton name="" control={control} label="" />
       </div>
 
       <div className="flex items-center justify-between mt-4 ml-4">
         <Typography variant="p2" className="text-grey_800">
           Unfollow when the subscription has ended
         </Typography>
-        <CustomSwitchButton />
+        <CustomSwitchButton name="" control={control} label="" />
       </div>
 
       <div className="flex items-center justify-between mt-4 ml-4">
@@ -36,7 +38,7 @@ const CollectionSettings = () => {
           </Typography>
         </div>
 
-        <CustomSwitchButton />
+        <CustomSwitchButton name="" control={control} label="" />
       </div>
     </div>
   );

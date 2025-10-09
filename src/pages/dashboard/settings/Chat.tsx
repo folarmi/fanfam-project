@@ -1,8 +1,10 @@
 import AccountBackButton from "@components/forms/AccountBackButton";
 import CustomSwitchButton from "@components/forms/CustomSwitchButton";
 import Typography from "@components/forms/Typography";
+import { useForm } from "react-hook-form";
 
 const ChatSettings = () => {
+  const { control } = useForm();
   return (
     <div>
       <AccountBackButton showBack={false} showMobileBack moduleName="Chat" />
@@ -12,7 +14,7 @@ const ChatSettings = () => {
           Don’t accept messages without a tip from free followers whom you don’t
           follow back
         </Typography>
-        <CustomSwitchButton />
+        <CustomSwitchButton name="" control={control} label="" />
       </div>
 
       <div className="flex items-center justify-between mt-4 ml-4">
@@ -25,7 +27,7 @@ const ChatSettings = () => {
           </Typography>
         </div>
 
-        <CustomSwitchButton />
+        <CustomSwitchButton name="" control={control} label="" />
       </div>
     </div>
   );

@@ -38,7 +38,7 @@ const TwoFactor = () => {
                 </Typography>
               </div>
 
-              <CustomSwitchButton />
+              <CustomSwitchButton name="email" control={control} label="" />
             </div>
           );
         })}

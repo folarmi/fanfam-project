@@ -12,6 +12,7 @@ interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   borderRadius?: string;
   className?: string;
   onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -24,6 +25,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   className,
   borderRadius = "3xl",
   onFocus,
+  onBlur,
   ...rest
 }) => {
   const {
@@ -67,7 +69,12 @@ const CustomInput: React.FC<CustomInputProps> = ({
           setIsFocused(true);
           if (onFocus) onFocus();
         }}
-        onBlur={() => setIsFocused(!!field.value)}
+        // onBlur={() => setIsFocused(!!field.value)}
+        onBlur={() => {
+          field.onBlur(); // ✅ preserve react-hook-form’s built-in blur handling
+          setIsFocused(!!field.value);
+          if (onBlur) onBlur(); // ✅ trigger parent onBlur logic (e.g. mutation)
+        }}
         style={{
           backgroundColor: readOnly ? "hsl(0,0%, 90%)" : "",
           cursor: readOnly ? "not-allowed" : "initial",
@@ -84,16 +91,6 @@ const CustomInput: React.FC<CustomInputProps> = ({
         </button>
       )}
 
-      {/* <label
-        htmlFor={name}
-        className={`absolute left-4 text-sm font-normal text-grey_200 duration-300 transform scale-75 origin-[0] -translate-y-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-[0.5] peer-placeholder-shown:top-1/2 peer-focus:scale-75 peer-focus:-translate-y-4 ${
-          isFocused || field.value
-            ? "-translate-y-4 scale-75"
-            : "translate-y-1/2 scale-100"
-        }`}
-      >
-        {label}
-      </label> */}
       <label
         htmlFor={name}
         className={`absolute left-4 text-sm font-normal text-grey_200 duration-300 transform scale-75 origin-[0] peer-focus:scale-75 peer-focus:-translate-y-4 ${

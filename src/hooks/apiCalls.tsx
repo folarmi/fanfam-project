@@ -18,6 +18,7 @@ import {
   showErrorToast,
   showSuccessToast,
 } from "@/utils/toastUtils";
+// import { da } from "date-fns/locale";
 
 interface MutationResponse {
   [x: string]: any;
@@ -169,6 +170,16 @@ export const useCustomMutation = <
     },
 
     onSuccess: (data: any) => {
+      if (
+        data === undefined ||
+        data === null ||
+        Object.keys(data || {}).length === 0
+      ) {
+        if (successMessage) showSuccessToast("Logout successfully");
+        if (onSuccessCallback) onSuccessCallback(data);
+        return;
+      }
+
       if (data?.success || data?.statusCode === 991) {
         if (successMessage) {
           showSuccessToast(successMessage(data));

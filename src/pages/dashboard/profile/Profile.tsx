@@ -1,12 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import { useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "../../../lib/hook";
+import { useAppSelector } from "../../../lib/hook";
 import type { RootState } from "../../../lib/store";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useCustomMutation } from "../../../hooks/apiCalls";
-import { updateProfileObject } from "../../../lib/features/profile/profileSlice";
+import { useState } from "react";
 import SearchInput from "../../../components/SearchInput";
 import IconAndNumber from "../../../components/IconAndNumber";
 import Pictures from "../../../assets/icons/pictures";
@@ -40,14 +36,18 @@ import defaultAvatar from "../../../assets/defaultAvatar.svg";
 import verifyBlue from "../../../assets/icons/verifyBlue.svg";
 import blueGift from "../../../assets/icons/blueGift.svg";
 import { Loader } from "@/components/molecules/Loader";
-
+import { useFetchProfile } from "@/hooks/apiHooks";
+// testUserNamed
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const { data, isLoading, error } = useFetchProfile(userObject);
+
+  console.log(data);
+
   const { profileDetails } = useAppSelector(
     (state: RootState) => state.profile
   );
   const { control } = useForm();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -77,22 +77,6 @@ const Profile = () => {
   const [addUserToList, setAddUserToList] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const getUserProfileUserMutation = useCustomMutation({
-    endpoint: `/profile/view`,
-    // successMessage: (data: any) => data?.message,
-    // errorMessage: (error: any) => error,
-    onSuccessCallback: (data) => {
-      dispatch(updateProfileObject(data?.data));
-    },
-  });
-
-  useEffect(() => {
-    getUserProfileUserMutation.mutate({
-      email: userObject.email,
-      role: userObject.role,
-      usid: userObject.usid,
-    });
-  }, []);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -126,7 +110,7 @@ const Profile = () => {
 
   return (
     <>
-      {getUserProfileUserMutation.isPending ? (
+      {isLoading ? (
         <Loader />
       ) : (
         <div>
