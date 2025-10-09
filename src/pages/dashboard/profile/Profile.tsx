@@ -42,11 +42,6 @@ const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data, isLoading } = useFetchProfile(userObject);
 
-  console.log(data);
-
-  const { profileDetails } = useAppSelector(
-    (state: RootState) => state.profile
-  );
   const { control } = useForm();
   const navigate = useNavigate();
 
@@ -137,7 +132,7 @@ const Profile = () => {
               <div className="relative flex items-center">
                 <div className="absolute -top-8">
                   <img
-                    src={profileDetails?.profilePic}
+                    src={data?.data?.profilePic}
                     alt="profilePicture"
                     width={100}
                     height={100}

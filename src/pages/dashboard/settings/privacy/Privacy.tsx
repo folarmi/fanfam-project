@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import AccountBackButton from "@components/forms/AccountBackButton";
 import CustomSwitchButton from "@components/forms/CustomSwitchButton";
 import Typography from "@components/forms/Typography";
@@ -40,9 +39,10 @@ const Privacy = () => {
     queryKeyPrefix: "notificationSettings",
   });
 
-  const onSubmit = (formData: any) => {
-    const theme = formData.Theme?.toUpperCase();
-    const language = formData.Language?.toUpperCase();
+  // const onSubmit = (formData: any) => {
+  const onSubmit = () => {
+    // const theme = formData.Theme?.toUpperCase();
+    // const language = formData.Language?.toUpperCase();
 
     // const modifiedFormData = {
     //   theme,
