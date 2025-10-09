@@ -16,7 +16,7 @@ import AmountInput from "../../../components/forms/AmountInput";
 import PaymentMethod from "../../../components/PaymentMethod";
 import CustomInput from "../../../components/forms/CustomInput";
 import CustomButton from "../../../components/forms/CustomButton";
-import { commentOptions, UserRole } from "../../../data";
+import { commentOptions } from "../../../data";
 import BlueBorderedButton from "../../../components/forms/BlueBorderedButton";
 import ModalContent from "../../../components/modals/ModalContent";
 import SubscriptionButton from "../../../components/molecules/SubscriptionButton";
@@ -34,10 +34,10 @@ import blueVerifiedTick from "../../../assets/blueVerifiedTick.svg";
 import copy from "../../../assets/copy.svg";
 import defaultAvatar from "../../../assets/defaultAvatar.svg";
 import verifyBlue from "../../../assets/icons/verifyBlue.svg";
-import blueGift from "../../../assets/icons/blueGift.svg";
+// import blueGift from "../../../assets/icons/blueGift.svg";
 import { Loader } from "@/components/molecules/Loader";
 import { useFetchProfile } from "@/hooks/apiHooks";
-// testUserNamed
+
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data, isLoading } = useFetchProfile(userObject);
@@ -230,7 +230,8 @@ const Profile = () => {
                       <img src={circleStar} alt="circleStar" />
                     </div>
 
-                    {userObject.role !== UserRole.creator && (
+                    {/* Gift Subscription */}
+                    {/* {userObject.role !== UserRole.creator && (
                       <>
                         <div
                           className={`flex items-center gap-x-2 border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white `}
@@ -251,27 +252,27 @@ const Profile = () => {
                           Subscribe
                         </CustomButton>
                       </>
-                    )}
+                    )} */}
 
-                    {userObject.role === UserRole.creator && (
-                      <>
-                        {" "}
-                        <Link to="/dashboard/profile/promote">
-                          <CustomButton
-                            variant="primary"
-                            primaryButtonSize="xs px-3"
-                          >
-                            Promote Profile
-                          </CustomButton>
-                        </Link>
-                        <BlueBorderedButton
-                          onClick={() =>
-                            navigate("/dashboard/profile/edit-profile")
-                          }
-                          text="Edit Profile"
-                        />
-                      </>
-                    )}
+                    {/* {userObject.role === UserRole.creator && ( */}
+                    <>
+                      {" "}
+                      <Link to="/dashboard/profile/promote">
+                        <CustomButton
+                          variant="primary"
+                          primaryButtonSize="xs px-3"
+                        >
+                          Promote Profile
+                        </CustomButton>
+                      </Link>
+                      <BlueBorderedButton
+                        onClick={() =>
+                          navigate("/dashboard/profile/edit-profile")
+                        }
+                        text="Edit Profile"
+                      />
+                    </>
+                    {/* )} */}
 
                     <div className="relative">
                       <img
@@ -300,11 +301,11 @@ const Profile = () => {
                 </div>
               </div>
 
-              <section className="mt-6">
+              <section className="mt-10">
                 <div className="md:hidden flex items-center ">
                   <img src={location} alt="location" />
                   <Typography className="text-grey_400 pl-1" variant="p3">
-                    Nigeria
+                    {data?.data?.location || "N/A"}
                   </Typography>
                 </div>
                 <div className="flex items-center">
@@ -312,19 +313,17 @@ const Profile = () => {
                     variant="titleTwo"
                     className="text-grey_800 font-bold pr-1"
                   >
-                    Priscilia yummy
+                    {data?.data?.fullName || ""}
                   </Typography>
                   <img src={blueVerifiedTick} alt="verify" />
                 </div>
 
                 <Typography variant="p2" className="text-grey_800 pt-[2px]">
-                  @yummychill54
+                  {data?.data?.username || ""}
                 </Typography>
 
                 <Typography variant="p2" className="text-grey_700 py-4">
-                  Lorem ipsum dolor sit amet consectetur. Amet dolor arcu
-                  praesent mi. Nulla sed cursus quis mas sa nato que at adip
-                  iscing{" "}
+                  {data?.data?.bio || "N/A"}
                   {isExpanded && (
                     <>
                       <span>

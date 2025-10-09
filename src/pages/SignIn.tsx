@@ -24,12 +24,13 @@ import SocialMedia from "../components/SocialMedia";
 const SignIn = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { control, handleSubmit } = useForm();
+  const { control, handleSubmit, getValues } = useForm();
   const platform = getPlatformFromUAParser();
   const browser = getBrowserInfo();
   const [ip, setIp] = useState<string>("");
   const [location, setLocation] = useState<string>("");
   const [, setError] = useState<string | null>(null);
+  const [notVerifiedError, setNotVerifiedError] = useState(false);
 
   useEffect(() => {
     const fetchIP = async () => {
@@ -56,6 +57,8 @@ const SignIn = () => {
     endpoint: `auth/login`,
     successMessage: (data: any) => data?.message,
     onSuccessCallback: (data) => {
+      setNotVerifiedError(false);
+
       const userObject = {
         email: data?.data?.email,
         role: data?.data?.role,
@@ -66,6 +69,9 @@ const SignIn = () => {
       localStorage.setItem("refreshToken", data?.data?.refreshToken);
       dispatch(updateUserObject(userObject));
       navigate("/dashboard");
+    },
+    onError: () => {
+      setNotVerifiedError(true);
     },
   });
 
@@ -84,6 +90,19 @@ const SignIn = () => {
 
     signInMutation.mutate(formValues);
   };
+
+  const resendVerificationLinkMutation = useCustomMutation({
+    endpoint: `auth/resend-verification-link?email=${getValues("email")}`,
+    successMessage: (data: any) => data?.message,
+    // successMessage: (data: any) => console.log(data?.message),
+    // errorMessage: (error: any) => error,
+    onSuccessCallback: () => {},
+  });
+
+  const resendVerificationEmail = () => {
+    resendVerificationLinkMutation.mutate({});
+  };
+
   return (
     <AuthLayout>
       <form className="" onSubmit={handleSubmit(submitForm)}>
@@ -102,6 +121,17 @@ const SignIn = () => {
           rules={{ required: "Password is required" }}
           className="-mb-2"
         />
+        {notVerifiedError && (
+          <button
+            onClick={resendVerificationEmail}
+            className="bg-transparent border-none p-0 cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 rounded w-full flex justify-end"
+            type="button"
+          >
+            <Typography variant="p2" className="text-red-600 mb-3">
+              Resend verification email.
+            </Typography>
+          </button>
+        )}
 
         <div className="w-full flex justify-between items-center mb-10">
           <Checkbox

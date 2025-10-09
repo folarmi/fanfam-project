@@ -14,7 +14,7 @@ import persistReducer from "redux-persist/es/persistReducer";
 
 // Persist configuration
 const persistConfig = {
-  key: "root",
+  key: "fanfam",
   version: 1,
   whitelist: ["auth", "profile"], // Add the reducers you want to persist
   storage,
@@ -22,17 +22,6 @@ const persistConfig = {
 
 // Persisted reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-
-// Create a single store instance
-// const store = configureStore({
-//   reducer: persistedReducer,
-// });
-
-// // Create a single persistor instance
-// export const persistor = persistStore(store);
-
-// // Export the store
-// export default store;
 
 export const makeStore = () => {
   const store = configureStore({
