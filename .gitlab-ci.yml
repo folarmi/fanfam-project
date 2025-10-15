@@ -48,7 +48,7 @@ cleanup:
     - fanfam
   script:
     - |
-      docker stop $CONTAINER_NAME
+      docker compose -f docker/compose.yml down
       docker image prune
       echo "cleanup done"
 
