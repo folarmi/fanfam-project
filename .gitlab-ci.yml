@@ -37,8 +37,8 @@ push:
     - fanfam
   script:
     - |
-      # docker info
-      echo "$CI_REGISTRY_PASSWORD" | docker login -u $"$CI_REGISTRY_USER" --password-stdin $"$DOCKER_REGISTRY_SERVER"
+      docker info
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $"$CI_REGISTRY"
       docker image push $DOCKER_REGISTRY
       echo "push completed"
 
