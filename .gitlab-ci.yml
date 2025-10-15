@@ -1,4 +1,4 @@
-image: node:22.20-alpine
+# image: node:22.20-alpine
 
 stages:
   - test
@@ -28,7 +28,7 @@ build:
     - fanfam
   script:
     - |
-      echo "Running Build"
+      echo "Running Build..."
       docker build -t $DOCKER_REGISTRY -f $DOCKER_FILE .
       echo "Build OK"
 push:
