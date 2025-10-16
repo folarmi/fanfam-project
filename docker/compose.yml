@@ -1,0 +1,16 @@
+
+  services:
+    fanfam-web:
+      image: registry.gitlab.com/biyartech1/fan-fam-apps/fanfam-frontend-react:dev
+      container_name: fanfam-web
+      env_file:
+        - ../.env
+      ports:
+        - "8080:3000"
+      networks:
+        - biyar-network
+    
+  networks:
+    biyar-network:
+      external: true
+      name: nat

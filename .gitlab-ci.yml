@@ -1,0 +1,61 @@
+# image: node:22.20-alpine
+
+stages:
+  - test
+  - build
+  - push
+  - cleanup
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: registry.gitlab.com/biyartech1/fan-fam-apps/fanfam-frontend-react:$CI_COMMIT_REF_NAME
+  DOCKER_REGISTRY_SERVER: registry.gitlab.com
+  DOCKER_FILE: docker/Dockerfile
+  COMPOSE_FILE: docker/compose.yml
+  CONTAINER_NAME: fanfam-web
+
+test:
+  stage: test
+  tags:
+    - fanfam
+  script:
+    - echo "Running test"
+    - echo "Test passed"
+
+build:
+  stage: build
+  tags:
+    - fanfam
+  script:
+    - |
+      echo "Running Build..."
+      docker build -t $DOCKER_REGISTRY -f $DOCKER_FILE .
+      echo "Build OK"
+push:
+  stage: push
+  tags:
+    - fanfam
+  script:
+    - |
+      docker info
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+      docker image push $DOCKER_REGISTRY
+      echo "push completed"
+
+cleanup:
+  stage: cleanup
+  tags:
+    - fanfam
+  script:
+    - |
+      docker compose -f docker/compose.yml down
+      docker image prune
+      echo "cleanup done"
+
+deploy:
+  stage: deploy
+  tags:
+    - fanfam
+  script:
+    - |
+      docker compose -f $COMPOSE_FILE up -d
