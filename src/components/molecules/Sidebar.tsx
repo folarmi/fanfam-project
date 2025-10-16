@@ -8,10 +8,13 @@ import { useCustomMutation } from "../../hooks/apiCalls";
 import type { RootState } from "../../lib/store";
 import { useAppSelector } from "../../lib/hook";
 import { sideBarItems } from "../../data";
+import { useDispatch } from "react-redux";
+import { logout } from "@/lib/features/auth/authSlice";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const { isCreator } = useAppSelector((state: RootState) => state.auth);
 
   const logOutMutation = useCustomMutation({
@@ -20,6 +23,9 @@ const Sidebar = () => {
     errorMessage: (error: any) => error,
     onSuccessCallback: () => {
       navigate("/");
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      dispatch(logout());
       localStorage.clear();
     },
   });

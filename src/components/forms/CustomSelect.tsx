@@ -5,19 +5,22 @@ type CustomSelectProps = {
   className?: string;
   ifLabel?: boolean;
   label?: string;
+  options?: { value: string; label: string }[];
 };
+
+const sampleOptions = [
+  { value: "chocolate", label: "Chocolate" },
+  { value: "strawberry", label: "Strawberry" },
+  { value: "vanilla", label: "Vanilla" },
+];
 
 const CustomSelect = ({
   placeholder,
   className,
   ifLabel,
   label,
+  options = sampleOptions,
 }: CustomSelectProps) => {
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
   return (
     <div className={`w-full ${className}`}>
       {ifLabel && (

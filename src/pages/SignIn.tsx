@@ -70,8 +70,11 @@ const SignIn = () => {
       dispatch(updateUserObject(userObject));
       navigate("/dashboard");
     },
-    onError: () => {
-      setNotVerifiedError(true);
+    onError: (error: any) => {
+      console.log(error?.response?.data?.data?.message);
+      setNotVerifiedError(
+        error?.response?.data?.data?.message === "Account has not been verified"
+      );
     },
   });
 

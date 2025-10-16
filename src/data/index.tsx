@@ -56,7 +56,7 @@ import type {
   NotificationObject,
   PrivacyAndSafetyData,
 } from "@/lib/types";
-// import { UserRoleType } from "../lib/types";
+import countryList from "react-select-country-list";
 
 export const sideBarItems = [
   {
@@ -1752,3 +1752,15 @@ export const transactionHistoryData = [
     fee: "$5.00",
   },
 ];
+
+export const getAllCountryOptions = () => {
+  return countryList().getData();
+};
+
+export const getAllCountryOptionsWithNames = () => {
+  const countries = countryList().getData();
+  return countries.map((country) => ({
+    value: country.label,
+    label: country.label,
+  }));
+};

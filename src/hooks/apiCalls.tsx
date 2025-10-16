@@ -191,6 +191,8 @@ export const useCustomMutation = <
     },
 
     onError: (error: any) => {
+      console.log("api calls", error);
+
       try {
         let message: string | string[] | Record<string, string[]>;
 
@@ -225,6 +227,49 @@ export const useCustomMutation = <
         showErrorToast("Failed to process error");
       }
     },
+
+    // onError: (error: any) => {
+    //   try {
+    //     // Call the custom onError callback first if it exists (for side effects like setting state)
+    //     if (options.onError) {
+    //       options.onError(error);
+    //     }
+
+    //     let message: string | string[] | Record<string, string[]>;
+
+    //     // Check if errorMessage callback exists AND returns a value
+    //     if (options.errorMessage) {
+    //       const customErrorMessage = options.errorMessage(error);
+
+    //       // Only use custom message if it's not null/undefined
+    //       // Otherwise, fall back to getApiErrors
+    //       message =
+    //         customErrorMessage !== null && customErrorMessage !== undefined
+    //           ? customErrorMessage
+    //           : getApiErrors(error);
+    //     } else {
+    //       // No errorMessage callback provided, use default
+    //       message = getApiErrors(error);
+    //     }
+
+    //     // Enhanced safety check
+    //     if (
+    //       !message ||
+    //       (typeof message === "string" && message.trim() === "") ||
+    //       (Array.isArray(message) && message.length === 0) ||
+    //       (typeof message === "object" &&
+    //         message !== null &&
+    //         Object.keys(message).length === 0)
+    //     ) {
+    //       message = "An unexpected error occurred";
+    //     }
+
+    //     showErrorToast(message);
+    //   } catch (e) {
+    //     console.error("Error processing error message:", e);
+    //     showErrorToast("Failed to process error");
+    //   }
+    // },
     ...mutationOptions,
   });
 };
