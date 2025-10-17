@@ -20,4 +20,4 @@ COPY --from=build /app/dist /app/dist ./
 
 EXPOSE 8080
 
-CMD [ "nginx", "-g", "daemon off" ]
+CMD [ "nginx", "-g", "daemon off;" ]
