@@ -52,7 +52,12 @@ const GiftSubscription = ({ toggleModal }: { toggleModal: () => void }) => {
           </div>
         ) : (
           <>
-            <CustomSelect ifLabel label="Select Subscription" />
+            <CustomSelect
+              name=""
+              control={control}
+              ifLabel
+              label="Select Subscription"
+            />
             <CustomInput
               control={control}
               name="name"

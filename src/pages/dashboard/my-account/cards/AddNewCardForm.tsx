@@ -17,12 +17,16 @@ const AddNewCardForm = () => {
       <form>
         <div className="flex items-center mt-4">
           <CustomSelect
+            name=""
+            control={control}
             ifLabel
             label="Country"
             placeholder="Select Country"
             className="mr-4"
           />
           <CustomSelect
+            name=""
+            control={control}
             ifLabel
             label="State/Province"
             placeholder="Select State/Province"

@@ -48,7 +48,7 @@ const PromoteProfile = () => {
               value="Get 500 followers"
             />
 
-            <CustomSelect ifLabel label="Ad Type" />
+            <CustomSelect name="" control={control} ifLabel label="Ad Type" />
 
             <div className="flex items-center justify-between mt-5">
               <CustomInput
@@ -103,8 +103,19 @@ const PromoteProfile = () => {
             />
 
             <div className="flex mt-2 items-center">
-              <CustomSelect ifLabel label="Time Zone" className="mr-2" />
-              <CustomSelect ifLabel label="Start Time" />
+              <CustomSelect
+                name=""
+                control={control}
+                ifLabel
+                label="Time Zone"
+                className="mr-2"
+              />
+              <CustomSelect
+                name=""
+                control={control}
+                ifLabel
+                label="Start Time"
+              />
             </div>
           </section>
         </section>

@@ -23,7 +23,13 @@ const AddBundle = ({ toggleModal }: any) => {
         }}
       />
 
-      <CustomSelect placeholder="3 months" ifLabel label="Select duration" />
+      <CustomSelect
+        name=""
+        control={control}
+        placeholder="3 months"
+        ifLabel
+        label="Select duration"
+      />
 
       <div className="flex items-center mt-8 mb-6 justify-end w-1/2 ml-auto">
         <CustomButton

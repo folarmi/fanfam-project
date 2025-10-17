@@ -26,12 +26,16 @@ const FreeTrialLink = ({ toggleModal }: any) => {
       <div className="flex items-center mt-4">
         <CustomSelect
           placeholder="Name of list"
+          name=""
+          control={control}
           className="mr-6"
           ifLabel
           label="Offer limit"
         />
         <CustomSelect
           placeholder="Offer expiration"
+          name=""
+          control={control}
           ifLabel
           label="Offer expiration"
         />
@@ -39,6 +43,8 @@ const FreeTrialLink = ({ toggleModal }: any) => {
 
       <div className="mt-4">
         <CustomSelect
+          name=""
+          control={control}
           placeholder="Offer expiration"
           ifLabel
           label="Free trial duration"

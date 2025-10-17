@@ -29,12 +29,16 @@ const PromotionalCampaign = ({ toggleModal }: any) => {
 
       <div className="flex items-center mt-4">
         <CustomSelect
+          name=""
+          control={control}
           placeholder="Name of list"
           className="mr-6"
           ifLabel
           label="Name of list"
         />
         <CustomSelect
+          name=""
+          control={control}
           placeholder="Offer expiration"
           ifLabel
           label="Offer expiration"
@@ -43,6 +47,8 @@ const PromotionalCampaign = ({ toggleModal }: any) => {
 
       <div className="mt-4">
         <CustomSelect
+          name=""
+          control={control}
           placeholder="Offer expiration"
           ifLabel
           label="Free trial duration"

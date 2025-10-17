@@ -8,6 +8,7 @@ import blueAdd from "../../assets/blueAdd.svg";
 import CustomSelect from "../forms/CustomSelect";
 import CustomButton from "../forms/CustomButton";
 import AnsweredPoll from "./AnsweredPoll";
+import { useForm } from "react-hook-form";
 
 type pollProps = {
   pollOptions: { id: string; name: string }[];
@@ -22,6 +23,7 @@ const Poll = ({
   activePoll,
 }: // setActivePoll,
 pollProps) => {
+  const control = useForm();
   const [isPollAnswered, setIsPollAnswered] = useState(false);
 
   // const handleDragEnd = (result: {
@@ -134,9 +136,9 @@ pollProps) => {
             </Typography>
 
             <div className="flex items-center gap-x-6">
-              <CustomSelect placeholder="Days" />
-              <CustomSelect placeholder="Hours" />
-              <CustomSelect placeholder="Minutes" />
+              <CustomSelect name="" control={control} placeholder="Days" />
+              <CustomSelect name="" control={control} placeholder="Hours" />
+              <CustomSelect name="" control={control} placeholder="Minutes" />
             </div>
           </div>
 
