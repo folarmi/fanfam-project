@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AccountBackButton from "@components/forms/AccountBackButton";
 import CustomSwitchButton from "@components/forms/CustomSwitchButton";
 import Typography from "@components/forms/Typography";
@@ -35,21 +36,14 @@ const Privacy = () => {
   }, [data?.data, reset]);
 
   const updateNotificationsMutation = useSettingsMutation({
-    settingsPath: "notification",
-    queryKeyPrefix: "notificationSettings",
+    settingsPath: "privacy-safety",
+    queryKeyPrefix: "privacySafetySettings",
+    method: "post",
   });
 
-  // const onSubmit = (formData: any) => {
-  const onSubmit = () => {
-    // const theme = formData.Theme?.toUpperCase();
-    // const language = formData.Language?.toUpperCase();
-
-    // const modifiedFormData = {
-    //   theme,
-    //   language,
-    // };
-
+  const onSubmit = (data: any) => {
     updateNotificationsMutation.mutate({
+      params: data,
       body: {
         email: userObject.email,
         usid: userObject.usid,

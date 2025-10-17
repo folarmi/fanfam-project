@@ -2,17 +2,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-type EmailType = "Reset" | "Signup" | "";
+type EmailType = "Reset" | "Signup" | null;
 
 export interface AuthState {
-  userEmail: string;
+  userEmail: string | null;
   emailType: EmailType;
   userObject: object;
 }
 
 const initialState: AuthState = {
-  userEmail: "",
-  emailType: "",
+  userEmail: null,
+  emailType: null,
   userObject: {},
 };
 
@@ -29,11 +29,16 @@ export const authSlice = createSlice({
     updateUserObject: (state, action: PayloadAction<any>) => {
       state.userObject = action.payload;
     },
+    logout: (state) => {
+      state.userEmail = null;
+      state.emailType = null;
+      state.userObject = {};
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { updateUserEmail, updateEmailType, updateUserObject } =
+export const { updateUserEmail, updateEmailType, updateUserObject, logout } =
   authSlice.actions;
 
 export default authSlice.reducer;

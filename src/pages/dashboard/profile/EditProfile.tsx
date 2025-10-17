@@ -63,10 +63,6 @@ const EditProfile = () => {
     contentType: "multipart/form-data",
     successMessage: (data: any) => data?.message,
     onSuccessCallback: () => {
-      // const formValues = {
-      //   ...getValues(),
-      // };
-      // updateCreatorProfileMutation.mutate(formValues);
       queryClient.invalidateQueries({
         queryKey: ["viewProfile"],
         exact: false,

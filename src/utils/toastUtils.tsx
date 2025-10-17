@@ -107,6 +107,7 @@ export const showErrorToast = (
 export const getApiErrors = (
   error: any
 ): string | string[] | Record<string, string[]> => {
+  console.log("toast utils", error);
   return (
     error?.response?.data?.data?.message ||
     error?.response?.data?.errors ||

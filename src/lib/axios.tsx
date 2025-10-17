@@ -48,13 +48,82 @@ api.interceptors.request.use(
 );
 
 // Response interceptor
+// api.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     // Check for token expiration (401 Unauthorized)
+//     if (error.response?.status === 401 && !originalRequest._retry) {
+//       originalRequest._retry = true; // Mark the request as retried
+
+//       if (!isRefreshing) {
+//         isRefreshing = true;
+
+//         try {
+//           const refreshToken = localStorage.getItem("refreshToken");
+
+//           if (!refreshToken) {
+//             throw new Error("No refresh token available");
+//           }
+
+//           // Make a request to refresh the token
+//           const { data } = await axios.post(
+//             `${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`,
+//             { token: refreshToken }
+//           );
+
+//           const newToken = data.accessToken;
+
+//           // Store new tokens
+//           localStorage.setItem("token", newToken);
+//           localStorage.setItem("refreshToken", data.refreshToken);
+
+//           // Notify all subscribers
+//           refreshSubscribers.forEach((callback) => callback(newToken));
+//           refreshSubscribers = []; // Clear the queue
+
+//           return api(originalRequest); // Retry the original request
+//         } catch (refreshError) {
+//           console.error("Token refresh failed:", refreshError);
+//           localStorage.removeItem("token");
+//           localStorage.removeItem("refreshToken");
+//           // Redirect to login
+//           window.location.href = "/";
+//           return Promise.reject(refreshError);
+//         } finally {
+//           isRefreshing = false;
+//         }
+//       }
+
+//       // Queue the request until the token is refreshed
+//       return new Promise((resolve) => {
+//         refreshSubscribers.push((newToken) => {
+//           originalRequest.headers.Authorization = `Bearer ${newToken}`;
+//           resolve(api(originalRequest)); // Retry the original request
+//         });
+//       });
+//     }
+
+//     return Promise.reject(error); // For other errors, reject the promise
+//   }
+// );
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    // Skip token refresh and redirect logic for login endpoint
+    const isLoginRequest =
+      originalRequest.url?.includes("auth/login") ||
+      originalRequest.url?.includes("auth/refresh");
 
     // Check for token expiration (401 Unauthorized)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isLoginRequest
+    ) {
       originalRequest._retry = true; // Mark the request as retried
 
       if (!isRefreshing) {
@@ -88,8 +157,10 @@ api.interceptors.response.use(
           console.error("Token refresh failed:", refreshError);
           localStorage.removeItem("token");
           localStorage.removeItem("refreshToken");
-          // Redirect to login
-          window.location.href = "/";
+          // Only redirect to login if NOT a login request
+          if (!isLoginRequest) {
+            // window.location.href = "/";
+          }
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
@@ -110,26 +181,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
-// // Any status codes that falls outside the range of 2xx causes this function to trigger
-// if (error?.response?.status === 401) {
-//   // Handle unauthorized errors (e.g., redirect to login)
-//   localStorage.removeItem("token");
-//   // window.location.href = "/sign-in";
-// }
-// return Promise.reject(error);
-// }
-
-// const axios = require('axios');
-// const https = require('https');
-// const fs = require('fs');
-
-// // Load the .pem certificate
-// const cert = fs.readFileSync('path/to/your_cert.pem'); // Replace with your .pem file path
-
-// // Create an HTTPS agent with the certificate
-// const httpsAgent = new https.Agent({
-//   cert: cert,
-//   key: cert,  // Use this if your key is in the same .pem file
-//   rejectUnauthorized: false // Set to true if you want to verify the certificate
-// });
