@@ -1,4 +1,4 @@
-FROM node:22.20-alpine
+FROM node:22.20-alpine as build
 
 WORKDIR /app
 
@@ -8,6 +8,16 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+RUN npm run build
 
-CMD [ "npm", "run", "dev" ]
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /usr/share/nginx/html
+
+RUN rm -rf ./*
+
+COPY --from=build /app/dist /app/dist ./
+
+EXPOSE 8080
+
+CMD [ "nginx", "-g", "daemon off" ]
