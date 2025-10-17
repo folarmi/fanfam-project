@@ -30,7 +30,7 @@ import suggestTwo from "../../../assets/suggestTwo.svg";
 import location from "../../../assets/icons/location.svg";
 import circleStar from "../../../assets/icons/circleStar.svg";
 import moreIcon from "../../../assets/icons/moreIcon.svg";
-import blueVerifiedTick from "../../../assets/blueVerifiedTick.svg";
+// import blueVerifiedTick from "../../../assets/blueVerifiedTick.svg";
 import copy from "../../../assets/copy.svg";
 import defaultAvatar from "../../../assets/defaultAvatar.svg";
 import verifyBlue from "../../../assets/icons/verifyBlue.svg";
@@ -315,7 +315,8 @@ const Profile = () => {
                   >
                     {data?.data?.fullName || ""}
                   </Typography>
-                  <img src={blueVerifiedTick} alt="verify" />
+                  {/* Verified image */}
+                  {/* <img src={blueVerifiedTick} alt="verify" /> */}
                 </div>
 
                 <Typography variant="p2" className="text-grey_800 pt-[2px]">

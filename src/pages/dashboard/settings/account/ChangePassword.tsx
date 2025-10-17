@@ -15,7 +15,6 @@ const ChangePassword = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
   const submitForm = (data: any) => {
-    console.log(data);
     const formData = {
       currentPassword: data.currentPassword,
       newPassword: data.newPassword,

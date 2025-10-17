@@ -14,17 +14,13 @@ import CustomTextBox from "../../../components/forms/CustomTextBox";
 import { Camera, MoreVertical } from "lucide-react";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { Loader } from "@/components/molecules/Loader";
+import CustomSelect from "@/components/forms/CustomSelect";
+import { genderOptions } from "@/data";
 
 const EditProfile = () => {
   const queryClient = useQueryClient();
 
   const [, setUploadedFile] = useState<File | null>(null);
-  const [bannerImage] = useState(
-    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=400&fit=crop"
-  );
-  const [profileImage] = useState(
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
-  );
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data, isLoading } = useFetchProfile(userObject);
 
@@ -123,9 +119,11 @@ const EditProfile = () => {
             <div className="relative">
               <div className="relative w-full h-[174px] overflow-hidden bg-gray-200">
                 <img
-                  src={bannerImage}
+                  src={
+                    "https://res.cloudinary.com/dezb6qbwe/image/upload/ze25hecynmhvbavqd7bq"
+                  }
                   alt="Banner"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
 
                 {/* Banner Edit Overlay with CustomFileUploader */}
@@ -133,7 +131,7 @@ const EditProfile = () => {
                   maxSizeMB={5}
                   acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
                   onFileUpload={handleFileUpload}
-                  defaultFile={bannerImage}
+                  // defaultFile={bannerImage}
                   showPreview={false}
                   renderTrigger={(onClick) => (
                     <div
@@ -165,7 +163,7 @@ const EditProfile = () => {
                     maxSizeMB={1}
                     acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
                     onFileUpload={handleFileUpload}
-                    defaultFile={profileImage}
+                    // defaultFile={profileImage}
                     showPreview={false}
                     renderTrigger={(onClick) => (
                       <div
@@ -194,7 +192,8 @@ const EditProfile = () => {
                     className="border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white cursor-pointer"
                   >
                     {updateCreatorProfileMutation.isPending ||
-                    uploadPictureMutation.isPending ? (
+                    uploadPictureMutation.isPending ||
+                    setUsernameMutation.isPending ? (
                       <div className="flex items-center">
                         <span className="loader mr-2"></span>
                         <Typography
@@ -244,13 +243,15 @@ const EditProfile = () => {
               onBlur={() => handleUserNameBlur()}
               placeholder="This is your unique username"
               readOnly={data?.data?.username ? true : false}
+              isVerified={setUsernameMutation.isSuccess}
             />
 
-            <CustomInput
-              label="Gender"
+            <CustomSelect
               name="gender"
+              options={genderOptions}
               control={control}
-              // rules={{ required: "Password is required" }}
+              label="Gender"
+              ifLabel
             />
 
             <CustomInput

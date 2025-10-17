@@ -1764,3 +1764,14 @@ export const getAllCountryOptionsWithNames = () => {
     label: country.label,
   }));
 };
+
+export const genderOptions = [
+  {
+    label: "Female",
+    value: "Female",
+  },
+  {
+    label: "Male",
+    value: "Male",
+  },
+];
