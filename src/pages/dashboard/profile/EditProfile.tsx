@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-// import editIcon from "../../../assets/icons/editIcon.svg";
+import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from "../../../lib/hook";
 import type { RootState } from "../../../lib/store";
 import { useForm } from "react-hook-form";
-import { useCustomMutation } from "../../../hooks/apiCalls";
+import { useCustomMutation, useFileUpload } from "../../../hooks/apiCalls";
 import CustomFileUploader from "../../../components/forms/CustomFileUploader";
 import Typography from "../../../components/forms/Typography";
 import CustomInput from "../../../components/forms/CustomInput";
@@ -20,24 +19,56 @@ import { genderOptions } from "@/data";
 const EditProfile = () => {
   const queryClient = useQueryClient();
 
-  const [, setUploadedFile] = useState<File | null>(null);
+  // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data, isLoading } = useFetchProfile(userObject);
-
   const { control, getValues, reset, setError, clearErrors } = useForm({
     defaultValues: data?.data,
   });
+  const { mutate: uploadProfilePicture, isPending: profilePictureIsPending } =
+    useFileUpload({
+      url: "/api/files/display-picture",
+      successToast: () => `File uploaded successfully!`,
+      errorToast: (error: any) =>
+        error.response?.data?.message || "Upload failed",
+    });
+  console.log(userObject);
+  const { mutate: uploadCoverPicture, isPending: coverPictureIsPending } =
+    useFileUpload({
+      successToast: () => `File uploaded successfully!`,
+      errorToast: (error: any) =>
+        error.response?.data?.message || "Upload failed",
+      url: "",
+    });
 
-  const handleFileUpload = (file: File) => {
-    setUploadedFile(file);
-    const formData = new FormData();
-    formData.append("documentType", file.type);
-    formData.append("files", file);
-    formData.append("email", userObject?.email);
-    formData.append("usid", userObject?.usid);
-    formData.append("role", userObject?.role);
+  const handleProfilePictureUpload = (file: File) => {
+    // setUploadedFile(file);
+    // const formData = new FormData();
+    // formData.append("documentType", file.type);
+    // formData.append("files", file);
+    // formData.append("email", userObject?.email);
+    // formData.append("usid", userObject?.usid);
+    // formData.append("role", userObject?.role);
 
-    uploadPictureMutation.mutate(formData);
+    // uploadPictureMutation.mutate(formData);
+
+    uploadProfilePicture({
+      // file: uploadedFile,
+      file,
+      extraData: {
+        usid: userObject?.usid,
+      },
+    });
+  };
+
+  const handleCoverPictureUpload = (file: File) => {
+    uploadCoverPicture({
+      // file: uploadedFile,
+      file,
+      extraData: {
+        usid: userObject?.usid,
+      },
+    });
   };
 
   const setUsernameMutation = useCustomMutation({
@@ -50,18 +81,6 @@ const EditProfile = () => {
       setError("username", {
         message: "Username is already taken",
         type: "manual",
-      });
-    },
-  });
-
-  const uploadPictureMutation = useCustomMutation({
-    endpoint: `profile/upload-picture`,
-    contentType: "multipart/form-data",
-    successMessage: (data: any) => data?.message,
-    onSuccessCallback: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["viewProfile"],
-        exact: false,
       });
     },
   });
@@ -130,7 +149,7 @@ const EditProfile = () => {
                 <CustomFileUploader
                   maxSizeMB={5}
                   acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
-                  onFileUpload={handleFileUpload}
+                  onFileUpload={handleCoverPictureUpload}
                   // defaultFile={bannerImage}
                   showPreview={false}
                   renderTrigger={(onClick) => (
@@ -162,7 +181,7 @@ const EditProfile = () => {
                   <CustomFileUploader
                     maxSizeMB={1}
                     acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
-                    onFileUpload={handleFileUpload}
+                    onFileUpload={handleProfilePictureUpload}
                     // defaultFile={profileImage}
                     showPreview={false}
                     renderTrigger={(onClick) => (
@@ -192,7 +211,8 @@ const EditProfile = () => {
                     className="border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white cursor-pointer"
                   >
                     {updateCreatorProfileMutation.isPending ||
-                    uploadPictureMutation.isPending ||
+                    profilePictureIsPending ||
+                    coverPictureIsPending ||
                     setUsernameMutation.isPending ? (
                       <div className="flex items-center">
                         <span className="loader mr-2"></span>

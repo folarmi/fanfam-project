@@ -130,15 +130,16 @@ const Profile = () => {
 
             <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
               <div className="relative flex items-center">
-                <div className="absolute -top-8">
-                  <img
-                    src={data?.data?.profilePic}
-                    alt="profilePicture"
-                    width={100}
-                    height={100}
-                    className="rounded-full"
-                  />
+                <div className="absolute -top-8 ">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
+                    <img
+                      src={data?.data?.profilePic}
+                      alt="profilePicture"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
+
                 <div className="w-full mt-6 flex items-center justify-between">
                   {/* <div className="flex items-center ml-28">
                 <Image src={location} alt="location" />

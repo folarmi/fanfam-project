@@ -303,7 +303,7 @@ export const useFileUpload = ({
   onError,
   onSuccess,
   successToast,
-  url = "appointment/api/files/upload",
+  url = "/api/files/upload",
 }: FileUploadOptions) => {
   return useMutation<
     any,
