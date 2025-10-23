@@ -27,7 +27,7 @@ const EditProfile = () => {
   });
   const { mutate: uploadProfilePicture, isPending: profilePictureIsPending } =
     useFileUpload({
-      url: "/api/files/display-picture",
+      url: "/files/display-picture",
       successToast: () => `File uploaded successfully!`,
       errorToast: (error: any) =>
         error.response?.data?.message || "Upload failed",
