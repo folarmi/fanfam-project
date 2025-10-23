@@ -194,6 +194,17 @@ export const useCustomMutation = <
       console.log("api calls", error);
 
       try {
+        if (options.onError) {
+          // call with full signature expected by react-query's onError:
+          // (error, variables, context, mutation)
+          options.onError(
+            error as unknown as TError,
+            undefined as unknown as TVariables,
+            undefined as unknown as TContext,
+            undefined as any
+          );
+        }
+
         let message: string | string[] | Record<string, string[]>;
 
         if (options.errorMessage) {
@@ -303,7 +314,7 @@ export const useFileUpload = ({
   onError,
   onSuccess,
   successToast,
-  url = "/api/files/upload",
+  url = "/files/upload",
 }: FileUploadOptions) => {
   return useMutation<
     any,

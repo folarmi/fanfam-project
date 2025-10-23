@@ -32,7 +32,7 @@ const EditProfile = () => {
       errorToast: (error: any) =>
         error.response?.data?.message || "Upload failed",
     });
-  console.log(userObject);
+
   const { mutate: uploadCoverPicture, isPending: coverPictureIsPending } =
     useFileUpload({
       successToast: () => `File uploaded successfully!`,

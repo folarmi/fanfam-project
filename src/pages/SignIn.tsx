@@ -76,6 +76,13 @@ const SignIn = () => {
         error?.response?.data?.data?.message === "Account has not been verified"
       );
     },
+    // errorMessage: (error: any) => {
+    //   const message =
+    //     error?.response?.data?.data?.message ||
+    //     "An error occurred during sign in";
+    //   toast.error(message);
+    //   return message;
+    // },
   });
 
   const submitForm = (data: any) => {
