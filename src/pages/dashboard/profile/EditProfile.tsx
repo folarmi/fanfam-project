@@ -25,35 +25,40 @@ const EditProfile = () => {
   const { control, getValues, reset, setError, clearErrors } = useForm({
     defaultValues: data?.data,
   });
+
   const { mutate: uploadProfilePicture, isPending: profilePictureIsPending } =
     useFileUpload({
       url: "/files/display-picture",
-      successToast: () => `File uploaded successfully!`,
+      onSuccess: (data) => {
+        const formValues = {
+          ...getValues(),
+          profileImageUrl: data?.body,
+          coverImageUrl: getValues("coverImageUrl"),
+        };
+        updateCreatorProfileMutation.mutate(formValues);
+        return data?.message || "File uploaded successfully!";
+      },
       errorToast: (error: any) =>
         error.response?.data?.message || "Upload failed",
     });
 
   const { mutate: uploadCoverPicture, isPending: coverPictureIsPending } =
     useFileUpload({
-      successToast: () => `File uploaded successfully!`,
+      onSuccess: (data) => {
+        const formValues = {
+          ...getValues(),
+          coverImageUrl: data?.body,
+          profileImageUrl: getValues("profilePic"),
+        };
+        updateCreatorProfileMutation.mutate(formValues);
+        return data?.message || "File uploaded successfully!";
+      },
       errorToast: (error: any) =>
         error.response?.data?.message || "Upload failed",
-      url: "",
     });
 
   const handleProfilePictureUpload = (file: File) => {
-    // setUploadedFile(file);
-    // const formData = new FormData();
-    // formData.append("documentType", file.type);
-    // formData.append("files", file);
-    // formData.append("email", userObject?.email);
-    // formData.append("usid", userObject?.usid);
-    // formData.append("role", userObject?.role);
-
-    // uploadPictureMutation.mutate(formData);
-
     uploadProfilePicture({
-      // file: uploadedFile,
       file,
       extraData: {
         usid: userObject?.usid,
@@ -138,11 +143,9 @@ const EditProfile = () => {
             <div className="relative">
               <div className="relative w-full h-[174px] overflow-hidden bg-gray-200">
                 <img
-                  src={
-                    "https://res.cloudinary.com/dezb6qbwe/image/upload/ze25hecynmhvbavqd7bq"
-                  }
+                  src={data?.data?.coverImageUrl}
                   alt="Banner"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
 
                 {/* Banner Edit Overlay with CustomFileUploader */}
