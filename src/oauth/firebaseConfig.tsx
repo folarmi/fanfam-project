@@ -2,8 +2,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-// Your web app's Firebase configuration
-// (Copy this from the Firebase console)
 const firebaseConfig = {
   apiKey: "AIzaSyCS3W7-ShjxyNhf5L7Kc1aS1TEQH5zko-E",
   authDomain: "fanfam-79fe8.firebaseapp.com",
@@ -19,3 +17,4 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication and export it
 export const auth = getAuth(app);
+console.log("✅ Firebase initialized:", app.name);

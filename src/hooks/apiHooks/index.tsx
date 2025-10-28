@@ -32,30 +32,3 @@ export const useFetchPrivacyAndSafetySettings = (userObject: UserObject) => {
     userObject,
   });
 };
-
-// {
-//     "profile": {
-//         "activityStatus": false,
-//         "fansCountOnProfile": false,
-//         "mediaCountOnYourProfile": false,
-//         "friendsList": false,
-//         "password": false
-//     },
-//     "discoverability": {
-//         "optOutOfSuggestion": false
-//     },
-//     "post": {
-//         "posts": false,
-//         "allowCommentsFromSubscribers": false,
-//         "postTipsSum": false
-//     },
-//     "watermark": {
-//         "pictures": false,
-//         "videos": false
-//     },
-//     "safety": {
-//         "blockedByGeneralIpAddresses": [],
-//         "blockedByCountry": []
-//     },
-//     "drmVideoProtection": false
-// }

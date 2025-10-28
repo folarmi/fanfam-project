@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   fetchDeviceIP,
   getBrowserInfo,
@@ -12,7 +11,6 @@ import {
 } from "../utils/helper";
 import { useEffect, useState } from "react";
 import { useCustomMutation } from "../hooks/apiCalls";
-import { updateUserObject } from "../lib/features/auth/authSlice";
 import AuthLayout from "../layouts/AuthLayout";
 import CustomInput from "../components/forms/CustomInput";
 import Checkbox from "../components/Checkbox";
@@ -20,10 +18,10 @@ import Typography from "../components/forms/Typography";
 import CustomButton from "../components/forms/CustomButton";
 import TextBetweenLines from "../components/molecules/TextBetweenLines";
 import SocialMedia from "../components/SocialMedia";
+import { useSignIn } from "@/hooks/useSignIn";
+import { GoogleSignIn } from "@/oauth/Google";
 
 const SignIn = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { control, handleSubmit, getValues } = useForm();
   const platform = getPlatformFromUAParser();
   const browser = getBrowserInfo();
@@ -31,6 +29,10 @@ const SignIn = () => {
   const [location, setLocation] = useState<string>("");
   const [, setError] = useState<string | null>(null);
   const [notVerifiedError, setNotVerifiedError] = useState(false);
+  const signInMutation = useSignIn({
+    setNotVerifiedError,
+    endpoint: "auth/login",
+  });
 
   useEffect(() => {
     const fetchIP = async () => {
@@ -52,38 +54,6 @@ const SignIn = () => {
       })
       .catch((err) => setError(err.message || "An unexpected error occurred"));
   }, []);
-
-  const signInMutation = useCustomMutation({
-    endpoint: `auth/login`,
-    successMessage: (data: any) => data?.message,
-    onSuccessCallback: (data) => {
-      setNotVerifiedError(false);
-
-      const userObject = {
-        email: data?.data?.email,
-        role: data?.data?.role,
-        usid: data?.data?.usid,
-      };
-
-      localStorage.setItem("token", data?.data?.accessToken);
-      localStorage.setItem("refreshToken", data?.data?.refreshToken);
-      dispatch(updateUserObject(userObject));
-      navigate("/dashboard");
-    },
-    onError: (error: any) => {
-      console.log(error?.response?.data?.data?.message);
-      setNotVerifiedError(
-        error?.response?.data?.data?.message === "Account has not been verified"
-      );
-    },
-    // errorMessage: (error: any) => {
-    //   const message =
-    //     error?.response?.data?.data?.message ||
-    //     "An error occurred during sign in";
-    //   toast.error(message);
-    //   return message;
-    // },
-  });
 
   const submitForm = (data: any) => {
     const formValues = {
@@ -170,6 +140,14 @@ const SignIn = () => {
         <TextBetweenLines text="or" />
 
         <SocialMedia />
+        <div className="flex items-center justify-center mb-10">
+          <GoogleSignIn
+            ip={ip}
+            location={location}
+            browser={browser}
+            platform={platform}
+          />
+        </div>
 
         <Link to="/sign-up">
           <Typography variant="p3" className="pb-10 text-center text-grey_500">
@@ -183,3 +161,14 @@ const SignIn = () => {
 };
 
 export { SignIn };
+
+// {
+//   "token": "string",
+//   "deviceMetaDto": {
+//     "deviceOS": "string",
+//     "deviceIP": "string",
+//     "location": "string",
+//     "platform": "string",
+//     "browser": "string"
+//   }
+// }
