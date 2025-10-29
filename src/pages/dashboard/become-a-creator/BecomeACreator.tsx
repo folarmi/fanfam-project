@@ -1,0 +1,55 @@
+import { CreatorHeaderText } from "@/components/atoms/CreatorHeaderText";
+import CustomButton from "@/components/forms/CustomButton";
+import Typography from "@/components/forms/Typography";
+import RadioButton from "@/components/RadioButtonLabel";
+import { becomeACreator } from "@/data";
+import { Link } from "react-router-dom";
+
+const BecomeACreator = () => {
+  return (
+    <div className="mt-4">
+      <CreatorHeaderText
+        title="Monetize your contents"
+        description=" Ready to start monetizing your contents become a creator now!"
+      />
+
+      <section className="border-t border-grey_10 ">
+        {becomeACreator.map(({ id, image, subtitle, title, link }) => {
+          return (
+            <Link
+              to={link}
+              className="flex items-center p-4 border border-grey_10 rounded-lg mt-4 mx-4"
+              key={id}
+            >
+              <img src={image} />
+
+              <div className="ml-4">
+                <Typography variant="subtitle2" className="">
+                  {title}
+                </Typography>
+                <Typography variant="p3" className="">
+                  {subtitle}
+                </Typography>
+              </div>
+
+              <div className="flex-shrink-0 ml-auto">
+                <RadioButton />
+              </div>
+            </Link>
+          );
+        })}
+      </section>
+
+      <div className="border-b border-grey_10">
+        <CustomButton
+          variant="primary"
+          className="shadow-custom mb-4 mt-3 mx-4 w-[96%]"
+        >
+          Get Started
+        </CustomButton>
+      </div>
+    </div>
+  );
+};
+
+export { BecomeACreator };

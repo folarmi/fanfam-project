@@ -7,21 +7,32 @@ import CustomButton from "../components/forms/CustomButton";
 import TextBetweenLines from "../components/molecules/TextBetweenLines";
 import AuthLayout from "../layouts/AuthLayout";
 import Checkbox from "../components/Checkbox";
-import SocialMedia from "../components/SocialMedia";
+// import SocialMedia from "../components/SocialMedia";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "../lib/hook";
 import {
   updateEmailType,
   updateUserEmail,
 } from "../lib/features/auth/authSlice";
-import { phoneRegex } from "../utils/helper";
+import {
+  getBrowserInfo,
+  getPlatformFromUAParser,
+  phoneRegex,
+} from "../utils/helper";
 import { useCustomMutation } from "../hooks/apiCalls";
 import { Link, useNavigate } from "react-router-dom";
 import { UserRole } from "@/data";
+import { GoogleSignIn } from "@/oauth/Google";
+import { useState } from "react";
 
 const Signup = () => {
   const navigate = useNavigate();
   const { control, handleSubmit } = useForm();
+  const platform = getPlatformFromUAParser();
+  const browser = getBrowserInfo();
+  const [ip] = useState<string>("");
+  const [location] = useState<string>("");
+
   const dispatch = useAppDispatch();
 
   const signUpMutation = useCustomMutation({
@@ -102,7 +113,15 @@ const Signup = () => {
 
         <TextBetweenLines text="or" />
 
-        <SocialMedia />
+        {/* <SocialMedia /> */}
+        <div className="flex items-center justify-center mb-10">
+          <GoogleSignIn
+            ip={ip}
+            location={location}
+            browser={browser}
+            platform={platform}
+          />
+        </div>
 
         <Typography variant="p3" className="pb-10 text-center text-grey_500">
           Already have an account?{" "}

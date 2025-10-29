@@ -57,6 +57,11 @@ import type {
   PrivacyAndSafetyData,
 } from "@/lib/types";
 import countryList from "react-select-country-list";
+import { CreatorIcon } from "@/components/svgs/Creator";
+import creatorOne from "@/assets/icons/creatorOne.svg";
+import creatorTwo from "@/assets/icons/creatorTwo.svg";
+import creatorThree from "@/assets/icons/creatorThree.svg";
+import creatorFour from "@/assets/icons/creatorFour.svg";
 
 export const sideBarItems = [
   {
@@ -106,6 +111,12 @@ export const sideBarItems = [
     name: "Settings",
     image: <SettingsIcon />,
     link: "/dashboard/settings/account",
+  },
+  {
+    id: 9,
+    name: "Become a Creator",
+    image: <CreatorIcon />,
+    link: "/dashboard/become-a-creator",
   },
 ];
 
@@ -1773,5 +1784,36 @@ export const genderOptions = [
   {
     label: "Male",
     value: "Male",
+  },
+];
+
+export const becomeACreator = [
+  {
+    id: 1,
+    title: "Verify Your Identity",
+    subtitle: "Upload an approved government ID to verify your identity",
+    image: creatorOne,
+    link: "/dashboard/become-a-creator/verify-identity",
+  },
+  {
+    id: 2,
+    title: "Complete Banking Information",
+    subtitle: "Complete your banking information",
+    image: creatorTwo,
+    link: "/dashboard/become-a-creator/banking-information",
+  },
+  {
+    id: 3,
+    title: "Setup your Profile",
+    subtitle: "Complete your Account Setup",
+    image: creatorThree,
+    link: "/dashboard/become-a-creator/setup-profile",
+  },
+  {
+    id: 4,
+    title: "Setup your strategy",
+    subtitle: "Setup your monetization strategy",
+    image: creatorFour,
+    link: "/dashboard/become-a-creator/monetization-strategy",
   },
 ];
