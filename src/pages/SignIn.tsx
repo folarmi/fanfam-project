@@ -17,7 +17,7 @@ import Checkbox from "../components/Checkbox";
 import Typography from "../components/forms/Typography";
 import CustomButton from "../components/forms/CustomButton";
 import TextBetweenLines from "../components/molecules/TextBetweenLines";
-import SocialMedia from "../components/SocialMedia";
+// import SocialMedia from "../components/SocialMedia";
 import { useSignIn } from "@/hooks/useSignIn";
 import { GoogleSignIn } from "@/oauth/Google";
 
@@ -139,7 +139,7 @@ const SignIn = () => {
 
         <TextBetweenLines text="or" />
 
-        <SocialMedia />
+        {/* <SocialMedia /> */}
         <div className="flex items-center justify-center mb-10">
           <GoogleSignIn
             ip={ip}
@@ -161,14 +161,3 @@ const SignIn = () => {
 };
 
 export { SignIn };
-
-// {
-//   "token": "string",
-//   "deviceMetaDto": {
-//     "deviceOS": "string",
-//     "deviceIP": "string",
-//     "location": "string",
-//     "platform": "string",
-//     "browser": "string"
-//   }
-// }

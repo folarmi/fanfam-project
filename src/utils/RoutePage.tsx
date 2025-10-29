@@ -42,10 +42,13 @@ import {
   BlockCountry,
   Preferences,
   Collections,
+  BecomeACreator,
+  VerifyYourIdentity,
 } from "../pages/dashboard";
 import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
 import SettingLayout from "@/layouts/SettingsLayout";
+import BecomeACreatorLayout from "@/layouts/BecomeACreatorLayout";
 
 const RoutePage = () => {
   return (
@@ -116,6 +119,14 @@ const RoutePage = () => {
             element={<BlockCountry />}
           />
           <Route path="settings/preferences" element={<Preferences />} />
+        </Route>
+
+        <Route element={<BecomeACreatorLayout />}>
+          <Route path="become-a-creator" element={<BecomeACreator />} />
+          <Route
+            path="become-a-creator/verify-identity"
+            element={<VerifyYourIdentity />}
+          />
         </Route>
       </Route>
 

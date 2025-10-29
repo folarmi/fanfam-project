@@ -18,6 +18,10 @@ export default {
           "linear-gradient(to right, rgba(1, 26, 39, 0.28), rgba(1, 26, 39, 0.25), rgba(1, 26, 39, 0.37))",
         "my-gradient":
           "linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0))",
+        "custom-combined": [
+          "0 1px 1px 0 rgba(1, 18, 32, 0.20)",
+          "inset 0 2px 0 0 rgba(255, 255, 255, 0.16)",
+        ].join(", "),
       },
       colors: {
         primary: "#2599F6",

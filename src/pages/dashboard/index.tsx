@@ -33,3 +33,5 @@ export * from "./settings/privacy/BlockCountry";
 export * from "./settings/privacy/BlockIP";
 export * from "./settings/Preferences";
 export * from "./collections/Collections";
+export * from "./become-a-creator/BecomeACreator";
+export * from "./become-a-creator/VerifyYourIdentity";

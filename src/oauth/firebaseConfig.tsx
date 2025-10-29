@@ -17,4 +17,3 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication and export it
 export const auth = getAuth(app);
-console.log("✅ Firebase initialized:", app.name);
