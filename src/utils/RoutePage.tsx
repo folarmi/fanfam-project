@@ -44,6 +44,9 @@ import {
   Collections,
   BecomeACreator,
   VerifyYourIdentity,
+  BankingInformation,
+  SetupProfile,
+  SetupStrategy,
 } from "../pages/dashboard";
 import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
@@ -126,6 +129,18 @@ const RoutePage = () => {
           <Route
             path="become-a-creator/verify-identity"
             element={<VerifyYourIdentity />}
+          />
+          <Route
+            path="become-a-creator/banking-information"
+            element={<BankingInformation />}
+          />
+          <Route
+            path="become-a-creator/setup-profile"
+            element={<SetupProfile />}
+          />
+          <Route
+            path="become-a-creator/monetization-strategy"
+            element={<SetupStrategy />}
           />
         </Route>
       </Route>

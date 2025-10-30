@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 const BlockCountry = () => {
-  const control = useForm();
+  const { control } = useForm();
   const countryOptions = useMemo(() => getAllCountryOptionsWithNames(), []);
 
   console.log(countryOptions);

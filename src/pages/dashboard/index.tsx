@@ -35,3 +35,6 @@ export * from "./settings/Preferences";
 export * from "./collections/Collections";
 export * from "./become-a-creator/BecomeACreator";
 export * from "./become-a-creator/VerifyYourIdentity";
+export * from "./become-a-creator/BankingInformation";
+export * from "./become-a-creator/SetupProfile";
+export * from "./become-a-creator/SetupStrategy";

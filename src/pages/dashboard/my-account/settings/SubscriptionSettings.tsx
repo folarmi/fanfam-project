@@ -18,7 +18,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SubscriptionHeader } from "./SubscriptionHeader";
 
-const SubscriptionSettings = () => {
+type Prop = {
+  showHeader?: boolean;
+};
+
+const SubscriptionSettings = ({ showHeader = true }: Prop) => {
   const { control } = useForm();
   const [isPromotionalCampaign, setIsPromotionalCampaign] = useState(false);
   const [isFreeTrialLink, setIsFreeTrialLink] = useState(false);
@@ -37,7 +41,7 @@ const SubscriptionSettings = () => {
 
   return (
     <div>
-      <SubscriptionHeader text="Subscription Settings" />
+      {showHeader && <SubscriptionHeader text="Subscription Settings" />}
 
       <section className="mt-4 ml-4 p-4 shadow-timeline-card-shadow">
         <CustomInput

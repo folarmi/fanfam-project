@@ -11,9 +11,10 @@ const BecomeACreator = () => {
       <CreatorHeaderText
         title="Monetize your contents"
         description=" Ready to start monetizing your contents become a creator now!"
+        showBackButton={false}
       />
 
-      <section className="border-t border-grey_10 ">
+      <section className="border-t border-grey_10">
         {becomeACreator.map(({ id, image, subtitle, title, link }) => {
           return (
             <Link
