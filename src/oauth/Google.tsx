@@ -30,6 +30,7 @@ export const GoogleSignIn = ({
     provider.addScope("https://www.googleapis.com/auth/userinfo.profile");
 
     try {
+      // const result = await signInWithPopup(auth, provider);
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const idToken = await user.getIdToken();
@@ -37,7 +38,6 @@ export const GoogleSignIn = ({
       // Call the mutation with Google token
       signInMutation.mutate({
         token: idToken,
-        // email: user.email,
         deviceMetaDto: {
           deviceOS: getDeviceOS(),
           deviceIP: ip,

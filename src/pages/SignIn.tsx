@@ -136,26 +136,26 @@ const SignIn = () => {
         >
           Sign in
         </CustomButton>
-
-        <TextBetweenLines text="or" />
-
-        {/* <SocialMedia /> */}
-        <div className="flex items-center justify-center mb-10">
-          <GoogleSignIn
-            ip={ip}
-            location={location}
-            browser={browser}
-            platform={platform}
-          />
-        </div>
-
-        <Link to="/sign-up">
-          <Typography variant="p3" className="pb-10 text-center text-grey_500">
-            Don't have an account?{" "}
-            <span className="text-primary">Create one</span>
-          </Typography>
-        </Link>
       </form>
+
+      <TextBetweenLines text="or" />
+
+      {/* <SocialMedia /> */}
+      <div className="flex items-center justify-center mb-10">
+        <GoogleSignIn
+          ip={ip}
+          location={location}
+          browser={browser}
+          platform={platform}
+        />
+      </div>
+
+      <Link to="/sign-up">
+        <Typography variant="p3" className="pb-10 text-center text-grey_500">
+          Don't have an account?{" "}
+          <span className="text-primary">Create one</span>
+        </Typography>
+      </Link>
     </AuthLayout>
   );
 };
