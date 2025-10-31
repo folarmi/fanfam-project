@@ -52,6 +52,7 @@ import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
 import SettingLayout from "@/layouts/SettingsLayout";
 import BecomeACreatorLayout from "@/layouts/BecomeACreatorLayout";
+// import AuthGate from "@/hooks/AuthGate";
 
 const RoutePage = () => {
   return (

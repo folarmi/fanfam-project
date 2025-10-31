@@ -24,7 +24,6 @@ export const useSignIn = ({
     successMessage: (data: any) => data?.message,
     onSuccessCallback: (data) => {
       setNotVerifiedError(false);
-
       const userObject = {
         email: data?.data?.email,
         role: data?.data?.role,
@@ -34,6 +33,10 @@ export const useSignIn = ({
       localStorage.setItem("token", data?.data?.accessToken);
       localStorage.setItem("refreshToken", data?.data?.refreshToken);
       dispatch(updateUserObject(userObject));
+
+      // Dispatch custom event
+      window.dispatchEvent(new Event("auth-complete"));
+
       navigate("/dashboard");
     },
     onError: (error: any) => {

@@ -68,7 +68,7 @@ const SignIn = () => {
       },
     };
 
-    signInMutation.mutate(formValues);
+    signInMutation?.mutate(formValues);
   };
 
   const resendVerificationLinkMutation = useCustomMutation({
@@ -130,7 +130,7 @@ const SignIn = () => {
         </div>
 
         <CustomButton
-          loading={signInMutation.isPending}
+          loading={signInMutation?.isPending}
           variant="primary"
           className="shadow-custom mb-6 px-6 w-full"
         >
@@ -140,7 +140,6 @@ const SignIn = () => {
 
       <TextBetweenLines text="or" />
 
-      {/* <SocialMedia /> */}
       <div className="flex items-center justify-center mb-10">
         <GoogleSignIn
           ip={ip}

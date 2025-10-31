@@ -154,13 +154,19 @@ export const useCustomMutation = <
         // GET and DELETE typically don't have a body
         response = await api[method]<TData>(finalEndpoint, {
           headers: {
+            ...api.defaults.headers.common,
             "Content-Type": contentType,
           },
         });
       } else {
         // POST, PUT, PATCH with body
         response = await api[method]<TData>(finalEndpoint, requestData, {
+          // headers: {
+          //   "Content-Type": contentType,
+          // },
+
           headers: {
+            ...api.defaults.headers.common,
             "Content-Type": contentType,
           },
         });
