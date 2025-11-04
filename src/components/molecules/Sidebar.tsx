@@ -16,6 +16,7 @@ const Sidebar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { isCreator } = useAppSelector((state: RootState) => state.auth);
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
 
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
@@ -57,25 +58,29 @@ const Sidebar = () => {
       }
 
       <div className="w-[25%]">
-        {sideBarItems.map(({ id, name, image, link }) => {
-          return (
-            <Link
-              className={`w-[236px] flex items-center mb-2 py-2 pl-4 rounded-lg ${
-                location?.pathname === link ? " bg-blue_100" : ""
-              }`}
-              to={link}
-              key={id}
-            >
-              <div className="flex items-center">
-                {/* <Image src={image} alt="icon" className="" /> */}
-                {image}
-                <Typography variant="subtitle2" className="text-grey_400 pl-4">
-                  {name}
-                </Typography>
-              </div>
-            </Link>
-          );
-        })}
+        {sideBarItems
+          .filter((item) => item.roles.includes(userObject.role))
+          .map(({ id, name, image, link }) => {
+            return (
+              <Link
+                className={`w-[236px] flex items-center mb-2 py-2 pl-4 rounded-lg ${
+                  location?.pathname === link ? " bg-blue_100" : ""
+                }`}
+                to={link}
+                key={id}
+              >
+                <div className="flex items-center">
+                  {image}
+                  <Typography
+                    variant="subtitle2"
+                    className="text-grey_400 pl-4"
+                  >
+                    {name}
+                  </Typography>
+                </div>
+              </Link>
+            );
+          })}
       </div>
 
       <div

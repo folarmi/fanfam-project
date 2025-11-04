@@ -8,15 +8,13 @@ import type { RootState } from "../../lib/store";
 import SearchInput from "../../components/SearchInput";
 import Poll from "../../components/molecules/Poll";
 import CommentBox from "../../components/CommentBox";
-import FileUploader from "../../components/molecules/FileUploader";
 import Timeline from "../../components/cards/Timeline";
 import TimeLineHomeModal from "../../components/modals/TimeLineHomeModal";
 import { UserRole } from "../../data";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
 import StoryModal from "../../components/modals/StoryModal";
-
-// import TimeLineHomeModal from "../components/modals/TimeLineHomeModal";
+import { StoryUploader } from "@/components/molecules/StoryUploader";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -62,17 +60,19 @@ const Home = () => {
             setPollOptions={setPollOptions}
             activePoll={activePoll}
             setActivePoll={setActivePoll}
+            setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
           />
         ) : (
           <CommentBox setIfUserIsCreatingPoll={setIfUserIsCreatingPoll} />
         )}
 
         <div className="my-2">
-          <FileUploader
+          {/* <FileUploader
             maxSizeMB={1}
             acceptFormats={["png", "jpeg", "jpg", "gif"]}
             onFileUpload={handleFileUpload}
-          />
+          /> */}
+          <StoryUploader onFileUpload={handleFileUpload} />;
         </div>
 
         <div className="relative">
@@ -121,6 +121,7 @@ const Home = () => {
             setShowModal={showMoreModalTwo}
           />
         </div>
+
         <Timeline
           profileName="Priscilia yummy"
           avatar={defaultLiveAvatar}

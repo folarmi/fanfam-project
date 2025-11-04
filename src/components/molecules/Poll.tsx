@@ -15,15 +15,17 @@ type pollProps = {
   setPollOptions: any;
   activePoll: string;
   setActivePoll: any;
+  setIfUserIsCreatingPoll: (val: boolean) => void;
 };
 
 const Poll = ({
   pollOptions,
   // setPollOptions,
   activePoll,
+  setIfUserIsCreatingPoll,
 }: // setActivePoll,
 pollProps) => {
-  const control = useForm();
+  const { control } = useForm();
   const [isPollAnswered, setIsPollAnswered] = useState(false);
 
   // const handleDragEnd = (result: {
@@ -143,7 +145,11 @@ pollProps) => {
           </div>
 
           <div className="flex items-center justify-end mt-6">
-            <Typography variant="subtitle3" className="text-blue_500 pr-7">
+            <Typography
+              variant="subtitle3"
+              className="text-blue_500 pr-7 cursor-pointer"
+              onClick={() => setIfUserIsCreatingPoll(false)}
+            >
               Cancel poll
             </Typography>
             <div className="w-[62px]">

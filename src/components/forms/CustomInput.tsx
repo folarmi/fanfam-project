@@ -13,6 +13,7 @@ interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   type?: string;
   borderRadius?: string;
   className?: string;
+  multiline?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
 }
