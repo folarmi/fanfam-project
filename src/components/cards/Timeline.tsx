@@ -17,7 +17,7 @@ type TimelineProps = {
   time: string;
   paragraphOne?: string;
   paragraphTwo?: string;
-  timeLineImage: string;
+  timeLineImage: string[];
   ifParagraph?: boolean;
   showModal?: any;
   setShowModal?: any;
@@ -107,11 +107,12 @@ const Timeline = ({
       </section>
 
       <div className="w-full my-4">
-        <img
-          src={timeLineImage}
-          alt="timelineImage"
-          className="w-full h-full"
-        />
+        {/* {timeLineImage.length > 0 && } */}
+        {timeLineImage?.map((img) => {
+          return (
+            <img src={img} alt="timelineImage" className="w-full h-full" />
+          );
+        })}
       </div>
 
       {ifIcon && (

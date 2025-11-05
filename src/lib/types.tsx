@@ -42,3 +42,38 @@ export interface LocationResult {
   error?: string;
   coords?: GeolocationCoords;
 }
+
+export interface MediaType {
+  PHOTO: "photo";
+  VIDEO: "video";
+  AUDIO: "audio";
+  DOCUMENT: "document";
+}
+
+export interface StoryPost {
+  publicId: string;
+  createdBy: string;
+  lastModifiedBy: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  creator: string;
+  message: string;
+  mediaLinks: string[];
+  comments: Comment[];
+  reactions: Reaction[];
+  mediaType: "PHOTO" | "VIDEO" | "AUDIO" | "TEXT";
+}
+
+// Optional child interfaces if you plan to expand later:
+export interface Comment {
+  id?: string;
+  author?: string;
+  text?: string;
+  createdAt?: string;
+}
+
+export interface Reaction {
+  id?: string;
+  user?: string;
+  type?: string; // e.g. "LIKE" | "LOVE" | "WOW"
+}
