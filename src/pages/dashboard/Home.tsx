@@ -1,7 +1,7 @@
 import { useState } from "react";
 import defaultLiveAvatar from "../../assets/defaultLiveAvatar.svg";
 // import defaultAvatar from "../../assets/defaultAvatar.svg";
-import timelineImage from "../../assets/timelineImage.svg";
+// import timelineImage from "../../assets/timelineImage.svg";
 // import timelineTwo from "../../assets/timelineTwo.svg";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
@@ -18,13 +18,13 @@ import { StoryUploader } from "@/components/molecules/StoryUploader";
 import { useGetData } from "@/hooks/apiCalls";
 import { Loader } from "@/components/molecules/Loader";
 import type { StoryPost } from "@/lib/types";
+import { formatTimeAgo } from "@/utils/helperTwo";
+import { useFetchProfile } from "@/hooks/apiHooks";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
-
-  const [showMoreModal, setShowMoreModal] = useState(false);
   const [isEditingStory, setIsEditingStory] = useState(false);
-  // const [showMoreModalTwo, setShowMoreModalTwo] = useState(false);
+  const [showMoreModal, setShowMoreModal] = useState<string | null>(null);
   const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [pollOptions, setPollOptions] = useState([
@@ -39,10 +39,11 @@ const Home = () => {
   ]);
   const [activePoll, setActivePoll] = useState(pollOptions[0].name);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const { data: profileData, isLoading } = useFetchProfile(userObject);
 
   const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
     useGetData({
-      url: `contents?page=0&size=20`,
+      url: `contents?creator=${userObject?.email}&page=0&size=20&sort=asc`,
       queryKey: ["GetContents"],
     });
   const toggleInterestModal = () => {
@@ -60,7 +61,7 @@ const Home = () => {
 
   return (
     <>
-      {getCreatorContentIsLoading ? (
+      {isLoading || getCreatorContentIsLoading ? (
         <Loader />
       ) : (
         <div className="">
@@ -84,54 +85,27 @@ const Home = () => {
 
             {getCreatorContent?.data?.content?.map((data: StoryPost) => {
               return (
-                <div className="relative">
+                <div className="relative" key={data?.publicId}>
                   <Timeline
-                    profileName={data?.createdBy}
+                    profileName={profileData?.data?.displayName}
                     avatar={defaultLiveAvatar}
-                    handle="@yummychill54 ."
-                    time="3 h ago"
+                    handle={`@${profileData?.data?.username}`}
+                    time={formatTimeAgo(data?.createdDate)}
                     paragraphOne={data?.message}
                     timeLineImage={data?.mediaLinks}
                     ifParagraph={true}
-                    showModal={showMoreModal}
-                    setShowModal={setShowMoreModal}
+                    // showModal={showMoreModal}
+                    // setShowModal={setShowMoreModal}
+                    showModal={showMoreModal === data?.publicId} // Only true for this specific item
+                    setShowModal={(show) =>
+                      setShowMoreModal(show ? data?.publicId : null)
+                    }
                     TimeLineModal={<TimeLineHomeModal />}
+                    ifIcon={data?.reactions.length > 0 ? true : false}
                   />
                 </div>
               );
             })}
-
-            {/* <div className="relative">
-              <Timeline
-                profileName="Priscilia yummy"
-                avatar={defaultAvatar}
-                handle="@yummychill54 ."
-                time="3 h ago"
-                paragraphOne="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-                paragraphTwo="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-                timeLineImage={timelineTwo}
-                ifParagraph={true}
-                showModal={setShowMoreModalTwo}
-                setShowModal={showMoreModalTwo}
-              />
-            </div>
-
-            <Timeline
-              profileName="Priscilia yummy"
-              avatar={defaultLiveAvatar}
-              handle="@yummychill54 ."
-              time="3 h ago"
-              timeLineImage={timelineImage}
-              ifParagraph={false}
-            /> */}
           </>
 
           {userObject.role !== UserRole.creator && (
