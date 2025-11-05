@@ -24,7 +24,9 @@ import { useFetchProfile } from "@/hooks/apiHooks";
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [isEditingStory, setIsEditingStory] = useState(false);
-  const [showMoreModal, setShowMoreModal] = useState<string | null>(null);
+  const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
+    null
+  );
   const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [pollOptions, setPollOptions] = useState([
@@ -57,6 +59,10 @@ const Home = () => {
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
     toggleIsEditingStoryModal();
+  };
+
+  const toggleTimelineHomeModal = () => {
+    setShowMoreModal(!showMoreModal);
   };
 
   return (
@@ -94,13 +100,15 @@ const Home = () => {
                     paragraphOne={data?.message}
                     timeLineImage={data?.mediaLinks}
                     ifParagraph={true}
-                    // showModal={showMoreModal}
-                    // setShowModal={setShowMoreModal}
                     showModal={showMoreModal === data?.publicId} // Only true for this specific item
                     setShowModal={(show) =>
                       setShowMoreModal(show ? data?.publicId : null)
                     }
-                    TimeLineModal={<TimeLineHomeModal />}
+                    TimeLineModal={
+                      <TimeLineHomeModal
+                        toggleTimelineHomeModal={toggleTimelineHomeModal}
+                      />
+                    }
                     ifIcon={data?.reactions.length > 0 ? true : false}
                   />
                 </div>

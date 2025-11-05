@@ -77,3 +77,8 @@ export interface Reaction {
   user?: string;
   type?: string; // e.g. "LIKE" | "LOVE" | "WOW"
 }
+
+export type MediaItem = {
+  mediaType: "PHOTO" | "DOCUMENT" | "VIDEO";
+  mediaLink: string;
+}[];

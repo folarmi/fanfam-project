@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import CustomButton from "./forms/CustomButton";
-import Picture from "../assets/icons/picture";
 import Smile from "../assets/icons/smile";
 import Poll from "../assets/icons/poll";
 import Record from "../assets/icons/record";
 import { useForm } from "react-hook-form";
 import { CustomTextArea } from "./forms/CustomTextArea";
 import { useCustomMutation, useFileUpload } from "@/hooks/apiCalls";
-import CustomFileUploader from "./forms/CustomFileUploader";
 import type { RootState } from "@/lib/store";
 import { useAppSelector } from "@/lib/hook";
+import { PostUploader } from "./molecules/PostUploader";
+import type { MediaItem } from "@/lib/types";
 
 type CommentBoxProps = {
   ifPoll?: boolean;
@@ -27,23 +27,11 @@ const CommentBox = ({
   const { handleSubmit, control } = useForm();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
-  // const [uploadedMediaLinks, setUploadedMediaLinks] = useState<string[]>([]);
 
   const {
     mutate: uploadPostWithPictures,
     isPending: postWithPictureIsPending,
   } = useFileUpload({
-    // onSuccess: (data) => {
-    //   const formValues = {
-    //     ...getValues(),
-    //     // message: "",
-    //     mediaLinks: [data?.body],
-    //     mentions: [],
-    //     mediaType: "PHOTO",
-    //   };
-    //   // createContentMutation.mutate(formValues);
-    //   return data?.message || "File uploaded successfully!";
-    // },
     onSuccess: (data) => {
       return data?.message || "File uploaded successfully!";
     },
@@ -70,35 +58,79 @@ const CommentBox = ({
   };
 
   // Sequential file upload function
-  const uploadFilesSequentially = async (files: File[]): Promise<string[]> => {
-    const mediaLinks: string[] = [];
+  // const uploadFilesSequentially = async (files: File[]): Promise<MediaItem> => {
+  //   const mediaLinks: MediaItem = [];
 
-    for (const file of files) {
-      try {
-        // Upload one file at a time
-        const result = await new Promise<any>((resolve, reject) => {
-          uploadPostWithPictures(
-            {
-              file: file,
-              extraData: {
-                usid: userObject?.usid,
-              },
+  //   for (const file of files) {
+  //     try {
+  //       // Upload one file at a time
+  //       const result = await new Promise<any>((resolve, reject) => {
+  //         uploadPostWithPictures(
+  //           {
+  //             file: file,
+  //             extraData: {
+  //               usid: userObject?.usid,
+  //             },
+  //           },
+  //           {
+  //             onSuccess: (data) => resolve(data),
+  //             onError: (error) => reject(error),
+  //           }
+  //         );
+  //       });
+
+  //       // Collect the media URL
+  //       if (result?.body) {
+  //         mediaLinks.push({
+  //           mediaType: file.type.startsWith("image/") ? "PHOTO" : "DOCUMENT",
+  //           mediaLink: result.body?.url,
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error(`Failed to upload ${file.name}:`, error);
+  //       throw error;
+  //     }
+  //   }
+
+  //   return mediaLinks;
+  // };
+
+  const uploadFilesSequentially = async (files: File[]): Promise<MediaItem> => {
+    const mediaLinks: MediaItem = [];
+
+    try {
+      // Upload all files in a single request
+      const result = await new Promise<any>((resolve, reject) => {
+        uploadPostWithPictures(
+          {
+            file: files, // Changed from 'file' to 'files' array
+            extraData: {
+              usid: userObject?.usid,
             },
-            {
-              onSuccess: (data) => resolve(data),
-              onError: (error) => reject(error),
-            }
-          );
-        });
+          },
+          {
+            onSuccess: (data) => resolve(data),
+            onError: (error) => reject(error),
+          }
+        );
+      });
 
-        // Collect the media URL
-        if (result?.body) {
-          mediaLinks.push(result.body);
-        }
-      } catch (error) {
-        console.error(`Failed to upload ${file.name}:`, error);
-        throw error;
+      // Process the response body array
+      if (result?.body && Array.isArray(result.body)) {
+        result.body.forEach((item: any, index: number) => {
+          mediaLinks.push({
+            mediaType: files[index].type.startsWith("image/")
+              ? "PHOTO"
+              : files[index].type.startsWith("video/")
+              ? "VIDEO"
+              : "DOCUMENT",
+            mediaLink: item.url,
+          });
+        });
       }
+    } catch (error) {
+      console.error("Failed to upload files:", error);
+      throw error;
     }
 
     return mediaLinks;
@@ -126,12 +158,12 @@ const CommentBox = ({
         // Now create the post with all media links
         const formValues = {
           ...data,
-          mediaLinks: mediaLinks, // Array of all uploaded URLs
+          mediaFiles: mediaLinks, // Array of all uploaded URLs
           mentions: [],
           mediaType: getMediaType(queuedFiles),
         };
-
-        createContentMutation.mutate(formValues);
+        console.log(formValues);
+        // createContentMutation.mutate(formValues);
 
         // Clear queue after successful post
         setQueuedFiles([]);
@@ -175,93 +207,9 @@ const CommentBox = ({
 
       <div className="flex items-center justify-between py-[5px]">
         <div className="flex items-center gap-x-3">
-          <CustomFileUploader
-            maxSizeMB={50}
-            acceptFormats={[
-              // Images
-              "jpg",
-              "jpeg",
-              "png",
-              "gif",
-              "webp",
-              // Videos
-              "mp4",
-              "mov",
-              "avi",
-              "mkv",
-              "webm",
-              // Documents
-              "pdf",
-              "doc",
-              "docx",
-              "txt",
-            ]}
-            multiple={true}
-            onFileUpload={handleFileUpload}
-            render={({
-              previews,
-              error,
-              removeFile,
-              triggerFileInput,
-              isDragging,
-              dropHandlers,
-            }) => (
-              <div
-                {...dropHandlers}
-                className={` rounded-lg transition-colors ${
-                  isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-                }`}
-              >
-                {previews.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
-                    {previews.map((preview, index) => (
-                      <div key={index} className="relative">
-                        {/* Different preview based on file type */}
-                        {preview.file.type.startsWith("image/") && (
-                          <img
-                            src={preview.url}
-                            alt={preview.name}
-                            className="w-20 h-20 object-cover rounded"
-                          />
-                        )}
-                        {preview.file.type.startsWith("video/") && (
-                          <video
-                            src={preview.url}
-                            className="w-20 h-20 object-cover rounded"
-                          />
-                        )}
-                        {preview.file.type.startsWith("application/") && (
-                          <div className="w-20 h-20 bg-gray-200 rounded flex items-center justify-center">
-                            <span className="text-xs text-gray-600">
-                              {preview.name.split(".").pop()?.toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            removeFile(index);
-                            handleRemoveFile(index);
-                          }}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm hover:bg-red-600"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <Picture
-                  onClick={triggerFileInput}
-                  isActive={true}
-                  className="cursor-pointer mb-2"
-                />
-
-                {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
-              </div>
-            )}
+          <PostUploader
+            handleFileUpload={handleFileUpload}
+            handleRemoveFile={handleRemoveFile}
           />
 
           <Smile isActive={isActive} className="cursor-pointer" />
