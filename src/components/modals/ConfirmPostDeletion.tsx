@@ -16,7 +16,7 @@ const ConfirmPostDeletion = ({ publicId, toggleModal }: Prop) => {
   const deletePostMutation = useCustomMutation({
     endpoint: `contents/${publicId}`,
     method: "delete",
-    // successMessage: () => "User Profile updated successfully",
+    successMessage: () => "Post deleted successfully",
     onSuccessCallback: () => {
       queryClient.invalidateQueries({
         queryKey: ["GetContents"],

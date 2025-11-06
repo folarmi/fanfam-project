@@ -44,6 +44,7 @@ export interface LocationResult {
 }
 
 export type MediaType = "PHOTO" | "VIDEO" | "AUDIO" | "DOCUMENT";
+export type ReactionType = "LIKE" | "LOVE" | "DISLIKE" | "LOL";
 export interface MediaFile {
   publicId: string;
   createdBy: string;
@@ -52,6 +53,14 @@ export interface MediaFile {
   lastModifiedDate: string;
   mediaType: MediaType;
   mediaLink: string;
+}
+export interface Reaction {
+  publicId: string;
+  createdBy: string;
+  lastModifiedBy: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  type: ReactionType;
 }
 
 export interface StoryPost {
@@ -73,12 +82,6 @@ export interface Comment {
   author?: string;
   text?: string;
   createdAt?: string;
-}
-
-export interface Reaction {
-  id?: string;
-  user?: string;
-  type?: string; // e.g. "LIKE" | "LOVE" | "WOW"
 }
 
 export type MediaItem = {

@@ -93,8 +93,9 @@ const Home = () => {
               return (
                 <div className="relative" key={data?.publicId}>
                   <Timeline
+                    publicId={data?.publicId}
                     profileName={profileData?.data?.displayName}
-                    avatar={defaultLiveAvatar}
+                    avatar={profileData?.data?.profilePic || defaultLiveAvatar}
                     handle={`@${profileData?.data?.username}`}
                     time={formatTimeAgo(data?.createdDate)}
                     paragraphOne={data?.message}
@@ -110,7 +111,8 @@ const Home = () => {
                         publicId={data?.publicId}
                       />
                     }
-                    ifIcon={data?.reactions.length > 0 ? true : false}
+                    reactions={data?.reactions}
+                    // ifIcon={data?.reactions.length > 0 ? true : false}
                   />
                 </div>
               );
