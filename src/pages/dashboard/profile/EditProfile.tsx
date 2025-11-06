@@ -68,7 +68,6 @@ const EditProfile = () => {
 
   const handleCoverPictureUpload = (file: File) => {
     uploadCoverPicture({
-      // file: uploadedFile,
       file,
       extraData: {
         usid: userObject?.usid,

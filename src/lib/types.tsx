@@ -43,11 +43,15 @@ export interface LocationResult {
   coords?: GeolocationCoords;
 }
 
-export interface MediaType {
-  PHOTO: "photo";
-  VIDEO: "video";
-  AUDIO: "audio";
-  DOCUMENT: "document";
+export type MediaType = "PHOTO" | "VIDEO" | "AUDIO" | "DOCUMENT";
+export interface MediaFile {
+  publicId: string;
+  createdBy: string;
+  lastModifiedBy: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  mediaType: MediaType;
+  mediaLink: string;
 }
 
 export interface StoryPost {
@@ -58,10 +62,9 @@ export interface StoryPost {
   lastModifiedDate: string;
   creator: string;
   message: string;
-  mediaLinks: string[];
+  mediaFiles: MediaFile[];
   comments: Comment[];
   reactions: Reaction[];
-  mediaType: "PHOTO" | "VIDEO" | "AUDIO" | "TEXT";
 }
 
 // Optional child interfaces if you plan to expand later:
@@ -79,6 +82,6 @@ export interface Reaction {
 }
 
 export type MediaItem = {
-  mediaType: "PHOTO" | "DOCUMENT" | "VIDEO";
+  mediaType: MediaType;
   mediaLink: string;
 }[];

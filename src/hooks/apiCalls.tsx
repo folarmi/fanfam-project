@@ -326,16 +326,18 @@ export const useFileUpload = ({
     any,
     AxiosError,
     {
-      file: File | File[] | null | undefined | any;
+      file?: File | File[] | null | undefined | any;
+      files?: File | File[] | null | undefined;
       extraData?: Record<string, any>;
     }
   >({
-    mutationFn: async ({ file, extraData }) => {
+    mutationFn: async ({ file, files, extraData }) => {
       const formData = new FormData();
+      const filesToUpload = files || file;
 
       // Handle both single file and array of files
-      if (Array.isArray(file)) {
-        file.forEach((file) => {
+      if (Array.isArray(filesToUpload)) {
+        filesToUpload.forEach((file) => {
           formData.append(`files`, file);
         });
       } else {

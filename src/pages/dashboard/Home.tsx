@@ -98,7 +98,7 @@ const Home = () => {
                     handle={`@${profileData?.data?.username}`}
                     time={formatTimeAgo(data?.createdDate)}
                     paragraphOne={data?.message}
-                    timeLineImage={data?.mediaLinks}
+                    timeLineImage={data?.mediaFiles}
                     ifParagraph={true}
                     showModal={showMoreModal === data?.publicId} // Only true for this specific item
                     setShowModal={(show) =>

@@ -32,6 +32,7 @@ const CommentBox = ({
     mutate: uploadPostWithPictures,
     isPending: postWithPictureIsPending,
   } = useFileUpload({
+    url: "files/upload-multiple",
     onSuccess: (data) => {
       return data?.message || "File uploaded successfully!";
     },
@@ -95,7 +96,7 @@ const CommentBox = ({
   //   return mediaLinks;
   // };
 
-  const uploadFilesSequentially = async (files: File[]): Promise<MediaItem> => {
+  const uploadFiles = async (files: File[]): Promise<MediaItem> => {
     const mediaLinks: MediaItem = [];
 
     try {
@@ -103,7 +104,7 @@ const CommentBox = ({
       const result = await new Promise<any>((resolve, reject) => {
         uploadPostWithPictures(
           {
-            file: files, // Changed from 'file' to 'files' array
+            files: files, // Changed from 'file' to 'files' array
             extraData: {
               usid: userObject?.usid,
             },
@@ -153,7 +154,7 @@ const CommentBox = ({
     if (queuedFiles.length > 0) {
       try {
         // Upload all files sequentially
-        const mediaLinks = await uploadFilesSequentially(queuedFiles);
+        const mediaLinks = await uploadFiles(queuedFiles);
 
         // Now create the post with all media links
         const formValues = {
@@ -163,7 +164,7 @@ const CommentBox = ({
           mediaType: getMediaType(queuedFiles),
         };
         console.log(formValues);
-        // createContentMutation.mutate(formValues);
+        createContentMutation.mutate(formValues);
 
         // Clear queue after successful post
         setQueuedFiles([]);

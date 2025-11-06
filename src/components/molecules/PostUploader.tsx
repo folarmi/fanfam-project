@@ -104,23 +104,3 @@ const PostUploader = ({
 };
 
 export { PostUploader };
-
-// {
-//   "message": "string",
-//   "mentions": [
-//     "string"
-//   ],
-//   "mediaFiles": [
-//     {
-//       "mediaType": "PHOTO",
-//       "mediaLink": "string"
-//     }
-//   ]
-// }
-
-// {
-//     "mediaLinks": [
-//         "https://res.cloudinary.com/dezb6qbwe/image/upload/v1762370616/46439ee7-7841-409e-bb8e-9388c21d65f4fafam-20251006HU8P8ehVcXD4LZRoGU87WRKmKCZHWONk6mEL6GXJ.jpg"
-//     ],
-//     "mediaType": "PHOTO"
-// }

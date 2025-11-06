@@ -16,6 +16,7 @@ const TimeLineHomeModal = ({ toggleTimelineHomeModal }: Prop) => {
 
   const toggleDeletePostModal = () => {
     setShowDeleteModal(!showDeleteModal);
+    // toggleTimelineHomeModal(false);
   };
 
   const test = () => {};
