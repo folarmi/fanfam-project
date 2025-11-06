@@ -91,6 +91,8 @@ export default {
         "timeline-card-shadow": "0px 4px 4px 0px rgba(236, 238, 251, 1)",
         "custom-double":
           "0px 4px 10px rgba(0, 0, 0, 0.25), 0px 0px 5px rgba(255, 255, 255, 1)",
+        overlay:
+          "0px 1px 20px 0px rgba(18, 34, 16, 0.1), 1px 0px 20px 0px rgba(18, 34, 16, 0.1)",
       },
       dropShadow: {
         "3xl": "0 4px 4px 0 rgba(183, 181, 181, 0.25)",

@@ -1,32 +1,63 @@
+import { useCustomMutation } from "@/hooks/apiCalls";
 import CustomButton from "../forms/CustomButton";
 import Typography from "../forms/Typography";
+import { useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 
 type Prop = {
   toggleModal: () => void;
-  selectedItem: string;
+  publicId: string;
 };
 
-const ConfirmPostDeletion = ({ selectedItem, toggleModal }: Prop) => {
+const ConfirmPostDeletion = ({ publicId, toggleModal }: Prop) => {
+  const queryClient = useQueryClient();
+  const { handleSubmit } = useForm();
+
+  const deletePostMutation = useCustomMutation({
+    endpoint: `contents/${publicId}`,
+    method: "delete",
+    // successMessage: () => "User Profile updated successfully",
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["GetContents"],
+        exact: false,
+      });
+    },
+  });
+
+  const submitForm = () => {
+    deletePostMutation.mutate({});
+    toggleModal();
+  };
+
   return (
-    <div className="flex flex-col bg-blue_200 hover:rounded-lg cursor-pointer p-6 max-w-[368px]">
+    <form
+      onSubmit={handleSubmit(submitForm)}
+      className="flex flex-col bg-blue_200 cursor-pointer p-6 rounded-2xl shadow-overlay"
+    >
       <Typography variant="titleOne">Delete post</Typography>
       <Typography variant="p2" className="py-6">
         Are you sure you want to delete this post?
       </Typography>
 
-      <div className="flex items-center pb-6">
+      <div className="flex items-center pb-6 ml-auto">
         <CustomButton
           onClick={toggleModal}
           variant="secondary"
-          className="text-xs mr-6 w-[84px]"
+          className="text-xs mr-6 "
         >
           Cancel
         </CustomButton>
-        <CustomButton variant="primary" className="text-xs px-3 w-[84px]">
-          Save name
+        <CustomButton
+          disabled={deletePostMutation.isPending}
+          loading={deletePostMutation.isPending}
+          variant="primary"
+          className="text-xs px-3 w-[84px]"
+        >
+          Yes Delete
         </CustomButton>
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -7,11 +7,11 @@ import Modal from "./Modal";
 import { ConfirmPostDeletion } from "./ConfirmPostDeletion";
 
 type Prop = {
+  publicId: string;
   toggleTimelineHomeModal: (show: boolean) => void;
 };
 
-const TimeLineHomeModal = ({ toggleTimelineHomeModal }: Prop) => {
-  const [selectedItem, setSelectedItem] = useState("");
+const TimeLineHomeModal = ({ toggleTimelineHomeModal, publicId }: Prop) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const toggleDeletePostModal = () => {
@@ -56,7 +56,6 @@ const TimeLineHomeModal = ({ toggleTimelineHomeModal }: Prop) => {
         ]}
         onClick={(item: string) => {
           handleModal(item);
-          setSelectedItem(item);
         }}
       />
 
@@ -64,7 +63,7 @@ const TimeLineHomeModal = ({ toggleTimelineHomeModal }: Prop) => {
         <div className="p-4">
           <ConfirmPostDeletion
             toggleModal={toggleDeletePostModal}
-            selectedItem={selectedItem}
+            publicId={publicId}
           />
         </div>
       </Modal>

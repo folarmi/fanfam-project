@@ -107,6 +107,7 @@ const Home = () => {
                     TimeLineModal={
                       <TimeLineHomeModal
                         toggleTimelineHomeModal={toggleTimelineHomeModal}
+                        publicId={data?.publicId}
                       />
                     }
                     ifIcon={data?.reactions.length > 0 ? true : false}
