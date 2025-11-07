@@ -6,6 +6,8 @@ const VideoMedia = () => {
   return (
     <div>
       <Timeline
+        showModal={false}
+        toggleModal={() => {}}
         profileName="Priscilia yummy"
         avatar={defaultAvatar}
         handle="@yummychill54 ."
@@ -27,6 +29,8 @@ const VideoMedia = () => {
         //   showMoreModal={showMoreModalTwo}
       />
       <Timeline
+        showModal={false}
+        toggleModal={() => {}}
         profileName="Priscilia yummy"
         avatar={defaultAvatar}
         handle="@yummychill54 ."

@@ -180,6 +180,9 @@ const Media = () => {
           <div className="relative">
             <Timeline
               profileName="Priscilia yummy"
+              // fix the two lines below
+              showModal={sortModal}
+              toggleModal={toggleSortModal}
               avatar={defaultAvatar}
               handle="@yummychill54 ."
               time="3 h ago"
@@ -205,6 +208,9 @@ const Media = () => {
           <div className="relative">
             <Timeline
               profileName="Priscilia yummy"
+              // fix the two lines below
+              showModal={sortModal}
+              toggleModal={toggleSortModal}
               avatar={defaultAvatar}
               handle="@yummychill54 ."
               time="3 h ago"

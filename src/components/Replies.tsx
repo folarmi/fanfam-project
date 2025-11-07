@@ -8,6 +8,8 @@ const Replies = () => {
     <div>
       <div className="relative">
         <Timeline
+          showModal={false}
+          toggleModal={() => {}}
           profileName="Priscilia yummy"
           avatar={defaultAvatar}
           handle="@yummychill54 ."
@@ -33,6 +35,8 @@ const Replies = () => {
 
       <div className="relative">
         <Timeline
+          showModal={false}
+          toggleModal={() => {}}
           profileName="Priscilia yummy"
           avatar={defaultAvatar}
           handle="@yummychill54 ."

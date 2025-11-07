@@ -24,7 +24,7 @@ const EditPost = (props: Prop) => {
 
   const { data: profileData, isLoading } = useFetchProfile(userObject);
 
-  const { onEdit, onCancel } = props;
+  const { onEdit } = props;
   return (
     <div>
       {getContentByIdIsLoading || isLoading ? (

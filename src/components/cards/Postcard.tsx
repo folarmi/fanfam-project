@@ -40,7 +40,7 @@ const PostCard: React.FC<PostCardProps> = ({
   isEditMode = false,
   className,
 }) => {
-  const hasImages = timeLineImage && timeLineImage.length > 0;
+  const hasImages = Array.isArray(timeLineImage) && timeLineImage.length > 0;
 
   return (
     <article

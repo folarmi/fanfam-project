@@ -37,7 +37,7 @@ const Post = () => {
     },
   ]);
   const [toggleCreateFolderModal, setToggleCreateFolderModal] = useState(false);
-  const [showMoreModal, setShowMoreModal] = useState(false);
+  const [showMoreModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   const toggleModal = () => {
@@ -123,13 +123,18 @@ const Post = () => {
           ifIcon={false}
           bgColor="#fafafa"
           showModal={showMoreModal}
-          setShowModal={setShowMoreModal}
+          // fix the  line below
+          toggleModal={toggleModal}
+          // setShowModal={setShowMoreModal}
           TimeLineModal={<PersonPostModal />}
         />
       </div>
 
       <div className="relative">
         <Timeline
+          // fix the  line below
+          showModal={showMoreModal}
+          toggleModal={toggleModal}
           profileName="Priscilia yummy"
           avatar={defaultAvatar}
           handle="@yummychill54 ."
