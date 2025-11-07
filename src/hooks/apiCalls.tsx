@@ -197,8 +197,6 @@ export const useCustomMutation = <
     },
 
     onError: (error: any) => {
-      console.log("api calls", error);
-
       try {
         if (options.onError) {
           // call with full signature expected by react-query's onError:

@@ -10,7 +10,7 @@ import addFolder from "../assets/icons/addFolder.svg";
 import Modal from "./modals/Modal";
 import CreateFolder from "./cards/CreateFolder";
 import PersonPostModal from "./modals/PersonPostModal";
-import Timeline from "./cards/Timeline";
+import Timeline from "./cards/ViewPost";
 
 const Post = () => {
   const [isProfileTabActive, setIsProfileTabActive] = useState("All");

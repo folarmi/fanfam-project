@@ -1,4 +1,4 @@
-import Timeline from "./cards/Timeline";
+import Timeline from "./cards/ViewPost";
 import defaultAvatar from "../assets/defaultAvatar.svg";
 import timelineImage from "../assets/timelineImage.svg";
 import timelineTwo from "../assets/timelineTwo.svg";

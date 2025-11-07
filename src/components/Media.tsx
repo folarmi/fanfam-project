@@ -5,7 +5,7 @@ import Typography from "./forms/Typography";
 import filter from "../assets/icons/filter.svg";
 import mediaToggle from "../assets/icons/mediaToggle.svg";
 import switchList from "../assets/icons/switchList.svg";
-import Timeline from "./cards/Timeline";
+import Timeline from "./cards/ViewPost";
 import defaultAvatar from "../assets/defaultAvatar.svg";
 import timelineImage from "../assets/timelineImage.svg";
 import timelineTwo from "../assets/timelineTwo.svg";

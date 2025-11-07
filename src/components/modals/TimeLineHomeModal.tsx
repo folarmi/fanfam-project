@@ -5,18 +5,24 @@ import ModalContent from "./ModalContent";
 import { useState } from "react";
 import Modal from "./Modal";
 import { ConfirmPostDeletion } from "./ConfirmPostDeletion";
+import { EditPost } from "./EditPost";
 
 type Prop = {
   publicId: string;
   toggleTimelineHomeModal: (show: boolean) => void;
 };
 
-const TimeLineHomeModal = ({ toggleTimelineHomeModal, publicId }: Prop) => {
+const TimeLineHomeModal = ({ publicId }: Prop) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const toggleDeletePostModal = () => {
     setShowDeleteModal(!showDeleteModal);
     // toggleTimelineHomeModal(false);
+  };
+
+  const toggleEditPostModal = () => {
+    setShowEditModal(!showEditModal);
   };
 
   const test = () => {};
@@ -30,7 +36,7 @@ const TimeLineHomeModal = ({ toggleTimelineHomeModal, publicId }: Prop) => {
         test();
         break;
       case "Edit post":
-        test();
+        toggleEditPostModal();
         break;
       case "Delete post":
         toggleDeletePostModal();
@@ -66,6 +72,15 @@ const TimeLineHomeModal = ({ toggleTimelineHomeModal, publicId }: Prop) => {
             publicId={publicId}
           />
         </div>
+      </Modal>
+
+      <Modal show={showEditModal} toggleModal={toggleEditPostModal}>
+        <EditPost
+          onCancel={toggleDeletePostModal}
+          onEdit={toggleDeletePostModal}
+          toggleModal={toggleDeletePostModal}
+          publicId={publicId}
+        />
       </Modal>
     </>
   );

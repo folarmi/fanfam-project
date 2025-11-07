@@ -1,5 +1,5 @@
 import videoMediaDefault from "../assets/videoMediaDefault.svg";
-import Timeline from "./cards/Timeline";
+import Timeline from "./cards/ViewPost";
 import defaultAvatar from "../assets/defaultAvatar.svg";
 
 const VideoMedia = () => {

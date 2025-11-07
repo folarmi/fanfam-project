@@ -1,14 +1,10 @@
 import { useState } from "react";
 import defaultLiveAvatar from "../../assets/defaultLiveAvatar.svg";
-// import defaultAvatar from "../../assets/defaultAvatar.svg";
-// import timelineImage from "../../assets/timelineImage.svg";
-// import timelineTwo from "../../assets/timelineTwo.svg";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
 import SearchInput from "../../components/SearchInput";
 import Poll from "../../components/molecules/Poll";
 import CommentBox from "../../components/CommentBox";
-import Timeline from "../../components/cards/Timeline";
 import TimeLineHomeModal from "../../components/modals/TimeLineHomeModal";
 import { UserRole } from "../../data";
 import Modal from "../../components/modals/Modal";
@@ -20,6 +16,7 @@ import { Loader } from "@/components/molecules/Loader";
 import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import { useFetchProfile } from "@/hooks/apiHooks";
+import ViewPost from "../../components/cards/ViewPost";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -92,7 +89,7 @@ const Home = () => {
             {getCreatorContent?.data?.content?.map((data: StoryPost) => {
               return (
                 <div className="relative" key={data?.publicId}>
-                  <Timeline
+                  <ViewPost
                     publicId={data?.publicId}
                     profileName={profileData?.data?.displayName}
                     avatar={profileData?.data?.profilePic || defaultLiveAvatar}
@@ -102,7 +99,7 @@ const Home = () => {
                     timeLineImage={data?.mediaFiles}
                     ifParagraph={true}
                     showModal={showMoreModal === data?.publicId} // Only true for this specific item
-                    setShowModal={(show) =>
+                    setShowModal={(show: boolean) =>
                       setShowMoreModal(show ? data?.publicId : null)
                     }
                     TimeLineModal={

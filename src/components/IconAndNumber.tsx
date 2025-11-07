@@ -9,7 +9,7 @@ type IconAndNumberProp = {
   numberColor?: string;
   className?: string;
   reactionType: string;
-  publicid: string;
+  publicid: string | undefined;
 };
 
 const IconAndNumber = ({
