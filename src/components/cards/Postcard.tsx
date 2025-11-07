@@ -11,7 +11,7 @@ export interface PostCardProps {
   bgColor?: string;
   paragraphOne?: string;
   paragraphTwo?: string;
-  timeLineImage?: MediaFile[];
+  timeLineImage?: MediaFile[] | string;
   publicId?: string;
   reactionsData?: ReactionItem[];
   ifParagraph?: boolean;
