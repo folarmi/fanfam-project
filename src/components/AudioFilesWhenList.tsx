@@ -112,9 +112,19 @@ const AudioFilesWhenList = ({
 
       {ifIcon && (
         <div className="pb-4 pl-4 flex items-center">
-          <IconAndNumber Icon={Like} number={52} />
-          <IconAndNumber Icon={Comment} number={24} />
-          <IconAndNumber Icon={Pay} />
+          <IconAndNumber
+            reactionType="LIKE"
+            publicid="333"
+            Icon={Like}
+            number={52}
+          />
+          <IconAndNumber
+            reactionType="LIKE"
+            publicid="333"
+            Icon={Comment}
+            number={24}
+          />
+          <IconAndNumber reactionType="LIKE" publicid="333" Icon={Pay} />
         </div>
       )}
     </div>

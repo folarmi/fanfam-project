@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useCustomMutation } from "@/hooks/apiCalls";
+import type { ReactionType } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 
 type IconAndNumberProp = {
@@ -8,7 +9,7 @@ type IconAndNumberProp = {
   number?: number;
   numberColor?: string;
   className?: string;
-  reactionType: string;
+  reactionType: ReactionType;
   publicid: string | undefined;
 };
 

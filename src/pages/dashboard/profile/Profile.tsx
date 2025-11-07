@@ -118,13 +118,29 @@ const Profile = () => {
                 number={24}
                 numberColor="#ffffff"
                 className="cursor-pointer"
+                reactionType="LIKE"
+                publicid="fff"
               />
-              <IconAndNumber Icon={Videos} number={56} numberColor="#ffffff" />
-              <IconAndNumber Icon={Live} number={16} numberColor="#ffffff" />
+              <IconAndNumber
+                reactionType="LIKE"
+                publicid="fff"
+                Icon={Videos}
+                number={56}
+                numberColor="#ffffff"
+              />
+              <IconAndNumber
+                reactionType="LIKE"
+                publicid="fff"
+                Icon={Live}
+                number={16}
+                numberColor="#ffffff"
+              />
               <IconAndNumber
                 Icon={ProfileLike}
                 number={847}
                 numberColor="#ffffff"
+                reactionType="LIKE"
+                publicid="fff"
               />
             </div>
 

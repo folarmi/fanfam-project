@@ -118,9 +118,19 @@ const AnsweredPoll = ({ isPollAnswered }: any) => {
             </section>
 
             <div className="pl-4 flex items-center mt-4">
-              <IconAndNumber Icon={Like} number={52} />
-              <IconAndNumber Icon={Comment} number={24} />
-              <IconAndNumber Icon={Pay} />
+              <IconAndNumber
+                reactionType="LIKE"
+                publicid="fff"
+                Icon={Like}
+                number={52}
+              />
+              <IconAndNumber
+                reactionType="LIKE"
+                publicid="fff"
+                Icon={Comment}
+                number={24}
+              />
+              <IconAndNumber reactionType="LIKE" publicid="fff" Icon={Pay} />
             </div>
           </div>
         </>
