@@ -9,7 +9,7 @@ import { EditPost } from "./EditPost";
 
 type Prop = {
   publicId: string;
-  toggleTimelineHomeModal: (show: boolean) => void;
+  toggleTimelineHomeModal: () => void;
 };
 
 const TimeLineHomeModal = ({ publicId }: Prop) => {
@@ -78,7 +78,7 @@ const TimeLineHomeModal = ({ publicId }: Prop) => {
         <EditPost
           onCancel={toggleDeletePostModal}
           onEdit={toggleDeletePostModal}
-          toggleModal={toggleDeletePostModal}
+          toggleModal={toggleEditPostModal}
           publicId={publicId}
         />
       </Modal>

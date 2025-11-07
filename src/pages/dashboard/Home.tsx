@@ -17,6 +17,7 @@ import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import ViewPost from "../../components/cards/ViewPost";
+import { transformReactions } from "@/lib/reaction";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -98,9 +99,11 @@ const Home = () => {
                     paragraphOne={data?.message}
                     timeLineImage={data?.mediaFiles}
                     ifParagraph={true}
-                    showModal={showMoreModal === data?.publicId} // Only true for this specific item
-                    setShowModal={(show: boolean) =>
-                      setShowMoreModal(show ? data?.publicId : null)
+                    showModal={showMoreModal === data?.publicId}
+                    toggleModal={() =>
+                      setShowMoreModal(
+                        showMoreModal === data?.publicId ? null : data?.publicId
+                      )
                     }
                     TimeLineModal={
                       <TimeLineHomeModal
@@ -108,8 +111,7 @@ const Home = () => {
                         publicId={data?.publicId}
                       />
                     }
-                    reactions={data?.reactions}
-                    // ifIcon={data?.reactions.length > 0 ? true : false}
+                    reactionsData={transformReactions(data?.reactions)}
                   />
                 </div>
               );

@@ -1,4 +1,11 @@
+import { useGetData } from "@/hooks/apiCalls";
 import PostCard from "../cards/Postcard";
+import { Loader } from "../molecules/Loader";
+import { useFetchProfile } from "@/hooks/apiHooks";
+import { useAppSelector } from "@/lib/hook";
+import type { RootState } from "@/lib/store";
+import { formatTimeAgo } from "@/utils/helperTwo";
+import CustomButton from "../forms/CustomButton";
 
 type Prop = {
   toggleModal: () => void;
@@ -8,34 +15,51 @@ type Prop = {
 };
 
 const EditPost = (props: Prop) => {
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+
+  const { data, isLoading: getContentByIdIsLoading } = useGetData({
+    url: `contents/${props.publicId}`,
+    queryKey: ["GetContentsById"],
+  });
+
+  const { data: profileData, isLoading } = useFetchProfile(userObject);
+
   const { onEdit, onCancel } = props;
   return (
-    <PostCard
-      avatar="dd"
-      profileName="ff"
-      handle="@ff"
-      time="ff"
-      {...props}
-      isEditMode={true}
-      onContentClick={onEdit}
-      ifIcon={false} // Hide reactions in edit mode
-      headerActions={
-        <div className="flex gap-2 ml-2">
-          <button
-            onClick={onEdit}
-            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            Edit
-          </button>
-          <button
-            onClick={onCancel}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      }
-    />
+    <div>
+      {getContentByIdIsLoading || isLoading ? (
+        <Loader />
+      ) : (
+        <PostCard
+          {...props}
+          avatar={profileData?.data?.profilePic}
+          ifParagraph
+          paragraphOne={data?.data?.message}
+          profileName={profileData?.data?.displayName}
+          handle={`@${profileData?.data?.username}`}
+          time={formatTimeAgo(data?.createdDate)}
+          isEditMode={true}
+          onContentClick={onEdit}
+          ifIcon={false}
+          timeLineImage={data?.data?.mediaFiles}
+          className="rounded-2xl max-w-[806px] bg-overlay bg-grey_20"
+          headerActions={
+            <div className="flex items-center pb-6 ml-auto">
+              <CustomButton
+                onClick={props.toggleModal}
+                variant="secondary"
+                className="text-xs mr-6 "
+              >
+                Cancel
+              </CustomButton>
+              <CustomButton variant="primary" className="text-xs px-3 w-[84px]">
+                Save
+              </CustomButton>
+            </div>
+          }
+        />
+      )}
+    </div>
   );
 };
 

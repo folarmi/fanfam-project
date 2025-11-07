@@ -3,7 +3,7 @@ import Typography from "../forms/Typography";
 import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
 
-interface PostCardProps {
+export interface PostCardProps {
   avatar: string;
   profileName: string;
   handle: string;
@@ -19,6 +19,7 @@ interface PostCardProps {
   headerActions?: React.ReactNode; // For edit/view mode differences
   onContentClick?: () => void; // For edit mode
   isEditMode?: boolean;
+  className?: string;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -26,7 +27,7 @@ const PostCard: React.FC<PostCardProps> = ({
   profileName,
   handle,
   time,
-  bgColor,
+  bgColor = "#FAFAFA",
   paragraphOne,
   paragraphTwo,
   timeLineImage,
@@ -37,13 +38,14 @@ const PostCard: React.FC<PostCardProps> = ({
   headerActions,
   onContentClick,
   isEditMode = false,
+  className,
 }) => {
   const hasImages = timeLineImage && timeLineImage.length > 0;
 
   return (
     <article
       style={{ backgroundColor: bgColor }}
-      className="pt-4 mb-2 drop-shadow-4xl"
+      className={`pt-4 mb-2 drop-shadow-4xl ${className || ""}`}
       aria-label={`Post by ${profileName}`}
     >
       {/* Header Section */}
@@ -55,7 +57,11 @@ const PostCard: React.FC<PostCardProps> = ({
           loading="lazy"
         />
 
-        <div className="flex justify-between w-full items-start ml-2">
+        <div
+          className={`flex ${
+            isEditMode ? "flex-col" : "flex-row"
+          } justify-between w-full items-start ml-2`}
+        >
           <section
             className={`flex-1 min-w-0 ${isEditMode ? "cursor-pointer" : ""}`}
             onClick={onContentClick}
@@ -107,8 +113,8 @@ const PostCard: React.FC<PostCardProps> = ({
           </section>
 
           {/* Header Actions (More button, Edit button, etc.) */}
-          {headerActions}
         </div>
+        {headerActions}
       </header>
 
       {/* Media Section */}
