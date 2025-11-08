@@ -12,13 +12,13 @@ type Prop = {
   toggleTimelineHomeModal: () => void;
 };
 
-const TimeLineHomeModal = ({ publicId }: Prop) => {
+const TimeLineHomeModal = ({ publicId, toggleTimelineHomeModal }: Prop) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   const toggleDeletePostModal = () => {
     setShowDeleteModal(!showDeleteModal);
-    // toggleTimelineHomeModal(false);
+    toggleTimelineHomeModal();
   };
 
   const toggleEditPostModal = () => {

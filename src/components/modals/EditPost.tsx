@@ -1,11 +1,11 @@
 import { useGetData } from "@/hooks/apiCalls";
 import PostCard from "../cards/Postcard";
-import { Loader } from "../molecules/Loader";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import CustomButton from "../forms/CustomButton";
+import { MiniLoader } from "../molecules/MiniLoader";
 
 type Prop = {
   toggleModal: () => void;
@@ -28,7 +28,7 @@ const EditPost = (props: Prop) => {
   return (
     <div>
       {getContentByIdIsLoading || isLoading ? (
-        <Loader />
+        <MiniLoader />
       ) : (
         <PostCard
           {...props}
@@ -44,11 +44,11 @@ const EditPost = (props: Prop) => {
           timeLineImage={data?.data?.mediaFiles}
           className="rounded-2xl max-w-[806px] bg-overlay bg-grey_20"
           headerActions={
-            <div className="flex items-center pb-6 ml-auto">
+            <div className="flex justify-end mb-6">
               <CustomButton
                 onClick={props.toggleModal}
                 variant="secondary"
-                className="text-xs mr-6 "
+                className="text-xs mr-6"
               >
                 Cancel
               </CustomButton>

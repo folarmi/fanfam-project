@@ -2,6 +2,7 @@ import type { MediaFile, ReactionItem } from "@/lib/types";
 import Typography from "../forms/Typography";
 import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
+import close from "@/assets/close.svg";
 
 export interface PostCardProps {
   avatar: string;
@@ -68,16 +69,23 @@ const PostCard: React.FC<PostCardProps> = ({
           >
             {/* Profile Info */}
             <div className="flex items-center flex-wrap gap-x-1.5">
-              <Typography variant="titleTwo" className="font-semibold truncate">
-                {profileName}
-              </Typography>
+              <div className={`flex ${isEditMode ? "flex-col" : "flex-row"} `}>
+                <Typography
+                  variant="titleTwo"
+                  className="font-semibold truncate"
+                >
+                  {profileName}
+                </Typography>
 
-              <Typography
-                variant="p2"
-                className="hidden md:inline text-grey_500 truncate"
-              >
-                {handle}
-              </Typography>
+                <Typography
+                  variant="p2"
+                  className={`hidden md:inline text-grey_500 truncate ${
+                    isEditMode ? "ml-0" : "ml-2"
+                  }`}
+                >
+                  {handle}
+                </Typography>
+              </div>
 
               <Typography
                 variant="p2"
@@ -85,6 +93,10 @@ const PostCard: React.FC<PostCardProps> = ({
               >
                 {time}
               </Typography>
+
+              {isEditMode && (
+                <div className="ml-auto">{<img src={close} />}</div>
+              )}
             </div>
 
             {/* Mobile handle */}
@@ -113,12 +125,24 @@ const PostCard: React.FC<PostCardProps> = ({
           </section>
 
           {/* Header Actions (More button, Edit button, etc.) */}
+          {!isEditMode && headerActions}
         </div>
-        {headerActions}
       </header>
 
+      {isEditMode && hasImages && (
+        <MediaGrid
+          timeLineImage={timeLineImage}
+          onMediaClick={isEditMode ? onContentClick : undefined}
+        />
+      )}
+
+      {/* Header Actions for EDIT mode - positioned below media */}
+      {isEditMode && headerActions && (
+        <div className="px-4 py-2">{headerActions}</div>
+      )}
+
       {/* Media Section */}
-      {hasImages && (
+      {!isEditMode && hasImages && (
         <MediaGrid
           timeLineImage={timeLineImage}
           onMediaClick={isEditMode ? onContentClick : undefined}
