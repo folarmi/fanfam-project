@@ -1,3 +1,4 @@
+import type { MediaType } from "@/lib/types";
 import { formatDistanceToNowStrict } from "date-fns";
 
 export const formatTimeAgo = (date?: string): string => {
@@ -61,4 +62,16 @@ export const getFileIcon = (url: string) => {
       />
     </svg>
   );
+};
+
+// Determine media type based on files
+export const getMediaType = (files: File[]): MediaType => {
+  if (files.length === 0) return "PHOTO";
+
+  const firstFile = files[0];
+  const fileType = firstFile.type;
+
+  if (fileType.startsWith("image/")) return "PHOTO";
+  if (fileType.startsWith("video/")) return "VIDEO";
+  return "DOCUMENT";
 };

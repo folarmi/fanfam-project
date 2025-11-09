@@ -76,10 +76,9 @@ const TimeLineHomeModal = ({ publicId, toggleTimelineHomeModal }: Prop) => {
 
       <Modal show={showEditModal} toggleModal={toggleEditPostModal}>
         <EditPost
-          onCancel={toggleDeletePostModal}
-          onEdit={toggleDeletePostModal}
-          toggleModal={toggleEditPostModal}
           publicId={publicId}
+          toggleModal={toggleEditPostModal}
+          // onCancel={toggleDeletePostModal}
         />
       </Modal>
     </>

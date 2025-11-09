@@ -1,43 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import CustomButton from "./forms/CustomButton";
-import Smile from "../assets/icons/smile";
-import Poll from "../assets/icons/poll";
-import Record from "../assets/icons/record";
 import { useForm } from "react-hook-form";
 import { CustomTextArea } from "./forms/CustomTextArea";
-import { useCustomMutation, useFileUpload } from "@/hooks/apiCalls";
+import { useCustomMutation } from "@/hooks/apiCalls";
 import type { RootState } from "@/lib/store";
 import { useAppSelector } from "@/lib/hook";
-import { PostUploader } from "./molecules/PostUploader";
-import type { MediaItem } from "@/lib/types";
+import MediaUploadGrid from "./molecules/MediaUploadGrid";
+import { getMediaType } from "@/utils/helperTwo";
+import { useUploadFiles } from "@/hooks/useUploadFiles";
+import { useQueryClient } from "@tanstack/react-query";
 
-type CommentBoxProps = {
+type CommentBoxProp = {
   ifPoll?: boolean;
-  ifRecord?: boolean;
-  setIfUserIsCreatingPoll?: any;
 };
 
-const CommentBox = ({
-  ifPoll = true,
-  ifRecord = true,
-  setIfUserIsCreatingPoll,
-}: CommentBoxProps) => {
+const CommentBox = () => {
   const [isActive, setIsActive] = useState(false);
-  const { handleSubmit, control } = useForm();
+  const queryClient = useQueryClient();
+  const { handleSubmit, control, reset } = useForm();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
 
   const {
-    mutate: uploadPostWithPictures,
-    isPending: postWithPictureIsPending,
-  } = useFileUpload({
-    url: "files/upload-multiple",
-    onSuccess: (data) => {
-      return data?.message || "File uploaded successfully!";
+    uploadFiles,
+    postWithPictureIsPending,
+    reset: resetFiles,
+  } = useUploadFiles({
+    usid: userObject?.usid,
+    onSuccess: (mediaItems) => {
+      console.log("Upload successful:", mediaItems);
     },
-    errorToast: (error: any) =>
-      error.response?.data?.message || "Upload failed",
+    onError: (error) => {
+      console.error("Upload failed:", error);
+      // Show toast notification
+    },
   });
 
   const handleFocus = () => {
@@ -58,98 +55,6 @@ const CommentBox = ({
     setQueuedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Sequential file upload function
-  // const uploadFilesSequentially = async (files: File[]): Promise<MediaItem> => {
-  //   const mediaLinks: MediaItem = [];
-
-  //   for (const file of files) {
-  //     try {
-  //       // Upload one file at a time
-  //       const result = await new Promise<any>((resolve, reject) => {
-  //         uploadPostWithPictures(
-  //           {
-  //             file: file,
-  //             extraData: {
-  //               usid: userObject?.usid,
-  //             },
-  //           },
-  //           {
-  //             onSuccess: (data) => resolve(data),
-  //             onError: (error) => reject(error),
-  //           }
-  //         );
-  //       });
-
-  //       // Collect the media URL
-  //       if (result?.body) {
-  //         mediaLinks.push({
-  //           mediaType: file.type.startsWith("image/") ? "PHOTO" : "DOCUMENT",
-  //           mediaLink: result.body?.url,
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error(`Failed to upload ${file.name}:`, error);
-  //       throw error;
-  //     }
-  //   }
-
-  //   return mediaLinks;
-  // };
-
-  const uploadFiles = async (files: File[]): Promise<MediaItem> => {
-    const mediaLinks: MediaItem = [];
-
-    try {
-      // Upload all files in a single request
-      const result = await new Promise<any>((resolve, reject) => {
-        uploadPostWithPictures(
-          {
-            files: files, // Changed from 'file' to 'files' array
-            extraData: {
-              usid: userObject?.usid,
-            },
-          },
-          {
-            onSuccess: (data) => resolve(data),
-            onError: (error) => reject(error),
-          }
-        );
-      });
-
-      // Process the response body array
-      if (result?.body && Array.isArray(result.body)) {
-        result.body.forEach((item: any, index: number) => {
-          mediaLinks.push({
-            mediaType: files[index].type.startsWith("image/")
-              ? "PHOTO"
-              : files[index].type.startsWith("video/")
-              ? "VIDEO"
-              : "DOCUMENT",
-            mediaLink: item.url,
-          });
-        });
-      }
-    } catch (error) {
-      console.error("Failed to upload files:", error);
-      throw error;
-    }
-
-    return mediaLinks;
-  };
-
-  // Determine media type based on files
-  const getMediaType = (files: File[]): "PHOTO" | "VIDEO" | "DOCUMENT" => {
-    if (files.length === 0) return "PHOTO";
-
-    const firstFile = files[0];
-    const fileType = firstFile.type;
-
-    if (fileType.startsWith("image/")) return "PHOTO";
-    if (fileType.startsWith("video/")) return "VIDEO";
-    return "DOCUMENT";
-  };
-
-  // Modified submit handler
   const submitForm = async (data: any) => {
     if (queuedFiles.length > 0) {
       try {
@@ -163,7 +68,6 @@ const CommentBox = ({
           mentions: [],
           mediaType: getMediaType(queuedFiles),
         };
-        console.log(formValues);
         createContentMutation.mutate(formValues);
 
         // Clear queue after successful post
@@ -176,7 +80,7 @@ const CommentBox = ({
       // No files, just post text
       createContentMutation.mutate({
         ...data,
-        mediaLinks: [],
+        mediaFiles: [],
         mentions: [],
       });
     }
@@ -184,6 +88,14 @@ const CommentBox = ({
 
   const createContentMutation = useCustomMutation({
     endpoint: `contents`,
+    onSuccessCallback: () => {
+      reset();
+      resetFiles();
+      queryClient.invalidateQueries({
+        queryKey: ["GetContents"],
+        exact: false,
+      });
+    },
     successMessage: () => {
       return "Posted added successfully";
     },
@@ -207,29 +119,18 @@ const CommentBox = ({
       />
 
       <div className="flex items-center justify-between py-[5px]">
-        <div className="flex items-center gap-x-3">
-          <PostUploader
-            handleFileUpload={handleFileUpload}
-            handleRemoveFile={handleRemoveFile}
-          />
+        <MediaUploadGrid
+          handleFileUpload={handleFileUpload}
+          handleRemoveFile={handleRemoveFile}
+          isActive={isActive}
+          ifPoll
+          ifRecord
+        />
 
-          <Smile isActive={isActive} className="cursor-pointer" />
-          {ifPoll && (
-            <Poll
-              onClick={() => setIfUserIsCreatingPoll(true)}
-              isActive={isActive}
-              className="cursor-pointer"
-            />
-          )}
-          {ifRecord && (
-            <Record isActive={isActive} className="cursor-pointer" />
-          )}
-        </div>
-
-        <div className="w-[62px]">
+        <div className="w-fit">
           <CustomButton
             variant={isActive ? "primary" : "disabled"}
-            className="w-full bg-grey_90"
+            className=" bg-grey_90 px-6"
             disabled={
               createContentMutation.isPending || postWithPictureIsPending
             }

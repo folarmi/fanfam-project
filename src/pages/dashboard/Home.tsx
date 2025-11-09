@@ -43,7 +43,7 @@ const Home = () => {
 
   const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
     useGetData({
-      url: `contents?creator=${userObject?.email}&page=0&size=20&sort=asc`,
+      url: `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`,
       queryKey: ["GetContents"],
     });
   const toggleInterestModal = () => {
