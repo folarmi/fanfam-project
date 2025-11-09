@@ -13,7 +13,7 @@ interface UseUploadFilesOptions {
 
 interface UseUploadFilesReturn {
   uploadFiles: (files: File[]) => Promise<MediaItem[]>;
-  postWithPictureIsPending: boolean;
+  isUploading: boolean;
   uploadedFiles: MediaItem[];
   reset: () => void;
 }
@@ -23,17 +23,15 @@ export const useUploadFiles = (
 ): UseUploadFilesReturn => {
   const [uploadedFiles, setUploadedFiles] = useState<MediaItem[]>([]);
 
-  const {
-    mutate: uploadPostWithPictures,
-    isPending: postWithPictureIsPending,
-  } = useFileUpload({
-    url: "files/upload-multiple",
-    onSuccess: (data) => {
-      return data?.message || "File uploaded successfully!";
-    },
-    errorToast: (error: any) =>
-      error.response?.data?.message || "Upload failed",
-  });
+  const { mutate: uploadPostWithPictures, isPending: isUploading } =
+    useFileUpload({
+      url: "files/upload-multiple",
+      onSuccess: (data) => {
+        return data?.message || "File uploaded successfully!";
+      },
+      errorToast: (error: any) =>
+        error.response?.data?.message || "Upload failed",
+    });
 
   const uploadFiles = async (files: File[]): Promise<MediaItem[]> => {
     if (!files || files.length === 0) {
@@ -95,7 +93,7 @@ export const useUploadFiles = (
 
   return {
     uploadFiles,
-    postWithPictureIsPending,
+    isUploading,
     uploadedFiles,
     reset,
   };

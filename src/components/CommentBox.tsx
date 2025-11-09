@@ -13,9 +13,15 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type CommentBoxProp = {
   ifPoll?: boolean;
+  ifRecord?: boolean;
+  setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
 };
 
-const CommentBox = () => {
+const CommentBox = ({
+  ifRecord,
+  ifPoll,
+  setIfUserIsCreatingPoll,
+}: CommentBoxProp) => {
   const [isActive, setIsActive] = useState(false);
   const queryClient = useQueryClient();
   const { handleSubmit, control, reset } = useForm();
@@ -24,7 +30,7 @@ const CommentBox = () => {
 
   const {
     uploadFiles,
-    postWithPictureIsPending,
+    isUploading,
     reset: resetFiles,
   } = useUploadFiles({
     usid: userObject?.usid,
@@ -123,20 +129,17 @@ const CommentBox = () => {
           handleFileUpload={handleFileUpload}
           handleRemoveFile={handleRemoveFile}
           isActive={isActive}
-          ifPoll
-          ifRecord
+          ifPoll={ifPoll}
+          ifRecord={ifRecord}
+          setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
         />
 
         <div className="w-fit">
           <CustomButton
             variant={isActive ? "primary" : "disabled"}
             className=" bg-grey_90 px-6"
-            disabled={
-              createContentMutation.isPending || postWithPictureIsPending
-            }
-            loading={
-              createContentMutation.isPending || postWithPictureIsPending
-            }
+            disabled={createContentMutation.isPending || isUploading}
+            loading={createContentMutation.isPending || isUploading}
           >
             Post
           </CustomButton>

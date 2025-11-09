@@ -80,7 +80,11 @@ const Home = () => {
                 setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
               />
             ) : (
-              <CommentBox setIfUserIsCreatingPoll={setIfUserIsCreatingPoll} />
+              <CommentBox
+                ifPoll
+                ifRecord
+                setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+              />
             )}
 
             <div className="my-2">

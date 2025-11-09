@@ -12,13 +12,13 @@ type Prop = {
   toggleTimelineHomeModal: () => void;
 };
 
-const TimeLineHomeModal = ({ publicId, toggleTimelineHomeModal }: Prop) => {
+const TimeLineHomeModal = ({ publicId }: Prop) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   const toggleDeletePostModal = () => {
     setShowDeleteModal(!showDeleteModal);
-    toggleTimelineHomeModal();
+    // toggleTimelineHomeModal();
   };
 
   const toggleEditPostModal = () => {
@@ -75,11 +75,7 @@ const TimeLineHomeModal = ({ publicId, toggleTimelineHomeModal }: Prop) => {
       </Modal>
 
       <Modal show={showEditModal} toggleModal={toggleEditPostModal}>
-        <EditPost
-          publicId={publicId}
-          toggleModal={toggleEditPostModal}
-          // onCancel={toggleDeletePostModal}
-        />
+        <EditPost publicId={publicId} toggleModal={toggleEditPostModal} />
       </Modal>
     </>
   );

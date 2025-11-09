@@ -96,7 +96,7 @@ export interface Comment {
 export type MediaItem = {
   mediaType: MediaType;
   mediaLink: string;
-}[];
+};
 
 // {
 //     "phoneNumber": "+2348175988567",

@@ -1,71 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { useGetData } from "@/hooks/apiCalls";
-// import PostCard from "../cards/Postcard";
-// import { useFetchProfile } from "@/hooks/apiHooks";
-// import { useAppSelector } from "@/lib/hook";
-// import type { RootState } from "@/lib/store";
-// import { formatTimeAgo } from "@/utils/helperTwo";
-// import CustomButton from "../forms/CustomButton";
-// import { MiniLoader } from "../molecules/MiniLoader";
-
-// type Prop = {
-//   toggleModal: () => void;
-//   publicId: string;
-//   onEdit: () => void;
-//   onCancel: () => void;
-// };
-
-// const EditPost = (props: Prop) => {
-// const { userObject } = useAppSelector((state: RootState) => state.auth);
-
-// const { data, isLoading: getContentByIdIsLoading } = useGetData({
-//   url: `contents/${props.publicId}`,
-//   queryKey: ["GetContentsById"],
-// });
-
-// const { data: profileData, isLoading } = useFetchProfile(userObject);
-
-//   const { onEdit } = props;
-//   return (
-//     <div>
-//       {getContentByIdIsLoading || isLoading ? (
-//         <MiniLoader />
-//       ) : (
-//         <PostCard
-//           {...props}
-//           avatar={profileData?.data?.profilePic}
-//           ifParagraph
-//           paragraphOne={data?.data?.message}
-//           profileName={profileData?.data?.displayName}
-//           handle={`@${profileData?.data?.username}`}
-//           time={formatTimeAgo(data?.createdDate)}
-//           isEditMode={true}
-//           onContentClick={onEdit}
-//           ifIcon={false}
-//           timeLineImage={data?.data?.mediaFiles}
-//           className="rounded-2xl max-w-[806px] bg-overlay bg-grey_20"
-//           headerActions={
-// <div className="flex justify-end mb-6">
-//   <CustomButton
-//     onClick={props.toggleModal}
-//     variant="secondary"
-//     className="text-xs mr-6"
-//   >
-//     Cancel
-//   </CustomButton>
-//   <CustomButton variant="primary" className="text-xs px-3 w-[84px]">
-//     Save
-//   </CustomButton>
-// </div>
-//           }
-//         />
-//       )}
-//     </div>
-//   );
-// };
-
-// export { EditPost };
-
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Typography from "../forms/Typography";
@@ -77,14 +10,23 @@ import { MiniLoader } from "../molecules/MiniLoader";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { CustomTextArea } from "../forms/CustomTextArea";
 import CustomButton from "../forms/CustomButton";
-import MediaGrid from "../molecules/MediaGrid";
 import MediaUploadGrid from "../molecules/MediaUploadGrid";
 import { useQueryClient } from "@tanstack/react-query";
+import type { MediaItem, MediaType } from "@/lib/types";
+import { useUploadFiles } from "@/hooks/useUploadFiles";
+import EditMediaGrid from "../molecules/EditMediaGrid";
 
 export interface EditPostProps {
   publicId: string;
   toggleModal: () => void;
   className?: string;
+}
+
+// Extended media type to track new vs existing files
+interface EditMediaItem extends MediaItem {
+  isNew?: boolean;
+  file?: File;
+  previewUrl?: string;
 }
 
 export const EditPost: React.FC<EditPostProps> = ({
@@ -99,15 +41,17 @@ export const EditPost: React.FC<EditPostProps> = ({
     url: `contents/${publicId}`,
     queryKey: ["GetContentsById"],
   });
-
+  const { uploadFiles, isUploading } = useUploadFiles({
+    usid: userObject?.usid,
+  });
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      content: data?.data,
+      message: data?.data,
     },
   });
 
-  const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
   const [isActive, setIsActive] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<EditMediaItem[]>([]);
 
   const handleFocus = () => {
     setIsActive(true);
@@ -116,48 +60,137 @@ export const EditPost: React.FC<EditPostProps> = ({
   const handleBlur = () => {
     setIsActive(false);
   };
+
+  // Handle new file selection (creates preview)
   const handleFileUpload = (files: File[]) => {
-    setQueuedFiles((prev) => [...prev, ...files]);
+    const newMediaItems: EditMediaItem[] = files?.map((file) => {
+      // Determine media type
+      let mediaType: MediaType = "DOCUMENT";
+      if (file.type.startsWith("image/")) {
+        mediaType = "PHOTO";
+      } else if (file.type.startsWith("video/")) {
+        mediaType = "VIDEO";
+      } else if (file.type.startsWith("audio/")) {
+        mediaType = "AUDIO";
+      }
+
+      return {
+        mediaType,
+        mediaLink: "",
+        previewUrl: URL.createObjectURL(file),
+        isNew: true,
+        file,
+      };
+    });
+
+    setMediaFiles((prev) => [...prev, ...newMediaItems]);
   };
 
+  // Remove media (works for both new and existing)
   const handleRemoveFile = (index: number) => {
-    setQueuedFiles((prev) => prev.filter((_, i) => i !== index));
+    const fileToRemove = mediaFiles[index];
+
+    // Cleanup preview URL if it's a new file
+    if (fileToRemove?.isNew && fileToRemove?.previewUrl) {
+      URL.revokeObjectURL(fileToRemove.previewUrl);
+    }
+
+    setMediaFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const editContentMutation = useCustomMutation({
     endpoint: `contents/${publicId}`,
     method: "put",
     onSuccessCallback: () => {
+      // Cleanup all preview URLs
+      mediaFiles?.forEach((file) => {
+        if (file.isNew && file.previewUrl) {
+          URL.revokeObjectURL(file.previewUrl);
+        }
+      });
+
       toggleModal();
       queryClient.invalidateQueries({
         queryKey: ["GetContentsById"],
         exact: false,
       });
     },
-    successMessage: () => {
-      return "Posted edited successfully";
-    },
+    successMessage: () => "Post edited successfully",
     onError: () => {},
   });
 
   const onSubmitForm = async (formData: any) => {
-    const formValues = {
-      message: formData?.message || data?.data?.message,
-      mentions: [],
-      mediaFiles: data?.data?.mediaFiles,
-    };
-    editContentMutation.mutate(formValues);
-  };
-  // no files
-  // new files
-  // previous files
+    try {
+      // Separate existing media from new files
+      const existingMedia = mediaFiles?.filter((file) => !file.isNew);
+      const newFiles = mediaFiles?.filter((file) => file.isNew);
 
+      let uploadedMedia: MediaItem[] = [];
+
+      // Upload new files if any
+      if (newFiles?.length > 0) {
+        const filesToUpload = newFiles
+          ?.map((item) => item.file)
+          ?.filter((file): file is File => file !== undefined);
+
+        if (filesToUpload?.length > 0) {
+          uploadedMedia = await uploadFiles(filesToUpload);
+        }
+      }
+
+      // Combine existing media with newly uploaded media
+      const allMediaFiles: MediaItem[] = [
+        ...existingMedia.map((media) => ({
+          mediaType: media.mediaType,
+          mediaLink: media.mediaLink,
+        })),
+        ...uploadedMedia,
+      ];
+
+      const formValues = {
+        message: formData?.message || data?.data?.message,
+        mentions: [],
+        mediaFiles: allMediaFiles,
+      };
+      // console.log(formValues);
+      editContentMutation.mutate(formValues);
+    } catch (error) {
+      console.error("Failed to update post:", error);
+      // Error already handled by useUploadFiles hook
+    }
+  };
+
+  // Initialize form and media when data loads
   useEffect(() => {
     if (data?.data) {
-      const defaults = data?.data;
-      reset(defaults);
+      reset({ message: data?.data?.message });
+
+      // Convert existing media to EditMediaItem format
+      if (data?.data?.mediaFiles && Array.isArray(data.data.mediaFiles)) {
+        const existingMedia: EditMediaItem[] = data?.data?.mediaFiles.map(
+          (media: MediaItem) => ({
+            ...media,
+            isNew: false,
+          })
+        );
+        setMediaFiles(existingMedia);
+      }
     }
   }, [data?.data, reset]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      mediaFiles.forEach((file) => {
+        if (file.isNew && file.previewUrl) {
+          URL.revokeObjectURL(file.previewUrl);
+        }
+      });
+    };
+  }, [mediaFiles]);
+
+  // Updated to use postWithPictureIsPending
+  const isSaving = editContentMutation?.isPending || isUploading;
 
   return (
     <>
@@ -236,7 +269,11 @@ export const EditPost: React.FC<EditPostProps> = ({
             </div>
 
             {/* Media Grid with Remove Buttons */}
-            <MediaGrid timeLineImage={data?.data?.mediaFiles} />
+            <EditMediaGrid
+              mediaFiles={mediaFiles}
+              onRemove={handleRemoveFile}
+              disabled={isSaving}
+            />
 
             {/* Add Media Button */}
             <MediaUploadGrid
@@ -255,12 +292,12 @@ export const EditPost: React.FC<EditPostProps> = ({
                 Cancel
               </CustomButton>
               <CustomButton
-                disabled={editContentMutation?.isPending}
-                loading={editContentMutation?.isPending}
+                disabled={isSaving}
+                loading={isSaving}
                 variant="primary"
                 className="text-xs px-3 w-fit"
               >
-                {editContentMutation?.isPending ? "Saving..." : "Save"}
+                {isSaving ? "Saving..." : "Save"}
               </CustomButton>
             </div>
           </form>
