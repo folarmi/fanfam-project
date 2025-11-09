@@ -166,35 +166,3 @@ const EditMediaGrid: React.FC<EditMediaGridProps> = ({
 };
 
 export default EditMediaGrid;
-
-// Backend response
-//   "body": [
-//         {
-//             "resource_type": "raw",
-//             "url": "https://res.cloudinary.com/dezb6qbwe/raw/upload/v1762696452/8B20D8DA-9D64-4267-AC6F-97DA5724039A"
-//         },
-//         {
-//             "resource_type": "raw",
-//             "url": "https://res.cloudinary.com/dezb6qbwe/raw/upload/v1762696452/587959AB-6FA8-4117-A68D-31DF91B8B468"
-//         }
-//     ],
-
-// Formvalues
-// {
-//     "message": "Testing for Edit purposes two",
-//     "mentions": [],
-//     "mediaFiles": [
-//         {
-//             "mediaType": "PHOTO",
-//             "mediaLink": "https://res.cloudinary.com/dezb6qbwe/image/upload/v1762686993/C7EE96C6-DD4B-410E-B335-09676C88D4D5.jpg"
-//         },
-//         {
-//             "mediaType": "PHOTO",
-//             "mediaLink": "https://res.cloudinary.com/dezb6qbwe/raw/upload/v1762696452/8B20D8DA-9D64-4267-AC6F-97DA5724039A"
-//         },
-//         {
-//             "mediaType": "PHOTO",
-//             "mediaLink": "https://res.cloudinary.com/dezb6qbwe/raw/upload/v1762696452/587959AB-6FA8-4117-A68D-31DF91B8B468"
-//         }
-//     ]
-// }
