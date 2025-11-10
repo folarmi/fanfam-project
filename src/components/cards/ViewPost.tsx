@@ -9,28 +9,27 @@ import Love from "@/assets/icons/love";
 import PostCard, { type PostCardProps } from "./Postcard";
 import { MoreHorizontal } from "lucide-react";
 import type { ReactionItem } from "@/lib/types";
-import Modal from "../modals/Modal";
-import { CommentOnPost } from "../modals/CommentOnPost";
+// import Modal from "../modals/Modal";
+// import { CommentOnPost } from "../modals/CommentOnPost";
 
 interface ViewPostProps extends Omit<PostCardProps, "headerActions"> {
-  showModal: boolean;
-  showCommentModal: string | null;
-  toggleModal: () => void;
-  toggleShowCommentModal: (postId?: string) => void;
+  showModal?: boolean;
+  toggleModal?: () => void;
+  // showCommentModal?: string | null;
+  // toggleShowCommentModal?: (postId?: string) => void;
   TimeLineModal?: React.ReactNode;
 }
 
 const ViewPost: React.FC<ViewPostProps> = ({
   showModal,
-  showCommentModal,
+  // showCommentModal,
   toggleModal,
   TimeLineModal,
-  toggleShowCommentModal,
+  // toggleShowCommentModal,
   publicId,
   ...postProps
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  console.log(showCommentModal === publicId);
   // // Close modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -38,7 +37,7 @@ const ViewPost: React.FC<ViewPostProps> = ({
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)
       ) {
-        toggleModal();
+        toggleModal?.();
       }
     };
 
@@ -63,13 +62,14 @@ const ViewPost: React.FC<ViewPostProps> = ({
       {...postProps}
       ifIcon
       reactionsData={reactionsData}
-      toggleShowCommentModal={toggleShowCommentModal}
+      // toggleShowCommentModal={toggleShowCommentModal}
+      publicId={publicId}
       headerActions={
         <>
           <button
             onClick={(e) => {
               e.stopPropagation();
-              toggleModal();
+              toggleModal?.();
             }}
             className="cursor-pointer p-1 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="More options"
@@ -91,15 +91,15 @@ const ViewPost: React.FC<ViewPostProps> = ({
             </div>
           )}
 
-          <Modal
+          {/* <Modal
             show={showCommentModal === publicId}
-            toggleModal={() => toggleShowCommentModal(publicId)}
+            toggleModal={() => toggleShowCommentModal?.(publicId)}
           >
             <CommentOnPost
               publicId={publicId}
-              toggleModal={() => toggleShowCommentModal(publicId)}
+              toggleModal={() => toggleShowCommentModal?.(publicId)}
             />
-          </Modal>
+          </Modal> */}
         </>
       }
     />

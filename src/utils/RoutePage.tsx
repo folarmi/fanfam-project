@@ -47,6 +47,7 @@ import {
   BankingInformation,
   SetupProfile,
   SetupStrategy,
+  SinglePostDetails,
 } from "../pages/dashboard";
 import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
@@ -66,6 +67,7 @@ const RoutePage = () => {
       <Route path="/dashboard">
         <Route element={<DashboardLayout />}>
           <Route index element={<Home />} />
+          <Route path=":id" element={<SinglePostDetails />} />
           <Route path="profile" element={<Profile />} />
           <Route path="profile/edit-profile" element={<EditProfile />} />
           <Route path="promote-profile" element={<PromoteProfile />} />

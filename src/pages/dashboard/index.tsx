@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 export * from "./Home";
+export * from "./SinglePostDetails";
 export * from "./profile/Profile";
 export * from "./profile/EditProfile";
 export * from "./profile/PromoteProfile";

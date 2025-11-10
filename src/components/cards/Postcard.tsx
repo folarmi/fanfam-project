@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { MediaFile, ReactionItem } from "@/lib/types";
 import Typography from "../forms/Typography";
 import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
-import Chat from "@/assets/icons/chat";
+// import Chat from "@/assets/icons/chat";
+import { useNavigate } from "react-router-dom";
 
 export interface PostCardProps {
   avatar: string;
@@ -39,13 +41,18 @@ const PostCard: React.FC<PostCardProps> = ({
   className,
   toggleShowCommentModal,
 }) => {
+  const navigate = useNavigate();
   const hasImages = Array.isArray(timeLineImage) && timeLineImage.length > 0;
 
   return (
     <article
       style={{ backgroundColor: bgColor }}
-      className={`pt-4 mb-2 drop-shadow-4xl ${className || ""}`}
+      className={`pt-4 mb-2 drop-shadow-4xl cursor-pointer ${className || ""}`}
       aria-label={`Post by ${profileName}`}
+      onClick={() => {
+        toggleShowCommentModal?.(null as any);
+        navigate(`/dashboard/${publicId}`);
+      }}
     >
       {/* Header Section */}
       <header className="flex items-start px-4 relative">
@@ -117,10 +124,13 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Action Icons (Reactions) */}
       {ifIcon && reactionsData && (
         <footer className="flex items-center py-4 ml-16">
-          <Chat
+          {/* <Chat
             number={99}
-            onClick={() => toggleShowCommentModal?.(publicId)}
-          />
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent click from reaching <article>
+              toggleShowCommentModal?.(publicId);
+            }}
+          /> */}
 
           {reactionsData?.map(({ type, icon: Icon, number }) => (
             <IconAndNumber

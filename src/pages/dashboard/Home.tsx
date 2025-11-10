@@ -21,10 +21,13 @@ import { transformReactions } from "@/lib/reaction";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
-  const { data: profileData, isLoading } = useFetchProfile(userObject);
   const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
     useGetData({
-      url: `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`,
+      url: `${
+        userObject?.role === UserRole.creator
+          ? `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`
+          : "contents?page=0&size=20&sort=createdDate,desc"
+      }`,
       queryKey: ["GetContents"],
     });
 
@@ -44,7 +47,7 @@ const Home = () => {
       name: "Option Two",
     },
   ]);
-  const [showCommentModal, setShowCommentModal] = useState<string | null>(null);
+  // const [showCommentModal, setShowCommentModal] = useState<string | null>(null);
   const [activePoll, setActivePoll] = useState(pollOptions[0].name);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const toggleInterestModal = () => {
@@ -64,99 +67,150 @@ const Home = () => {
     setShowMoreModal(!showMoreModal);
   };
 
-  const toggleShowCommentModal = (postId?: string) => {
-    console.log(postId);
-    if (!postId) return;
-    setShowCommentModal(showCommentModal === postId ? null : postId);
+  // const toggleShowCommentModal = (postId?: string | null) => {
+  //   if (!postId) {
+  //     setShowCommentModal(null);
+  //     return;
+  //   }
+  //   setShowCommentModal(showCommentModal === postId ? null : postId);
+  // };
+
+  const PostItem = ({ data }: { data: StoryPost }) => {
+    const { data: profileData, isLoading } = useFetchProfile({
+      email: data?.createdBy,
+      role: "CREATOR",
+      usid: userObject?.usid,
+    });
+
+    if (isLoading || getCreatorContentIsLoading) return <Loader />;
+
+    return (
+      <div className="relative">
+        <ViewPost
+          publicId={data?.publicId}
+          profileName={profileData?.data?.displayName}
+          avatar={profileData?.data?.profilePic || defaultLiveAvatar}
+          handle={`@${profileData?.data?.username}`}
+          time={formatTimeAgo(data?.createdDate)}
+          paragraphOne={data?.message}
+          timeLineImage={data?.mediaFiles}
+          ifParagraph={true}
+          showModal={showMoreModal === data?.publicId}
+          // showCommentModal={showCommentModal}
+          toggleModal={() =>
+            setShowMoreModal(
+              showMoreModal === data?.publicId ? null : data?.publicId
+            )
+          }
+          // toggleShowCommentModal={toggleShowCommentModal}
+          TimeLineModal={
+            <TimeLineHomeModal
+              toggleTimelineHomeModal={toggleTimelineHomeModal}
+              publicId={data?.publicId}
+            />
+          }
+          reactionsData={transformReactions(data?.reactions)}
+        />
+      </div>
+    );
   };
 
   return (
     <>
-      {isLoading || getCreatorContentIsLoading ? (
+      {/* {isLoading || getCreatorContentIsLoading ? (
         <Loader />
-      ) : (
-        <div className="">
-          <>
-            <SearchInput />
-            {ifUserIsCreatingPoll ? (
-              <Poll
-                pollOptions={pollOptions}
-                setPollOptions={setPollOptions}
-                activePoll={activePoll}
-                setActivePoll={setActivePoll}
-                setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
-              />
-            ) : (
-              <CommentBox
-                ifPoll
-                ifRecord
-                setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
-              />
-            )}
-
-            <div className="my-2">
-              <StoryUploader onFileUpload={handleFileUpload} />
-            </div>
-
-            {getCreatorContent?.data?.content?.map((data: StoryPost) => {
-              return (
-                <div className="relative" key={data?.publicId}>
-                  <ViewPost
-                    publicId={data?.publicId}
-                    profileName={profileData?.data?.displayName}
-                    avatar={profileData?.data?.profilePic || defaultLiveAvatar}
-                    handle={`@${profileData?.data?.username}`}
-                    time={formatTimeAgo(data?.createdDate)}
-                    paragraphOne={data?.message}
-                    timeLineImage={data?.mediaFiles}
-                    ifParagraph={true}
-                    showModal={showMoreModal === data?.publicId}
-                    showCommentModal={showCommentModal}
-                    toggleModal={() =>
-                      setShowMoreModal(
-                        showMoreModal === data?.publicId ? null : data?.publicId
-                      )
-                    }
-                    toggleShowCommentModal={() =>
-                      toggleShowCommentModal(data?.publicId)
-                    }
-                    TimeLineModal={
-                      <TimeLineHomeModal
-                        toggleTimelineHomeModal={toggleTimelineHomeModal}
-                        publicId={data?.publicId}
-                      />
-                    }
-                    reactionsData={transformReactions(data?.reactions)}
-                  />
-                </div>
-              );
-            })}
-          </>
-
-          {userObject.role !== UserRole.creator && (
-            <Modal show={showInterestModal} toggleModal={toggleInterestModal}>
-              <div className="p-4">
-                <InterestModal toggleModal={toggleInterestModal} />
-              </div>
-            </Modal>
+      ) : ( */}
+      <div className="">
+        <>
+          <SearchInput />
+          {ifUserIsCreatingPoll ? (
+            <Poll
+              pollOptions={pollOptions}
+              setPollOptions={setPollOptions}
+              activePoll={activePoll}
+              setActivePoll={setActivePoll}
+              setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+            />
+          ) : (
+            <CommentBox
+              ifPoll
+              ifRecord
+              setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+            />
           )}
 
-          <Modal
-            ifClose={false}
-            show={isEditingStory}
-            toggleModal={toggleIsEditingStoryModal}
-          >
+          <div className="my-2">
+            <StoryUploader onFileUpload={handleFileUpload} />
+          </div>
+
+          {/* {getCreatorContent?.data?.content?.map((data: StoryPost) => {
+            return (
+              <div className="relative" key={data?.publicId}>
+                <ViewPost
+                  publicId={data?.publicId}
+                  profileName={profileData?.data?.displayName}
+                  avatar={profileData?.data?.profilePic || defaultLiveAvatar}
+                  handle={`@${profileData?.data?.username}`}
+                  time={formatTimeAgo(data?.createdDate)}
+                  paragraphOne={data?.message}
+                  timeLineImage={data?.mediaFiles}
+                  ifParagraph={true}
+                  showModal={showMoreModal === data?.publicId}
+                  // showCommentModal={showCommentModal}
+                  toggleModal={() =>
+                    setShowMoreModal(
+                      showMoreModal === data?.publicId ? null : data?.publicId
+                    )
+                  }
+                  // toggleShowCommentModal={() =>
+                  //   toggleShowCommentModal(data?.publicId)
+                  // }
+                  TimeLineModal={
+                    <TimeLineHomeModal
+                      toggleTimelineHomeModal={toggleTimelineHomeModal}
+                      publicId={data?.publicId}
+                    />
+                  }
+                  reactionsData={transformReactions(data?.reactions)}
+                />
+              </div>
+            );
+          })} */}
+
+          {getCreatorContent?.data?.content?.map((data: StoryPost) => (
+            <PostItem key={data?.publicId} data={data} />
+          ))}
+        </>
+
+        {userObject.role !== UserRole.creator && (
+          <Modal show={showInterestModal} toggleModal={toggleInterestModal}>
             <div className="p-4">
-              <StoryModal
-                toggleModal={toggleIsEditingStoryModal}
-                uploadedFile={uploadedFile}
-              />
+              <InterestModal toggleModal={toggleInterestModal} />
             </div>
           </Modal>
-        </div>
-      )}
+        )}
+
+        <Modal
+          ifClose={false}
+          show={isEditingStory}
+          toggleModal={toggleIsEditingStoryModal}
+        >
+          <div className="p-4">
+            <StoryModal
+              toggleModal={toggleIsEditingStoryModal}
+              uploadedFile={uploadedFile}
+            />
+          </div>
+        </Modal>
+      </div>
+      {/* )} */}
     </>
   );
 };
 
 export { Home };
+
+// const { data, isLoading: getContentByIdIsLoading } = useGetData({
+//   url: `contents/${params?.id}`,
+//   queryKey: ["GetContentsById"],
+// });

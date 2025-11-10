@@ -15,11 +15,13 @@ type CommentBoxProp = {
   ifPoll?: boolean;
   ifRecord?: boolean;
   setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
+  endpoint?: string;
 };
 
 const CommentBox = ({
   ifRecord,
   ifPoll,
+  endpoint = "contents",
   setIfUserIsCreatingPoll,
 }: CommentBoxProp) => {
   const [isActive, setIsActive] = useState(false);
@@ -93,7 +95,7 @@ const CommentBox = ({
   };
 
   const createContentMutation = useCustomMutation({
-    endpoint: `contents`,
+    endpoint,
     onSuccessCallback: () => {
       reset();
       resetFiles();
