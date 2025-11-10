@@ -9,21 +9,28 @@ import Love from "@/assets/icons/love";
 import PostCard, { type PostCardProps } from "./Postcard";
 import { MoreHorizontal } from "lucide-react";
 import type { ReactionItem } from "@/lib/types";
+import Modal from "../modals/Modal";
+import { CommentOnPost } from "../modals/CommentOnPost";
 
 interface ViewPostProps extends Omit<PostCardProps, "headerActions"> {
   showModal: boolean;
+  showCommentModal: string | null;
   toggleModal: () => void;
+  toggleShowCommentModal: (postId?: string) => void;
   TimeLineModal?: React.ReactNode;
 }
 
 const ViewPost: React.FC<ViewPostProps> = ({
   showModal,
+  showCommentModal,
   toggleModal,
   TimeLineModal,
+  toggleShowCommentModal,
+  publicId,
   ...postProps
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-
+  console.log(showCommentModal === publicId);
   // // Close modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -44,9 +51,6 @@ const ViewPost: React.FC<ViewPostProps> = ({
     };
   }, [showModal, toggleModal]);
 
-  // // Memoized image check
-  // const hasImages = props.timeLineImage.length > 0;
-
   const reactionsData: ReactionItem[] = [
     { type: "LIKE", icon: Like, number: 0 },
     { type: "DISLIKE", icon: Dislike, number: 0 },
@@ -59,6 +63,7 @@ const ViewPost: React.FC<ViewPostProps> = ({
       {...postProps}
       ifIcon
       reactionsData={reactionsData}
+      toggleShowCommentModal={toggleShowCommentModal}
       headerActions={
         <>
           <button
@@ -85,6 +90,16 @@ const ViewPost: React.FC<ViewPostProps> = ({
               {TimeLineModal}
             </div>
           )}
+
+          <Modal
+            show={showCommentModal === publicId}
+            toggleModal={() => toggleShowCommentModal(publicId)}
+          >
+            <CommentOnPost
+              publicId={publicId}
+              toggleModal={() => toggleShowCommentModal(publicId)}
+            />
+          </Modal>
         </>
       }
     />

@@ -21,6 +21,13 @@ import { transformReactions } from "@/lib/reaction";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const { data: profileData, isLoading } = useFetchProfile(userObject);
+  const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
+    useGetData({
+      url: `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`,
+      queryKey: ["GetContents"],
+    });
+
   const [isEditingStory, setIsEditingStory] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
     null
@@ -37,15 +44,9 @@ const Home = () => {
       name: "Option Two",
     },
   ]);
+  const [showCommentModal, setShowCommentModal] = useState<string | null>(null);
   const [activePoll, setActivePoll] = useState(pollOptions[0].name);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const { data: profileData, isLoading } = useFetchProfile(userObject);
-
-  const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
-    useGetData({
-      url: `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`,
-      queryKey: ["GetContents"],
-    });
   const toggleInterestModal = () => {
     setShowInterestModal(!showInterestModal);
   };
@@ -61,6 +62,12 @@ const Home = () => {
 
   const toggleTimelineHomeModal = () => {
     setShowMoreModal(!showMoreModal);
+  };
+
+  const toggleShowCommentModal = (postId?: string) => {
+    console.log(postId);
+    if (!postId) return;
+    setShowCommentModal(showCommentModal === postId ? null : postId);
   };
 
   return (
@@ -104,10 +111,14 @@ const Home = () => {
                     timeLineImage={data?.mediaFiles}
                     ifParagraph={true}
                     showModal={showMoreModal === data?.publicId}
+                    showCommentModal={showCommentModal}
                     toggleModal={() =>
                       setShowMoreModal(
                         showMoreModal === data?.publicId ? null : data?.publicId
                       )
+                    }
+                    toggleShowCommentModal={() =>
+                      toggleShowCommentModal(data?.publicId)
                     }
                     TimeLineModal={
                       <TimeLineHomeModal

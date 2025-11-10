@@ -2,6 +2,7 @@ import type { MediaFile, ReactionItem } from "@/lib/types";
 import Typography from "../forms/Typography";
 import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
+import Chat from "@/assets/icons/chat";
 
 export interface PostCardProps {
   avatar: string;
@@ -11,12 +12,13 @@ export interface PostCardProps {
   bgColor?: string;
   paragraphOne?: string;
   paragraphTwo?: string;
-  timeLineImage?: MediaFile[];
+  timeLineImage?: string | MediaFile[];
   publicId?: string;
   reactionsData?: ReactionItem[];
   ifParagraph?: boolean;
   ifIcon?: boolean;
   headerActions?: React.ReactNode;
+  toggleShowCommentModal?: (id: string | undefined) => void;
   className?: string;
 }
 
@@ -35,6 +37,7 @@ const PostCard: React.FC<PostCardProps> = ({
   ifIcon = true,
   headerActions,
   className,
+  toggleShowCommentModal,
 }) => {
   const hasImages = Array.isArray(timeLineImage) && timeLineImage.length > 0;
 
@@ -114,7 +117,12 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Action Icons (Reactions) */}
       {ifIcon && reactionsData && (
         <footer className="flex items-center py-4 ml-16">
-          {reactionsData.map(({ type, icon: Icon, number }) => (
+          <Chat
+            number={99}
+            onClick={() => toggleShowCommentModal?.(publicId)}
+          />
+
+          {reactionsData?.map(({ type, icon: Icon, number }) => (
             <IconAndNumber
               key={type}
               publicid={publicId}
