@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import defaultLiveAvatar from "../../assets/defaultLiveAvatar.svg";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
@@ -11,11 +11,10 @@ import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
 import StoryModal from "../../components/modals/StoryModal";
 import { StoryUploader } from "@/components/molecules/StoryUploader";
-import { useGetData } from "@/hooks/apiCalls";
+import { useCustomMutation, useGetData } from "@/hooks/apiCalls";
 import { Loader } from "@/components/molecules/Loader";
 import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
-import { useFetchProfile } from "@/hooks/apiHooks";
 import ViewPost from "../../components/cards/ViewPost";
 import { transformReactions } from "@/lib/reaction";
 
@@ -30,6 +29,14 @@ const Home = () => {
       }`,
       queryKey: ["GetContents"],
     });
+  const useRecordContentView = (contentId: string) => {
+    return useCustomMutation({
+      endpoint: `contents/${contentId}/view`,
+      onSuccessCallback: () => {
+        console.log("Content view recorded for", contentId);
+      },
+    });
+  };
 
   const [isEditingStory, setIsEditingStory] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
@@ -76,11 +83,36 @@ const Home = () => {
   // };
 
   const PostItem = ({ data }: { data: StoryPost }) => {
-    const { data: profileData, isLoading } = useFetchProfile({
-      email: data?.createdBy,
-      role: "CREATOR",
-      usid: userObject?.usid,
+    const postRef = useRef<HTMLDivElement>(null);
+    const [hasViewed, setHasViewed] = useState(false);
+
+    const { data: profileData, isLoading } = useGetData({
+      url: `profile/${data?.createdBy}`,
+      queryKey: ["GetCreatorProfile", data?.createdBy],
+      enabled: !!data?.createdBy,
     });
+
+    // Record view mutation with the specific contentId
+    const recordViewMutation = useRecordContentView(data?.publicId || "");
+
+    useEffect(() => {
+      if (!postRef.current || hasViewed || !data?.publicId) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            // Trigger the POST request
+            recordViewMutation.mutate({});
+            setHasViewed(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.5 }
+      );
+
+      observer.observe(postRef.current);
+      return () => observer.disconnect();
+    }, [hasViewed, data?.publicId, recordViewMutation]);
 
     if (isLoading || getCreatorContentIsLoading) return <Loader />;
 
