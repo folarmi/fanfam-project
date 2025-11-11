@@ -98,10 +98,13 @@ const Home = () => {
     useEffect(() => {
       if (!postRef.current || hasViewed || !data?.publicId) return;
 
+      // check if the user has already viewed it
+      const alreadyViewed = data?.viewers?.includes(userObject?.email);
+      if (alreadyViewed) return; // don’t record again
+
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            // Trigger the POST request
             recordViewMutation.mutate({});
             setHasViewed(true);
             observer.disconnect();
@@ -112,12 +115,12 @@ const Home = () => {
 
       observer.observe(postRef.current);
       return () => observer.disconnect();
-    }, [hasViewed, data?.publicId, recordViewMutation]);
+    }, [hasViewed, data?.publicId, data?.viewers, recordViewMutation]);
 
     if (isLoading || getCreatorContentIsLoading) return <Loader />;
 
     return (
-      <div className="relative">
+      <div className="relative" ref={postRef}>
         <ViewPost
           publicId={data?.publicId}
           profileName={profileData?.data?.displayName}

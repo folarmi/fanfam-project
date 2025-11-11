@@ -83,6 +83,12 @@ export interface StoryPost {
   mediaFiles: MediaFile[];
   comments: Comment[];
   reactions: Reaction[];
+  viewers: string[];
+  meta: {
+    reactionCount: number;
+    commentCount: number;
+    viewCount: number;
+  };
 }
 
 // Optional child interfaces if you plan to expand later:
