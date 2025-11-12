@@ -48,6 +48,9 @@ export interface LocationResult {
 
 export type MediaType = "PHOTO" | "VIDEO" | "AUDIO" | "DOCUMENT";
 export type ReactionType = "LIKE" | "LOVE" | "DISLIKE" | "LOL";
+export interface IsReactionLiked {
+  isLiked: boolean;
+}
 export interface MediaFile {
   publicId: string;
   createdBy: string;
@@ -70,6 +73,7 @@ export interface ReactionItem {
   type: ReactionType;
   icon: ComponentType<any>;
   number?: number;
+  createdBy: string[];
 }
 
 export interface StoryPost {
@@ -103,21 +107,3 @@ export type MediaItem = {
   mediaType: MediaType;
   mediaLink: string;
 };
-
-// {
-//     "phoneNumber": "+2348175988567",
-//     "usid": "fafam-20251006HU8P8ehVcXD4LZRoGU87WRKmKCZHWONk6mEL6GXJ",
-//     "role": "CREATOR",
-//     "email": "excel@mailinator.com",
-//     "residence": "sdkfndskf",
-//     "fullName": "Brennan Carey",
-//     "gender": "Male",
-//     "location": "Laudantium quos nem",
-//     "profilePic": "http://res.cloudinary.com/dezb6qbwe/image/upload/c_fill,h_250,w_200/v1762332518/image_id_fafam-20251006HU8P8ehVcXD4LZRoGU87WRKmKCZHWONk6mEL6GXJ",
-//     "interest": "Blanditiis consectet",
-//     "bio": "sjdknfbkjdsfsjkdnf",
-//     "username": "testUserName",
-//     "websiteUrl": null,
-//     "displayName": "Cynthia Kirby",
-//     "coverImageUrl": "http://res.cloudinary.com/dezb6qbwe/image/upload/v1762332508/24d0a56e-3bbb-4c2e-8abc-dbd6ffd6da23fafam-20251006HU8P8ehVcXD4LZRoGU87WRKmKCZHWONk6mEL6GXJ.svg"
-// }

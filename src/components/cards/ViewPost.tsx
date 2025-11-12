@@ -1,14 +1,9 @@
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // import ashMore from "../../assets/icons/ashMore.svg";
-import Like from "../../assets/icons/like";
 import React, { useEffect, useRef } from "react";
-import Dislike from "@/assets/icons/dislike";
-import Lol from "@/assets/icons/lol";
-import Love from "@/assets/icons/love";
 import PostCard, { type PostCardProps } from "./Postcard";
 import { MoreHorizontal } from "lucide-react";
-import type { ReactionItem } from "@/lib/types";
 // import Modal from "../modals/Modal";
 // import { CommentOnPost } from "../modals/CommentOnPost";
 
@@ -50,18 +45,18 @@ const ViewPost: React.FC<ViewPostProps> = ({
     };
   }, [showModal, toggleModal]);
 
-  const reactionsData: ReactionItem[] = [
-    { type: "LIKE", icon: Like, number: 0 },
-    { type: "DISLIKE", icon: Dislike, number: 0 },
-    { type: "LOL", icon: Lol },
-    { type: "LOVE", icon: Love },
-  ];
+  // const reactionsData: ReactionItem[] = [
+  //   { type: "LIKE", icon: Like, number: 0 },
+  //   { type: "DISLIKE", icon: Dislike, number: 0 },
+  //   { type: "LOL", icon: Lol, number: 0 },
+  //   { type: "LOVE", icon: Love, number: 0 },
+  // ];
 
   return (
     <PostCard
       {...postProps}
       ifIcon
-      reactionsData={reactionsData}
+      // reactionsData={reactionsData}
       // toggleShowCommentModal={toggleShowCommentModal}
       publicId={publicId}
       headerActions={

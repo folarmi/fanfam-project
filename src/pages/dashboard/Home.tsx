@@ -178,40 +178,6 @@ const Home = () => {
             <StoryUploader onFileUpload={handleFileUpload} />
           </div>
 
-          {/* {getCreatorContent?.data?.content?.map((data: StoryPost) => {
-            return (
-              <div className="relative" key={data?.publicId}>
-                <ViewPost
-                  publicId={data?.publicId}
-                  profileName={profileData?.data?.displayName}
-                  avatar={profileData?.data?.profilePic || defaultLiveAvatar}
-                  handle={`@${profileData?.data?.username}`}
-                  time={formatTimeAgo(data?.createdDate)}
-                  paragraphOne={data?.message}
-                  timeLineImage={data?.mediaFiles}
-                  ifParagraph={true}
-                  showModal={showMoreModal === data?.publicId}
-                  // showCommentModal={showCommentModal}
-                  toggleModal={() =>
-                    setShowMoreModal(
-                      showMoreModal === data?.publicId ? null : data?.publicId
-                    )
-                  }
-                  // toggleShowCommentModal={() =>
-                  //   toggleShowCommentModal(data?.publicId)
-                  // }
-                  TimeLineModal={
-                    <TimeLineHomeModal
-                      toggleTimelineHomeModal={toggleTimelineHomeModal}
-                      publicId={data?.publicId}
-                    />
-                  }
-                  reactionsData={transformReactions(data?.reactions)}
-                />
-              </div>
-            );
-          })} */}
-
           {getCreatorContent?.data?.content?.map((data: StoryPost) => (
             <PostItem key={data?.publicId} data={data} />
           ))}
@@ -244,8 +210,3 @@ const Home = () => {
 };
 
 export { Home };
-
-// const { data, isLoading: getContentByIdIsLoading } = useGetData({
-//   url: `contents/${params?.id}`,
-//   queryKey: ["GetContentsById"],
-// });

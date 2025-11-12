@@ -5,6 +5,8 @@ import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
 // import Chat from "@/assets/icons/chat";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@/lib/hook";
+import type { RootState } from "@/lib/store";
 
 export interface PostCardProps {
   avatar: string;
@@ -41,8 +43,14 @@ const PostCard: React.FC<PostCardProps> = ({
   className,
   toggleShowCommentModal,
 }) => {
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+
   const navigate = useNavigate();
   const hasImages = Array.isArray(timeLineImage) && timeLineImage.length > 0;
+
+  const userReaction = reactionsData?.find((reaction) =>
+    reaction.createdBy.includes(userObject?.email)
+  )?.type;
 
   return (
     <article
@@ -139,6 +147,7 @@ const PostCard: React.FC<PostCardProps> = ({
               reactionType={type}
               Icon={Icon}
               number={number}
+              isActive={userReaction === type}
             />
           ))}
         </footer>

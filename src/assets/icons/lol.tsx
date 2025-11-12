@@ -1,4 +1,6 @@
-const Lol = () => (
+import type { IsReactionLiked } from "@/lib/types";
+
+const Lol = ({ isLiked }: IsReactionLiked) => (
   <svg
     width="24"
     height="25"
@@ -6,28 +8,32 @@ const Lol = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
+    {/* Main circle */}
     <path
       d="M12 22.5C17.5228 22.5 22 18.0228 22 12.5C22 6.97715 17.5228 2.5 12 2.5C6.47715 2.5 2 6.97715 2 12.5C2 18.0228 6.47715 22.5 12 22.5Z"
-      stroke="#8D8E96"
+      stroke={isLiked ? "#2599F6" : "#8D8E96"}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      fill="none"
+      fill={isLiked ? "#2599F6" : "none"}
     />
+    {/* Smile */}
     <path
       d="M8.5 15.5C8.5 15.5 10 17.5 12 17.5C14 17.5 15.5 15.5 15.5 15.5"
-      stroke="#8D8E96"
+      stroke={isLiked ? "#fff" : "#8D8E96"}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+    {/* Left eye */}
     <path
       d="M8.88867 10.1113C9.49635 10.1113 9.98922 9.61846 9.98922 9.01078C9.98922 8.4031 9.49635 7.91022 8.88867 7.91022C8.28099 7.91022 7.78812 8.4031 7.78812 9.01078C7.78812 9.61846 8.28099 10.1113 8.88867 10.1113Z"
-      fill="#8D8E96"
+      fill={isLiked ? "#fff" : "#8D8E96"}
     />
+    {/* Right eye */}
     <path
       d="M15.1113 10.1113C15.719 10.1113 16.2119 9.61846 16.2119 9.01078C16.2119 8.4031 15.719 7.91022 15.1113 7.91022C14.5036 7.91022 14.0107 8.4031 14.0107 9.01078C14.0107 9.61846 14.5036 10.1113 15.1113 10.1113Z"
-      fill="#8D8E96"
+      fill={isLiked ? "#fff" : "#8D8E96"}
     />
   </svg>
 );

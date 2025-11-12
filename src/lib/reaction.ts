@@ -15,17 +15,21 @@ const REACTION_CONFIG: Record<ReactionType, ComponentType<any>> = {
 
 export const transformReactions = (
   reactions: Reaction[] = []
-): ReactionItem[] => {
-  // Count reactions by type
-  const counts = reactions.reduce((acc, { type }) => {
-    acc[type] = (acc[type] || 0) + 1;
+): (ReactionItem & { createdBy: string[] })[] => {
+  // ✅ Count reactions by type and collect createdBy emails
+  const grouped = reactions.reduce((acc, { type, createdBy }) => {
+    const normalized = type?.toUpperCase() as ReactionType;
+    if (!acc[normalized]) acc[normalized] = { count: 0, users: [] };
+    acc[normalized].count += 1;
+    acc[normalized].users.push(createdBy);
     return acc;
-  }, {} as Record<ReactionType, number>);
+  }, {} as Record<ReactionType, { count: number; users: string[] }>);
 
-  // Return all reaction types with their counts
+  // ✅ Return all reaction types with their counts + createdBy users
   return (Object.keys(REACTION_CONFIG) as ReactionType[]).map((type) => ({
     type,
     icon: REACTION_CONFIG[type],
-    number: counts[type] || 0,
+    number: grouped[type]?.count || 0,
+    createdBy: grouped[type]?.users || [],
   }));
 };
