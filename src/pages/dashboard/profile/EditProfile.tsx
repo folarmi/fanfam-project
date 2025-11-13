@@ -47,7 +47,7 @@ const EditProfile = () => {
       onSuccess: (data) => {
         const formValues = {
           ...getValues(),
-          coverImageUrl: data?.body,
+          coverImageUrl: data?.body?.url,
           profileImageUrl: getValues("profilePic"),
         };
         updateCreatorProfileMutation.mutate(formValues);

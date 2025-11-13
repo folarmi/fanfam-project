@@ -107,3 +107,11 @@ export type MediaItem = {
   mediaType: MediaType;
   mediaLink: string;
 };
+
+export interface BankingInfo {
+  country: string;
+  bankName: string;
+  bankCode: string;
+  accountNo: string;
+  accountName: string;
+}

@@ -3,12 +3,32 @@ import CustomButton from "@/components/forms/CustomButton";
 import CustomInput from "@/components/forms/CustomInput";
 import CustomSelect from "@/components/forms/CustomSelect";
 import { banks, getAllCountryOptionsWithNames } from "@/data";
+import { useCustomMutation } from "@/hooks/apiCalls";
+import type { BankingInfo } from "@/lib/types";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 const BankingInformation = () => {
-  const { control } = useForm();
+  const { control, handleSubmit } = useForm<BankingInfo>();
+  const queryClient = useQueryClient();
   const countryOptions = useMemo(() => getAllCountryOptionsWithNames(), []);
+
+  const creatorBankInfoMutation = useCustomMutation({
+    endpoint: "profile/creator-bank-info",
+    method: "put",
+    successMessage: () => "User Profile updated successfully",
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["viewProfile"],
+        exact: false,
+      });
+    },
+  });
+
+  const onSubmit = (data: BankingInfo) => {
+    creatorBankInfoMutation.mutate(data);
+  };
 
   return (
     <div className="mt-4">
@@ -20,13 +40,17 @@ const BankingInformation = () => {
       </div>
 
       <section className="border-t border-b border-grey_10">
-        <form className="mx-4 mt-4 flex flex-col ">
+        <form
+          className="mx-4 mt-4 flex flex-col"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <CustomSelect
             name="country"
             options={countryOptions}
             control={control}
             label="Country"
             ifLabel
+            rules={{ required: "Country is required" }}
           />
           <CustomSelect
             name="bankName"
@@ -34,22 +58,34 @@ const BankingInformation = () => {
             control={control}
             label="Bank Name"
             ifLabel
+            rules={{ required: "Bank name is required" }}
           />
 
           <CustomInput
+            label="Bank Code"
+            name="bankCode"
+            control={control}
+            placeholder="345"
+            rules={{ required: "Bank Code is required" }}
+          />
+          <CustomInput
             label="Account Number"
-            name="accountNumber"
+            name="accountNo"
             control={control}
             placeholder="2000211109"
+            rules={{ required: "Account number is required" }}
           />
           <CustomInput
             label="Account name"
             name="accountName"
             control={control}
             placeholder="Cynthia Ofore"
+            rules={{ required: "Account name is required" }}
           />
 
           <CustomButton
+            disabled={creatorBankInfoMutation.isPending}
+            loading={creatorBankInfoMutation.isPending}
             variant="primary"
             className="shadow-custom mb-4 mt-3 mx-4 w-[96%]"
           >
