@@ -1,11 +1,48 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { CreatorHeaderText } from "@/components/atoms/CreatorHeaderText";
 import CustomButton from "@/components/forms/CustomButton";
 import Typography from "@/components/forms/Typography";
 import RadioButton from "@/components/RadioButtonLabel";
 import { becomeACreator } from "@/data";
 import { Link } from "react-router-dom";
+import creatorOne from "@/assets/icons/creatorOne.svg";
+import { usePersonaVerification } from "@/hooks/usePersonaVerification";
+import { useCustomMutation } from "@/hooks/apiCalls";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 const BecomeACreator = () => {
+  const queryClient = useQueryClient();
+  const [inquiryId, setInquiryId] = useState<string | null>(null);
+
+  const verifyCreatorMutation = useCustomMutation({
+    endpoint: `profile/verify/${inquiryId}`,
+    successMessage: () => "User Profile updated successfully",
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["viewProfile"],
+        exact: false,
+      });
+    },
+  });
+
+  const { open } = usePersonaVerification({
+    templateId: import.meta.env.VITE_PERSONA_TEMPLATE_ID,
+    environmentId: import.meta.env.VITE_PERSONA_ENVIRONMENT_ID,
+    onComplete: (data) => {
+      console.log("Verification complete:", data?.inquiryId);
+      setInquiryId(data?.inquiryId);
+    },
+    onCancel: () => console.log("Verification cancelled"),
+    onError: (error) => console.error("Persona error:", error),
+  });
+
+  useEffect(() => {
+    if (inquiryId) {
+      verifyCreatorMutation.mutate({});
+    }
+  }, [inquiryId]);
+
   return (
     <div className="mt-4">
       <CreatorHeaderText
@@ -15,6 +52,25 @@ const BecomeACreator = () => {
       />
 
       <section className="border-t border-grey_10">
+        <div
+          className="flex items-center p-4 border border-grey_10 rounded-lg mt-4 mx-4 cursor-pointer"
+          onClick={() => open()}
+        >
+          <img src={creatorOne} />
+
+          <div className="ml-4">
+            <Typography variant="subtitle2" className="">
+              Verify Your Identity
+            </Typography>
+            <Typography variant="p3" className="">
+              Upload an approved government ID to verify your identity
+            </Typography>
+          </div>
+
+          <div className="flex-shrink-0 ml-auto">
+            <RadioButton />
+          </div>
+        </div>
         {becomeACreator.map(({ id, image, subtitle, title, link }) => {
           return (
             <Link

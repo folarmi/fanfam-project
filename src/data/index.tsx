@@ -1798,13 +1798,6 @@ export const genderOptions = [
 
 export const becomeACreator = [
   {
-    id: 1,
-    title: "Verify Your Identity",
-    subtitle: "Upload an approved government ID to verify your identity",
-    image: creatorOne,
-    link: "/dashboard/become-a-creator/verify-identity",
-  },
-  {
     id: 2,
     title: "Complete Banking Information",
     subtitle: "Complete your banking information",
