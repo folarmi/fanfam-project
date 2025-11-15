@@ -8,9 +8,11 @@ import type { BankingInfo } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const BankingInformation = () => {
   const { control, handleSubmit } = useForm<BankingInfo>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const countryOptions = useMemo(() => getAllCountryOptionsWithNames(), []);
 
@@ -23,6 +25,7 @@ const BankingInformation = () => {
         queryKey: ["viewProfile"],
         exact: false,
       });
+      navigate(-1);
     },
   });
 

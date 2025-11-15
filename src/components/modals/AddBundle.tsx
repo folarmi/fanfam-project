@@ -4,12 +4,34 @@ import Typography from "../forms/Typography";
 import { useForm } from "react-hook-form";
 import CustomSelect from "../forms/CustomSelect";
 import CustomInput from "../forms/CustomInput";
+import { sampleMonths } from "@/data";
+import { useCustomMutation } from "@/hooks/apiCalls";
+
+export interface FormValues {
+  amount: 0;
+  durationInMonths: 0;
+}
 
 const AddBundle = ({ toggleModal }: any) => {
-  const { control } = useForm();
+  const { control, handleSubmit } = useForm<FormValues>();
+
+  const addSubscriptionBundleMutation = useCustomMutation({
+    endpoint: `subscriptions/bundle`,
+    successMessage: () => "Subscription Bundle added successfully",
+    onSuccessCallback: () => {},
+  });
+
+  const submitForm = (data: FormValues) => {
+    addSubscriptionBundleMutation.mutate({
+      ...data,
+    });
+  };
 
   return (
-    <div className="bg-white rounded-2xl p-6 w-full md:w-1/2">
+    <form
+      onSubmit={handleSubmit(submitForm)}
+      className="bg-white rounded-2xl p-6 w-full md:w-1/2"
+    >
       <Typography variant="h5" className="cursor-pointer text-grey_800 pb-6">
         Add Bundle
       </Typography>
@@ -24,11 +46,12 @@ const AddBundle = ({ toggleModal }: any) => {
       />
 
       <CustomSelect
-        name=""
+        name="durationInMonths"
         control={control}
         placeholder="3 months"
         ifLabel
-        label="Select duration"
+        options={sampleMonths}
+        label="Select duration(in months)"
       />
 
       <div className="flex items-center mt-8 mb-6 justify-end w-1/2 ml-auto">
@@ -39,11 +62,16 @@ const AddBundle = ({ toggleModal }: any) => {
         >
           Cancel
         </CustomButton>
-        <CustomButton variant="primary" className="text-xs px-3 w-fit">
-          Create link
+        <CustomButton
+          disabled={addSubscriptionBundleMutation?.isPending}
+          loading={addSubscriptionBundleMutation?.isPending}
+          variant="primary"
+          className="text-xs px-3 w-fit"
+        >
+          Create Bundle
         </CustomButton>
       </div>
-    </div>
+    </form>
   );
 };
 

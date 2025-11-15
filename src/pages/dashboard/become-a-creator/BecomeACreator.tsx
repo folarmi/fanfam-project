@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { CreatorHeaderText } from "@/components/atoms/CreatorHeaderText";
 import CustomButton from "@/components/forms/CustomButton";
@@ -10,6 +11,7 @@ import { usePersonaVerification } from "@/hooks/usePersonaVerification";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const BecomeACreator = () => {
   const queryClient = useQueryClient();
@@ -30,11 +32,10 @@ const BecomeACreator = () => {
     templateId: import.meta.env.VITE_PERSONA_TEMPLATE_ID,
     environmentId: import.meta.env.VITE_PERSONA_ENVIRONMENT_ID,
     onComplete: (data) => {
-      console.log("Verification complete:", data?.inquiryId);
       setInquiryId(data?.inquiryId);
     },
-    onCancel: () => console.log("Verification cancelled"),
-    onError: (error) => console.error("Persona error:", error),
+    onCancel: () => toast.warning("Verification cancelled"),
+    onError: (_error) => toast.error("An error occurred"),
   });
 
   useEffect(() => {

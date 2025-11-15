@@ -120,6 +120,7 @@ const Profile = () => {
                 className="cursor-pointer"
                 reactionType="LIKE"
                 publicid="fff"
+                isActive={false}
               />
               <IconAndNumber
                 reactionType="LIKE"
@@ -127,6 +128,7 @@ const Profile = () => {
                 Icon={Videos}
                 number={56}
                 numberColor="#ffffff"
+                isActive={false}
               />
               <IconAndNumber
                 reactionType="LIKE"
@@ -134,6 +136,7 @@ const Profile = () => {
                 Icon={Live}
                 number={16}
                 numberColor="#ffffff"
+                isActive={false}
               />
               <IconAndNumber
                 Icon={ProfileLike}
@@ -141,6 +144,7 @@ const Profile = () => {
                 numberColor="#ffffff"
                 reactionType="LIKE"
                 publicid="fff"
+                isActive={false}
               />
             </div>
 

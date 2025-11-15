@@ -69,7 +69,7 @@
 import ReactSelect from "react-select";
 import { useController, type UseControllerProps } from "react-hook-form";
 
-type OptionType = { value: string; label: string };
+type OptionType = { value: string | number; label: string | number };
 
 interface CustomSelectProps {
   name: string;

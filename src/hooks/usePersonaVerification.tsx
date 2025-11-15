@@ -24,7 +24,7 @@ interface UsePersonaVerificationResult {
  */
 export const usePersonaVerification = ({
   templateId,
-  environmentId = "env_9nyHyE7aH2r8u12YZtPqm8CbEw7i",
+  environmentId = import.meta.env.VITE_PERSONA_ENVIRONMENT_ID,
   onComplete,
   onCancel,
   onError,

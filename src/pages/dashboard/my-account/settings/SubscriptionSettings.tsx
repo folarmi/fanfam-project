@@ -1,5 +1,4 @@
-"use client";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomButton from "@components/forms/CustomButton";
 import CustomInput from "@components/forms/CustomInput";
 import Typography from "@components/forms/Typography";
@@ -17,13 +16,22 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SubscriptionHeader } from "./SubscriptionHeader";
+import { useCustomMutation } from "@/hooks/apiCalls";
 
 type Prop = {
   showHeader?: boolean;
 };
 
 const SubscriptionSettings = ({ showHeader = true }: Prop) => {
-  const { control } = useForm();
+  const { control, handleSubmit } = useForm();
+
+  const subscriptionAmountMutation = useCustomMutation({
+    endpoint: `subscriptions/amount`,
+    useQueryParams: true,
+    successMessage: () => "Subscription Amount updated successfully",
+    onSuccessCallback: () => {},
+  });
+
   const [isPromotionalCampaign, setIsPromotionalCampaign] = useState(false);
   const [isFreeTrialLink, setIsFreeTrialLink] = useState(false);
   const [isPromotion, setIsPromotion] = useState(false);
@@ -39,14 +47,25 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
     else if (buttonText === "Add bundle") setIsBundleModal(!isBundleModal);
   };
 
+  const submitAmount = (data: any) => {
+    subscriptionAmountMutation.mutate({
+      params: {
+        amount: data?.amount,
+      },
+    });
+  };
+
   return (
     <div>
       {showHeader && <SubscriptionHeader text="Subscription Settings" />}
 
-      <section className="mt-4 ml-4 p-4 shadow-timeline-card-shadow">
+      <form
+        onSubmit={handleSubmit(submitAmount)}
+        className="mt-4 ml-4 p-4 shadow-timeline-card-shadow"
+      >
         <CustomInput
           label="Price per month"
-          name="phoneNumber"
+          name="amount"
           control={control}
           rules={{
             required: "Price per month is required",
@@ -66,12 +85,17 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
             >
               Cancel
             </CustomButton>
-            <CustomButton variant="primary" className="text-xs px-3 w-[84px]">
+            <CustomButton
+              loading={subscriptionAmountMutation.isPending}
+              disabled={subscriptionAmountMutation.isPending}
+              variant="primary"
+              className="text-xs px-3 w-[84px]"
+            >
               Save
             </CustomButton>
           </div>
         </div>
-      </section>
+      </form>
 
       <div className="ml-4">
         {subscriptionSettings?.map(({ id, buttonText, desc, name }) => {
