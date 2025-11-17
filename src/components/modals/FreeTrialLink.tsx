@@ -20,7 +20,9 @@ const FreeTrialLink = ({ toggleModal }: any) => {
   const createFreeTrialLinkMutation = useCustomMutation({
     endpoint: `subscriptions/freetrial`,
     successMessage: () => "Free Trial Link added successfully",
-    onSuccessCallback: () => {},
+    onSuccessCallback: () => {
+      toggleModal("Create new free trial link");
+    },
   });
 
   const submitForm = (data: FormValues) => {

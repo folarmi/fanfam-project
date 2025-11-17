@@ -1,4 +1,8 @@
-import type { MediaType } from "@/lib/types";
+import type {
+  MediaType,
+  PromotionCampaignQualifier,
+  PromotionCampaignType,
+} from "@/lib/types";
 import { formatDistanceToNowStrict } from "date-fns";
 
 export const formatTimeAgo = (date?: string): string => {
@@ -74,4 +78,60 @@ export const getMediaType = (files: File[]): MediaType => {
   if (fileType.startsWith("image/")) return "PHOTO";
   if (fileType.startsWith("video/")) return "VIDEO";
   return "DOCUMENT";
+};
+
+export const mapQualifierNameToType = (
+  name: string
+): PromotionCampaignQualifier | undefined => {
+  const mapping: Record<string, PromotionCampaignQualifier> = {
+    "Both new and expired": "BOTH",
+    "New subscribers only": "NEW_SUBSCRIBERS",
+    "Expired subscribers only": "EXPIRED_SUBSCRIBERS",
+  };
+  return mapping[name];
+};
+
+// Map qualifier type to ID
+export const mapQualifierTypeToId = (
+  type: PromotionCampaignQualifier
+): number | undefined => {
+  const mapping: Record<PromotionCampaignQualifier, number> = {
+    BOTH: 1,
+    NEW_SUBSCRIBERS: 2,
+    EXPIRED_SUBSCRIBERS: 3,
+  };
+  return mapping[type];
+};
+
+// Map promotion type name to backend type
+export const mapPromotionTypeNameToType = (
+  name: string
+): PromotionCampaignType | undefined => {
+  const mapping: Record<string, PromotionCampaignType> = {
+    "Free trial": "FREE_TRIAL",
+    "First month discount": "FIRST_MONTH_DISCOUNT",
+  };
+  return mapping[name];
+};
+
+// Map promotion type ID to type
+export const mapPromotionTypeIdToType = (
+  id: number
+): PromotionCampaignType | undefined => {
+  const mapping: Record<number, PromotionCampaignType> = {
+    1: "FREE_TRIAL",
+    2: "FIRST_MONTH_DISCOUNT",
+  };
+  return mapping[id];
+};
+
+// Map promotion type to ID
+export const mapPromotionTypeToId = (
+  type: PromotionCampaignType
+): number | undefined => {
+  const mapping: Record<PromotionCampaignType, number> = {
+    FREE_TRIAL: 1,
+    FIRST_MONTH_DISCOUNT: 2,
+  };
+  return mapping[type];
 };

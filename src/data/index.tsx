@@ -2063,3 +2063,29 @@ export const numberOfDays = [
   { label: "180 days", value: 180 },
   { label: "365 days", value: 365 },
 ];
+
+export const qualifiers = [
+  {
+    id: 1,
+    name: "Both new and expired",
+  },
+  {
+    id: 2,
+    name: "New subscribers only",
+  },
+  {
+    id: 3,
+    name: "Expired subscribers only",
+  },
+];
+
+export const promotionType = [
+  {
+    id: 1,
+    name: "Free trial",
+  },
+  {
+    id: 2,
+    name: "First month discount",
+  },
+];

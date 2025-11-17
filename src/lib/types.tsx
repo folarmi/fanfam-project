@@ -115,3 +115,10 @@ export interface BankingInfo {
   accountNo: string;
   accountName: string;
 }
+
+export type PromotionCampaignQualifier =
+  | "NEW_SUBSCRIBERS"
+  | "EXPIRED_SUBSCRIBERS"
+  | "BOTH";
+
+export type PromotionCampaignType = "FREE_TRIAL" | "FIRST_MONTH_DISCOUNT";

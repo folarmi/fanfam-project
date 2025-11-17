@@ -18,7 +18,9 @@ const AddBundle = ({ toggleModal }: any) => {
   const addSubscriptionBundleMutation = useCustomMutation({
     endpoint: `subscriptions/bundle`,
     successMessage: () => "Subscription Bundle added successfully",
-    onSuccessCallback: () => {},
+    onSuccessCallback: () => {
+      toggleModal("Add bundle");
+    },
   });
 
   const submitForm = (data: FormValues) => {
