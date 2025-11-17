@@ -4,19 +4,43 @@ import Typography from "../forms/Typography";
 import { useForm } from "react-hook-form";
 import CustomSelect from "../forms/CustomSelect";
 import CustomInput from "../forms/CustomInput";
+import { useCustomMutation } from "@/hooks/apiCalls";
+import { numberOfDays, subscribersLimit } from "@/data";
+
+export interface FormValues {
+  name: string;
+  limitSize: number;
+  endDate: string;
+  duration: number;
+}
 
 const FreeTrialLink = ({ toggleModal }: any) => {
-  const { control } = useForm();
+  const { control, handleSubmit } = useForm<FormValues>();
+
+  const createFreeTrialLinkMutation = useCustomMutation({
+    endpoint: `subscriptions/freetrial`,
+    successMessage: () => "Free Trial Link added successfully",
+    onSuccessCallback: () => {},
+  });
+
+  const submitForm = (data: FormValues) => {
+    createFreeTrialLinkMutation.mutate({
+      ...data,
+    });
+  };
 
   return (
-    <div className="bg-white rounded-2xl p-6 w-full md:w-1/2">
+    <form
+      onSubmit={handleSubmit(submitForm)}
+      className="bg-white rounded-2xl p-6 w-full md:w-1/2"
+    >
       <Typography variant="h5" className="cursor-pointer text-grey_800 pb-6">
         Free trial link
       </Typography>
 
       <CustomInput
         label="Trial link name"
-        name="phoneNumber"
+        name="name"
         control={control}
         rules={{
           required: "Phone Number is required",
@@ -26,16 +50,18 @@ const FreeTrialLink = ({ toggleModal }: any) => {
       <div className="flex items-center mt-4">
         <CustomSelect
           placeholder="Name of list"
-          name=""
+          name="limitSize"
           control={control}
+          options={subscribersLimit}
           className="mr-6"
           ifLabel
           label="Offer limit"
         />
         <CustomSelect
           placeholder="Offer expiration"
-          name=""
+          name="endDate"
           control={control}
+          options={numberOfDays}
           ifLabel
           label="Offer expiration"
         />
@@ -43,9 +69,10 @@ const FreeTrialLink = ({ toggleModal }: any) => {
 
       <div className="mt-4">
         <CustomSelect
-          name=""
+          name="duration"
           control={control}
           placeholder="Offer expiration"
+          options={numberOfDays}
           ifLabel
           label="Free trial duration"
         />
@@ -65,11 +92,16 @@ const FreeTrialLink = ({ toggleModal }: any) => {
         >
           Cancel
         </CustomButton>
-        <CustomButton variant="primary" className="text-xs px-3 w-fit">
+        <CustomButton
+          disabled={createFreeTrialLinkMutation?.isPending}
+          loading={createFreeTrialLinkMutation?.isPending}
+          variant="primary"
+          className="text-xs px-3 w-fit"
+        >
           Create link
         </CustomButton>
       </div>
-    </div>
+    </form>
   );
 };
 

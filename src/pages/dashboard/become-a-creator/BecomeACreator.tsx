@@ -33,6 +33,7 @@ const BecomeACreator = () => {
     environmentId: import.meta.env.VITE_PERSONA_ENVIRONMENT_ID,
     onComplete: (data) => {
       setInquiryId(data?.inquiryId);
+      // setInquiryId("inq_2P9HD7sfvbt5KVdSpoUz7KKJhuto");
     },
     onCancel: () => toast.warning("Verification cancelled"),
     onError: (_error) => toast.error("An error occurred"),

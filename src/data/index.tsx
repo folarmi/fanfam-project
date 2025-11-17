@@ -2034,3 +2034,32 @@ export const sampleMonths = [
     value: 10,
   },
 ];
+
+export const subscribersLimit = [
+  { label: "1 subscriber", value: 1 },
+  { label: "5 subscribers", value: 5 },
+  { label: "10 subscribers", value: 10 },
+  { label: "25 subscribers", value: 25 },
+  { label: "50 subscribers", value: 50 },
+  { label: "100 subscribers", value: 100 },
+  { label: "250 subscribers", value: 250 },
+  { label: "500 subscribers", value: 500 },
+  { label: "1k subscribers", value: 1000 },
+  { label: "5k subscribers", value: 5000 },
+  { label: "10k subscribers", value: 10000 },
+  { label: "50k subscribers", value: 50000 },
+  { label: "100k subscribers", value: 100000 },
+];
+
+export const numberOfDays = [
+  { label: "1 day", value: 1 },
+  { label: "3 days", value: 3 },
+  { label: "7 days", value: 7 },
+  { label: "14 days", value: 14 },
+  { label: "21 days", value: 21 },
+  { label: "30 days", value: 30 },
+  { label: "60 days", value: 60 },
+  { label: "90 days", value: 90 },
+  { label: "180 days", value: 180 },
+  { label: "365 days", value: 365 },
+];
