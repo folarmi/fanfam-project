@@ -760,18 +760,10 @@ export const getHappyPeopleFeed = (freeTrial: FreeTrial) => [
     name: "Offer limit",
     value: freeTrial.limitSize,
   },
-];
-
-export const subBundles = [
   {
-    id: 1,
-    amount: "$15",
-    duration: "1 month",
-  },
-  {
-    id: 2,
-    amount: "$100",
-    duration: "6 months",
+    id: 4,
+    name: "Duration",
+    value: freeTrial.duration,
   },
 ];
 

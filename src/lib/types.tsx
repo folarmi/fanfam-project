@@ -124,9 +124,23 @@ export type PromotionCampaignQualifier =
 export type PromotionCampaignType = "FREE_TRIAL" | "FIRST_MONTH_DISCOUNT";
 
 export type FreeTrial = {
-  id: string;
   name: string;
   limitSize: number;
   endDate: string;
   duration: number;
+  publicId: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  lastModifiedBy: string;
+};
+
+export type SubscriptionBundle = {
+  amount: number;
+  durationInMonths: number;
+  startDate: string;
+  endDate: string;
+  publicId: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  lastModifiedBy: string;
 };

@@ -2,7 +2,7 @@
 import CustomButton from "@components/forms/CustomButton";
 import CustomInput from "@components/forms/CustomInput";
 import Typography from "@components/forms/Typography";
-import AddBundle from "@components/modals/AddBundle";
+import BundleForm from "@/components/modals/BundleForm";
 import FreeTrialLink from "@components/modals/FreeTrialLink";
 import Modal from "@components/modals/Modal";
 import PromotionalCampaign from "@components/modals/PromotionalCampaign";
@@ -10,7 +10,6 @@ import Tag from "@components/molecules/Tag";
 import {
   getHappyPeopleFeed,
   limitedOfferData,
-  subBundles,
   subscriptionSettings,
 } from "@/data";
 import { useState } from "react";
@@ -21,7 +20,7 @@ import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import { Loader } from "@/components/molecules/Loader";
 import { useFetchProfile } from "@/hooks/apiHooks";
-import type { FreeTrial } from "@/lib/types";
+import type { FreeTrial, SubscriptionBundle } from "@/lib/types";
 import { ConfirmDeletion } from "@/components/modals/ConfirmDeletion";
 
 type Prop = {
@@ -44,9 +43,19 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
   const [isFreeTrialLink, setIsFreeTrialLink] = useState(false);
   const [isPromotion, setIsPromotion] = useState(false);
   const [isBundleModal, setIsBundleModal] = useState(false);
-  const [isBundleContent, setIsBundleContent] = useState(false);
   const [deleteFreeTrialLink, setDeleteFreeTrialLink] = useState(false);
+  const [deleteSubBundle, setDeleteSubBundle] = useState(false);
   const [selectedFreeTrialLink, setSelectedFreeTrialLink] = useState("");
+  const [selectedBundle, setSelectedBundle] = useState<SubscriptionBundle>({
+    amount: 0,
+    durationInMonths: 0,
+    startDate: "",
+    endDate: "",
+    publicId: "",
+    createdDate: "",
+    lastModifiedDate: "",
+    lastModifiedBy: "",
+  });
 
   const toggleModal = (buttonText: string) => {
     if (buttonText === "Start promotion campaign")
@@ -60,6 +69,10 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
     setDeleteFreeTrialLink(!deleteFreeTrialLink);
   };
 
+  const toggleDeleteSubBundle = () => {
+    setDeleteSubBundle(!deleteSubBundle);
+  };
+
   const submitAmount = (data: any) => {
     subscriptionAmountMutation.mutate({
       params: {
@@ -71,7 +84,16 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
   const deleteFreeTrialLinkMutation = useCustomMutation({
     endpoint: `subscriptions/freetrial/${selectedFreeTrialLink}`,
     method: "delete",
-    successMessage: () => "Post deleted successfully",
+    successMessage: () => "Free Trial Link deleted successfully",
+    onSuccessCallback: () => {
+      refetch();
+    },
+  });
+
+  const deleteBundleMutation = useCustomMutation({
+    endpoint: `subscriptions/bundle/${selectedBundle.publicId}`,
+    method: "delete",
+    successMessage: () => "Bundle deleted successfully",
     onSuccessCallback: () => {
       refetch();
     },
@@ -192,67 +214,75 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                     </div>
                   )}
 
-                  {id === 2 && isBundleContent && (
-                    <div className="mt-2">
-                      {subBundles?.map(({ amount, duration, id }) => {
-                        return (
-                          <div
-                            key={id}
-                            className="flex items-center justify-between border border-grey_100 px-4 py-6 rounded-2xl mb-4"
-                          >
-                            <div className="flex items-center">
-                              <div className="flex flex-col md:flex-row md:items-center mr-6">
-                                <Typography
-                                  variant="p2"
-                                  className="text-grey_500"
-                                >
-                                  Amount:
-                                </Typography>
-                                <Typography
-                                  variant="subtitle2"
-                                  className="text-grey_800 md:pl-2"
-                                >
-                                  {amount}
-                                </Typography>
+                  <div className="mt-2">
+                    {id === 2 &&
+                      data?.data?.creatorProfile?.subscriptionBundles?.map(
+                        (item: SubscriptionBundle) => {
+                          return (
+                            <div
+                              key={id}
+                              className="flex items-center justify-between border border-grey_100 px-4 py-6 rounded-2xl mb-4"
+                            >
+                              <div className="flex items-center">
+                                <div className="flex flex-col md:flex-row md:items-center mr-6">
+                                  <Typography
+                                    variant="p2"
+                                    className="text-grey_500"
+                                  >
+                                    Amount:
+                                  </Typography>
+                                  <Typography
+                                    variant="subtitle2"
+                                    className="text-grey_800 md:pl-2"
+                                  >
+                                    {item.amount}
+                                  </Typography>
+                                </div>
+
+                                <div className="flex flex-col md:flex-row md:items-center">
+                                  <Typography
+                                    variant="p2"
+                                    className="text-grey_500"
+                                  >
+                                    Duration:
+                                  </Typography>
+                                  <Typography
+                                    variant="subtitle2"
+                                    className="text-grey_800 md:pl-2"
+                                  >
+                                    {item.durationInMonths || 0}
+                                  </Typography>
+                                </div>
                               </div>
 
-                              <div className="flex flex-col md:flex-row md:items-center">
-                                <Typography
-                                  variant="p2"
-                                  className="text-grey_500"
+                              <div className="flex items-center">
+                                <CustomButton
+                                  variant="secondary"
+                                  className="text-xs mr-4 w-fit"
+                                  onClick={() => {
+                                    setSelectedBundle(item);
+                                    toggleModal("Add bundle");
+                                  }}
                                 >
-                                  Duration:
-                                </Typography>
-                                <Typography
-                                  variant="subtitle2"
-                                  className="text-grey_800 md:pl-2"
+                                  Edit Bundle
+                                </CustomButton>
+
+                                <CustomButton
+                                  variant="secondary"
+                                  className="text-xs mr-4 w-fit"
+                                  onClick={() => {
+                                    toggleDeleteSubBundle();
+                                    setSelectedBundle(item);
+                                  }}
                                 >
-                                  {duration}
-                                </Typography>
+                                  Delete
+                                </CustomButton>
                               </div>
                             </div>
-
-                            <div className="flex items-center">
-                              <CustomButton
-                                variant="secondary"
-                                className="text-xs mr-4 w-fit"
-                              >
-                                Edit Bundle
-                              </CustomButton>
-
-                              <CustomButton
-                                variant="secondary"
-                                className="text-xs mr-4 w-fit"
-                                onClick={() => setIsBundleContent(false)}
-                              >
-                                Delete
-                              </CustomButton>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                          );
+                        }
+                      )}
+                  </div>
 
                   {id === 3 &&
                     data?.data?.creatorProfile?.freeTrialLinks?.map(
@@ -294,7 +324,7 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                               <CustomButton
                                 onClick={() => {
                                   toggleDeleteFreeTrial();
-                                  setSelectedFreeTrialLink(item.id);
+                                  setSelectedFreeTrialLink(item?.publicId);
                                 }}
                                 variant="secondary"
                                 className="text-xs mr-4 w-fit"
@@ -337,7 +367,11 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
             show={isBundleModal}
             toggleModal={() => toggleModal("Add Bundle")}
           >
-            <AddBundle toggleModal={toggleModal} />
+            <BundleForm
+              mode={selectedBundle?.publicId === "" ? "add" : "edit"}
+              toggleModal={() => toggleModal("Add bundle")}
+              bundleData={selectedBundle}
+            />
           </Modal>
 
           <Modal show={deleteFreeTrialLink} toggleModal={toggleDeleteFreeTrial}>
@@ -348,6 +382,18 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                 title="Delete Free trial link"
                 deleteFn={deleteFreeTrialLinkMutation.mutate}
                 isDeleting={deleteFreeTrialLinkMutation.isPending}
+              />
+            </div>
+          </Modal>
+
+          <Modal show={deleteSubBundle} toggleModal={toggleDeleteSubBundle}>
+            <div className="p-4">
+              <ConfirmDeletion
+                toggleModal={toggleDeleteSubBundle}
+                message=" Are you sure you want to delete this bundle?"
+                title="Delete Subscription Bundle"
+                deleteFn={deleteBundleMutation.mutate}
+                isDeleting={deleteBundleMutation.isPending}
               />
             </div>
           </Modal>

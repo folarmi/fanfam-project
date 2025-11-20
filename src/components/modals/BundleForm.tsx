@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomButton from "../forms/CustomButton";
 import Typography from "../forms/Typography";
 import { useForm } from "react-hook-form";
@@ -8,19 +7,34 @@ import { sampleMonths } from "@/data";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { parseFormattedNumber } from "@/utils/helperTwo";
 import { useQueryClient } from "@tanstack/react-query";
+import type { SubscriptionBundle } from "@/lib/types";
 
 export interface FormValues {
   amount: string;
   durationInMonths: number;
 }
 
-const AddBundle = ({ toggleModal }: any) => {
+interface BundleProps {
+  toggleModal: (modalName?: string) => void;
+  mode: "add" | "edit";
+  // bundleData?: { id: string; amount: number; durationInMonths: number };
+  bundleData?: SubscriptionBundle;
+}
+
+const BundleForm = ({ toggleModal, mode, bundleData }: BundleProps) => {
   const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<FormValues>();
 
   const addSubscriptionBundleMutation = useCustomMutation({
-    endpoint: `subscriptions/bundle`,
-    successMessage: () => "Subscription Bundle added successfully",
+    method: mode === "edit" ? "put" : "post",
+    endpoint:
+      mode === "edit"
+        ? `subscriptions/bundle/${bundleData?.publicId}`
+        : `subscriptions/bundle`,
+    successMessage: () =>
+      mode === "edit"
+        ? "Subscription Bundle updated successfully"
+        : "Subscription Bundle added successfully",
     onSuccessCallback: () => {
       toggleModal("Add bundle");
       queryClient.invalidateQueries({
@@ -86,4 +100,4 @@ const AddBundle = ({ toggleModal }: any) => {
   );
 };
 
-export default AddBundle;
+export default BundleForm;
