@@ -135,7 +135,7 @@ export type FreeTrial = {
 };
 
 export type SubscriptionBundle = {
-  amount: number;
+  amount: string;
   durationInMonths: number;
   startDate: string;
   endDate: string;
@@ -143,4 +143,15 @@ export type SubscriptionBundle = {
   createdDate: string;
   lastModifiedDate: string;
   lastModifiedBy: string;
+};
+
+export const EMPTY_BUNDLE: SubscriptionBundle = {
+  amount: 0,
+  durationInMonths: 0,
+  startDate: "",
+  endDate: "",
+  publicId: "",
+  createdDate: "",
+  lastModifiedDate: "",
+  lastModifiedBy: "",
 };

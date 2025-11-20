@@ -80,9 +80,12 @@ export const getMediaType = (files: File[]): MediaType => {
   return "DOCUMENT";
 };
 
-export const parseFormattedNumber = (value?: string): number => {
-  if (!value) return 0;
-  return Number(value.replace(/,/g, ""));
+export const parseFormattedNumber = (value?: string | number): number => {
+  if (value === null || value === undefined) return 0;
+
+  const str = String(value); // ensure it's always a string
+
+  return Number(str.replace(/,/g, ""));
 };
 
 export const mapQualifierNameToType = (

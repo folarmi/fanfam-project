@@ -20,7 +20,11 @@ import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import { Loader } from "@/components/molecules/Loader";
 import { useFetchProfile } from "@/hooks/apiHooks";
-import type { FreeTrial, SubscriptionBundle } from "@/lib/types";
+import {
+  EMPTY_BUNDLE,
+  type FreeTrial,
+  type SubscriptionBundle,
+} from "@/lib/types";
 import { ConfirmDeletion } from "@/components/modals/ConfirmDeletion";
 
 type Prop = {
@@ -46,16 +50,8 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
   const [deleteFreeTrialLink, setDeleteFreeTrialLink] = useState(false);
   const [deleteSubBundle, setDeleteSubBundle] = useState(false);
   const [selectedFreeTrialLink, setSelectedFreeTrialLink] = useState("");
-  const [selectedBundle, setSelectedBundle] = useState<SubscriptionBundle>({
-    amount: 0,
-    durationInMonths: 0,
-    startDate: "",
-    endDate: "",
-    publicId: "",
-    createdDate: "",
-    lastModifiedDate: "",
-    lastModifiedBy: "",
-  });
+  const [selectedBundle, setSelectedBundle] =
+    useState<SubscriptionBundle>(EMPTY_BUNDLE);
 
   const toggleModal = (buttonText: string) => {
     if (buttonText === "Start promotion campaign")
@@ -157,7 +153,10 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                   </Typography>
                   <div className="flex ml-auto justify-end mt-2">
                     <CustomButton
-                      onClick={() => toggleModal(buttonText)}
+                      onClick={() => {
+                        if (id === 2) setSelectedBundle(EMPTY_BUNDLE);
+                        toggleModal(buttonText);
+                      }}
                       variant="secondary"
                       className="text-xs w-fit cursor-pointer flex-shrink-0"
                     >

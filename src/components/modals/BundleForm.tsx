@@ -8,6 +8,7 @@ import { useCustomMutation } from "@/hooks/apiCalls";
 import { parseFormattedNumber } from "@/utils/helperTwo";
 import { useQueryClient } from "@tanstack/react-query";
 import type { SubscriptionBundle } from "@/lib/types";
+import { useEffect } from "react";
 
 export interface FormValues {
   amount: string;
@@ -17,15 +18,14 @@ export interface FormValues {
 interface BundleProps {
   toggleModal: (modalName?: string) => void;
   mode: "add" | "edit";
-  // bundleData?: { id: string; amount: number; durationInMonths: number };
   bundleData?: SubscriptionBundle;
 }
 
 const BundleForm = ({ toggleModal, mode, bundleData }: BundleProps) => {
   const queryClient = useQueryClient();
-  const { control, handleSubmit } = useForm<FormValues>();
+  const { control, handleSubmit, reset } = useForm<FormValues>();
 
-  const addSubscriptionBundleMutation = useCustomMutation({
+  const handleSubscriptionBundleMutation = useCustomMutation({
     method: mode === "edit" ? "put" : "post",
     endpoint:
       mode === "edit"
@@ -46,11 +46,20 @@ const BundleForm = ({ toggleModal, mode, bundleData }: BundleProps) => {
 
   const submitForm = (data: FormValues) => {
     const formvalues = {
-      ...data,
+      durationInMonths: data?.durationInMonths,
       amount: parseFormattedNumber(data?.amount),
     };
-    addSubscriptionBundleMutation.mutate(formvalues);
+    console.log(formvalues);
+
+    handleSubscriptionBundleMutation.mutate(formvalues);
   };
+
+  useEffect(() => {
+    if (bundleData?.publicId !== "") {
+      const defaults = bundleData;
+      reset(defaults);
+    }
+  }, [bundleData, reset]);
 
   return (
     <form
@@ -88,12 +97,12 @@ const BundleForm = ({ toggleModal, mode, bundleData }: BundleProps) => {
           Cancel
         </CustomButton>
         <CustomButton
-          disabled={addSubscriptionBundleMutation?.isPending}
-          loading={addSubscriptionBundleMutation?.isPending}
+          disabled={handleSubscriptionBundleMutation?.isPending}
+          loading={handleSubscriptionBundleMutation?.isPending}
           variant="primary"
           className="text-xs px-3 w-fit"
         >
-          Create Bundle
+          {mode === "add" ? "Create Bundle" : "Edit Bundle"}
         </CustomButton>
       </div>
     </form>
