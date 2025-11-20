@@ -6,10 +6,11 @@ import CustomSelect from "../forms/CustomSelect";
 import CustomInput from "../forms/CustomInput";
 import { sampleMonths } from "@/data";
 import { useCustomMutation } from "@/hooks/apiCalls";
+import { parseFormattedNumber } from "@/utils/helperTwo";
 
 export interface FormValues {
-  amount: 0;
-  durationInMonths: 0;
+  amount: string;
+  durationInMonths: number;
 }
 
 const AddBundle = ({ toggleModal }: any) => {
@@ -24,9 +25,11 @@ const AddBundle = ({ toggleModal }: any) => {
   });
 
   const submitForm = (data: FormValues) => {
-    addSubscriptionBundleMutation.mutate({
+    const formvalues = {
       ...data,
-    });
+      amount: parseFormattedNumber(data?.amount),
+    };
+    addSubscriptionBundleMutation.mutate(formvalues);
   };
 
   return (

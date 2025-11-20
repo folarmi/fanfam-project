@@ -25,7 +25,7 @@ const EditProfile = () => {
   const { control, getValues, reset, setError, clearErrors } = useForm({
     defaultValues: data?.data,
   });
-  console.log(userObject);
+
   const { mutate: uploadProfilePicture, isPending: profilePictureIsPending } =
     useFileUpload({
       url: "/files/display-picture",
@@ -35,6 +35,8 @@ const EditProfile = () => {
           profileImageUrl: data?.body,
           coverImageUrl: getValues("coverImageUrl"),
         };
+        delete formValues?.creatorProfile;
+        delete formValues?.profilePic;
         updateCreatorProfileMutation.mutate(formValues);
         return data?.message || "File uploaded successfully!";
       },
@@ -50,6 +52,8 @@ const EditProfile = () => {
           coverImageUrl: data?.body?.url,
           profileImageUrl: getValues("profilePic"),
         };
+        delete formValues?.creatorProfile;
+        delete formValues?.profilePic;
         updateCreatorProfileMutation.mutate(formValues);
         return data?.message || "File uploaded successfully!";
       },
@@ -106,6 +110,7 @@ const EditProfile = () => {
       ...getValues(),
       profileImageUrl: data?.data?.profilePic,
     };
+    delete formValues?.creatorProfile;
 
     updateCreatorProfileMutation.mutate(formValues);
   };

@@ -53,6 +53,7 @@ import galleryEmoji from "../assets/icons/galleryEmoji.svg";
 import { SettingsIcon } from "../components/svgs/Settings";
 import type {
   DisplayObject,
+  FreeTrial,
   NotificationObject,
   PrivacyAndSafetyData,
 } from "@/lib/types";
@@ -748,26 +749,16 @@ export const limitedOfferData = [
   },
 ];
 
-export const happyPeopleFeed = [
-  {
-    id: 1,
-    name: "Link created",
-    date: "July 31",
-  },
+export const getHappyPeopleFeed = (freeTrial: FreeTrial) => [
   {
     id: 2,
     name: "Link expires",
-    date: "August 4",
+    value: freeTrial.endDate,
   },
   {
     id: 3,
     name: "Offer limit",
-    date: "August 4",
-  },
-  {
-    id: 4,
-    name: "Claims count",
-    date: "5",
+    value: freeTrial.limitSize,
   },
 ];
 

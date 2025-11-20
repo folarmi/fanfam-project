@@ -122,3 +122,10 @@ export type PromotionCampaignQualifier =
   | "BOTH";
 
 export type PromotionCampaignType = "FREE_TRIAL" | "FIRST_MONTH_DISCOUNT";
+
+export type FreeTrial = {
+  name: string;
+  limitSize: number;
+  endDate: string;
+  duration: number;
+};

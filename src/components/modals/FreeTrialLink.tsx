@@ -6,6 +6,7 @@ import CustomSelect from "../forms/CustomSelect";
 import CustomInput from "../forms/CustomInput";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { numberOfDays, subscribersLimit } from "@/data";
+import moment from "moment";
 
 export interface FormValues {
   name: string;
@@ -26,9 +27,11 @@ const FreeTrialLink = ({ toggleModal }: any) => {
   });
 
   const submitForm = (data: FormValues) => {
-    createFreeTrialLinkMutation.mutate({
+    const formValues = {
       ...data,
-    });
+      endDate: moment(data?.endDate, "YYYY-MM-DD").toISOString(),
+    };
+    createFreeTrialLinkMutation.mutate(formValues);
   };
 
   return (
@@ -59,13 +62,16 @@ const FreeTrialLink = ({ toggleModal }: any) => {
           ifLabel
           label="Offer limit"
         />
-        <CustomSelect
-          placeholder="Offer expiration"
-          name="endDate"
-          control={control}
-          options={numberOfDays}
-          ifLabel
+
+        <CustomInput
           label="Offer expiration"
+          name="endDate"
+          className="mt-8"
+          control={control}
+          type="date"
+          rules={{
+            required: "Offer expiration is required",
+          }}
         />
       </div>
 
