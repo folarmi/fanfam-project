@@ -7,6 +7,7 @@ import CustomInput from "../forms/CustomInput";
 import { sampleMonths } from "@/data";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { parseFormattedNumber } from "@/utils/helperTwo";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface FormValues {
   amount: string;
@@ -14,6 +15,7 @@ export interface FormValues {
 }
 
 const AddBundle = ({ toggleModal }: any) => {
+  const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<FormValues>();
 
   const addSubscriptionBundleMutation = useCustomMutation({
@@ -21,6 +23,10 @@ const AddBundle = ({ toggleModal }: any) => {
     successMessage: () => "Subscription Bundle added successfully",
     onSuccessCallback: () => {
       toggleModal("Add bundle");
+      queryClient.invalidateQueries({
+        queryKey: ["viewProfile"],
+        exact: false,
+      });
     },
   });
 

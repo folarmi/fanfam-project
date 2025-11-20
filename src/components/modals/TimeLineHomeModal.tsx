@@ -4,8 +4,10 @@ import copy from "../../assets/copy.svg";
 import ModalContent from "./ModalContent";
 import { useState } from "react";
 import Modal from "./Modal";
-import { ConfirmPostDeletion } from "./ConfirmPostDeletion";
+import { ConfirmDeletion } from "./ConfirmDeletion";
 import { EditPost } from "./EditPost";
+import { useCustomMutation } from "@/hooks/apiCalls";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Prop = {
   publicId: string;
@@ -13,8 +15,21 @@ type Prop = {
 };
 
 const TimeLineHomeModal = ({ publicId }: Prop) => {
+  const queryClient = useQueryClient();
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const deletePostMutation = useCustomMutation({
+    endpoint: `contents/${publicId}`,
+    method: "delete",
+    successMessage: () => "Post deleted successfully",
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["GetContents"],
+        exact: false,
+      });
+    },
+  });
 
   const toggleDeletePostModal = () => {
     setShowDeleteModal(!showDeleteModal);
@@ -67,9 +82,12 @@ const TimeLineHomeModal = ({ publicId }: Prop) => {
 
       <Modal show={showDeleteModal} toggleModal={toggleDeletePostModal}>
         <div className="p-4">
-          <ConfirmPostDeletion
+          <ConfirmDeletion
             toggleModal={toggleDeletePostModal}
-            publicId={publicId}
+            message=" Are you sure you want to delete this post?"
+            title="Delete post"
+            deleteFn={deletePostMutation.mutate}
+            isDeleting={deletePostMutation.isPending}
           />
         </div>
       </Modal>

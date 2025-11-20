@@ -7,6 +7,7 @@ import CustomInput from "../forms/CustomInput";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { numberOfDays, subscribersLimit } from "@/data";
 import moment from "moment";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface FormValues {
   name: string;
@@ -16,6 +17,7 @@ export interface FormValues {
 }
 
 const FreeTrialLink = ({ toggleModal }: any) => {
+  const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<FormValues>();
 
   const createFreeTrialLinkMutation = useCustomMutation({
@@ -23,6 +25,10 @@ const FreeTrialLink = ({ toggleModal }: any) => {
     successMessage: () => "Free Trial Link added successfully",
     onSuccessCallback: () => {
       toggleModal("Create new free trial link");
+      queryClient.invalidateQueries({
+        queryKey: ["viewProfile"],
+        exact: false,
+      });
     },
   });
 
