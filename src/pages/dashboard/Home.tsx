@@ -167,15 +167,19 @@ const Home = () => {
               setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
             />
           ) : (
-            <CommentBox
-              ifPoll
-              ifRecord
-              setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
-            />
+            userObject.role === UserRole.creator && (
+              <CommentBox
+                ifPoll
+                ifRecord
+                setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+              />
+            )
           )}
 
           <div className="my-2">
-            <StoryUploader onFileUpload={handleFileUpload} />
+            {userObject.role === UserRole.creator && (
+              <StoryUploader onFileUpload={handleFileUpload} />
+            )}
           </div>
 
           {getCreatorContent?.data?.content?.map((data: StoryPost) => (
