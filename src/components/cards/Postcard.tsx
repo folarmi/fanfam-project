@@ -7,6 +7,7 @@ import MediaGrid from "../molecules/MediaGrid";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
+import DefaultAvatar from "../molecules/DefaultAvatar";
 
 export interface PostCardProps {
   avatar: string;
@@ -64,12 +65,16 @@ const PostCard: React.FC<PostCardProps> = ({
     >
       {/* Header Section */}
       <header className="flex items-start px-4 relative">
-        <img
-          src={avatar}
-          alt={`${profileName}'s avatar`}
-          className="w-10 h-10 rounded-full flex-shrink-0"
-          loading="lazy"
-        />
+        {avatar === null ? (
+          <DefaultAvatar fullName={profileName} />
+        ) : (
+          <img
+            src={avatar}
+            alt={`${profileName}'s avatar`}
+            className="w-10 h-10 rounded-full flex-shrink-0"
+            loading="lazy"
+          />
+        )}
 
         <div className="flex justify-between w-full items-start ml-2">
           <section className="flex-1 min-w-0">

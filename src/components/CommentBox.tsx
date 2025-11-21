@@ -16,6 +16,9 @@ type CommentBoxProp = {
   ifRecord?: boolean;
   setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
   endpoint?: string;
+  placeholder?: string;
+  commentId?: string;
+  onSuccess?: () => void;
 };
 
 const CommentBox = ({
@@ -23,6 +26,9 @@ const CommentBox = ({
   ifPoll,
   endpoint = "contents",
   setIfUserIsCreatingPoll,
+  commentId,
+  onSuccess,
+  placeholder = "Write a Post..",
 }: CommentBoxProp) => {
   const [isActive, setIsActive] = useState(false);
   const queryClient = useQueryClient();
@@ -95,7 +101,7 @@ const CommentBox = ({
   };
 
   const createContentMutation = useCustomMutation({
-    endpoint,
+    endpoint: commentId ? `${endpoint}/${commentId}/replies` : endpoint,
     onSuccessCallback: () => {
       reset();
       resetFiles();
@@ -103,9 +109,12 @@ const CommentBox = ({
         queryKey: ["GetContents"],
         exact: false,
       });
+      onSuccess?.();
     },
     successMessage: () => {
-      return "Posted added successfully";
+      return commentId
+        ? "Reply added successfully"
+        : "Posted added successfully";
     },
     onError: () => {},
   });
@@ -116,13 +125,15 @@ const CommentBox = ({
       className="mb-2 p-4 border border-grey_10 bg-grey_20 drop-shadow-4xl"
     >
       <CustomTextArea
-        placeholder="Write a Post.."
+        placeholder={placeholder}
         name="message"
         control={control}
-        rules={{ required: "Post is required" }}
+        rules={{
+          required: commentId ? "Reply is required" : "Post is required",
+        }}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        rows={5}
+        rows={commentId ? 3 : 5}
         className="w-full outline-none pt-3 bg-grey_20"
       />
 
