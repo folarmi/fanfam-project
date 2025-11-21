@@ -146,7 +146,7 @@ export type SubscriptionBundle = {
 };
 
 export const EMPTY_BUNDLE: SubscriptionBundle = {
-  amount: 0,
+  amount: "",
   durationInMonths: 0,
   startDate: "",
   endDate: "",
