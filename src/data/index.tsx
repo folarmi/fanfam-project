@@ -56,6 +56,7 @@ import type {
   FreeTrial,
   NotificationObject,
   PrivacyAndSafetyData,
+  PromotionalCampaignType,
 } from "@/lib/types";
 import countryList from "react-select-country-list";
 import { CreatorIcon } from "@/components/svgs/Creator";
@@ -63,6 +64,7 @@ import creatorOne from "@/assets/icons/creatorOne.svg";
 import creatorTwo from "@/assets/icons/creatorTwo.svg";
 import creatorThree from "@/assets/icons/creatorThree.svg";
 import creatorFour from "@/assets/icons/creatorFour.svg";
+import { convertToHumanReadableDate, getRemainingDays } from "@/utils/helper";
 
 export const sideBarItems = [
   {
@@ -726,7 +728,9 @@ export const subscriptionSettings = [
   },
 ];
 
-export const limitedOfferData = [
+export const getPromotionalCampaignData = (
+  campaign: PromotionalCampaignType
+) => [
   {
     id: 1,
     name: "Started",
@@ -735,12 +739,12 @@ export const limitedOfferData = [
   {
     id: 2,
     name: "End",
-    date: "August 4",
+    date: convertToHumanReadableDate(campaign.endDate),
   },
   {
     id: 3,
     name: "Days left",
-    date: "2",
+    date: getRemainingDays(campaign.endDate),
   },
   {
     id: 4,
@@ -749,11 +753,11 @@ export const limitedOfferData = [
   },
 ];
 
-export const getHappyPeopleFeed = (freeTrial: FreeTrial) => [
+export const getFreeTrialData = (freeTrial: FreeTrial) => [
   {
     id: 2,
     name: "Link expires",
-    value: freeTrial.endDate,
+    value: convertToHumanReadableDate(freeTrial.endDate),
   },
   {
     id: 3,

@@ -145,6 +145,20 @@ export type SubscriptionBundle = {
   lastModifiedBy: string;
 };
 
+export type PromotionalCampaignType = {
+  publicId: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  lastModifiedBy: string;
+  name: string;
+  limitSize: number;
+  endDate: string;
+  duration: number;
+  message: string;
+  qualifier: PromotionCampaignQualifier;
+  type: PromotionCampaignType;
+};
+
 export const EMPTY_BUNDLE: SubscriptionBundle = {
   amount: "",
   durationInMonths: 0,

@@ -5,11 +5,10 @@ import Typography from "@components/forms/Typography";
 import BundleForm from "@/components/modals/BundleForm";
 import FreeTrialLink from "@components/modals/FreeTrialLink";
 import Modal from "@components/modals/Modal";
-import PromotionalCampaign from "@components/modals/PromotionalCampaign";
 import Tag from "@components/molecules/Tag";
 import {
-  getHappyPeopleFeed,
-  limitedOfferData,
+  getFreeTrialData,
+  getPromotionalCampaignData,
   subscriptionSettings,
 } from "@/data";
 import { useState } from "react";
@@ -23,9 +22,12 @@ import { useFetchProfile } from "@/hooks/apiHooks";
 import {
   EMPTY_BUNDLE,
   type FreeTrial,
+  type PromotionalCampaignType,
   type SubscriptionBundle,
 } from "@/lib/types";
 import { ConfirmDeletion } from "@/components/modals/ConfirmDeletion";
+import PromotionalCampaign from "@/components/modals/PromotionalCampaign";
+import { mapPromotionType, mapQualifier } from "@/utils/helperTwo";
 
 type Prop = {
   showHeader?: boolean;
@@ -36,22 +38,16 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data, isLoading, refetch } = useFetchProfile(userObject);
 
-  const subscriptionAmountMutation = useCustomMutation({
-    endpoint: `subscriptions/amount`,
-    useQueryParams: true,
-    successMessage: () => "Subscription Amount updated successfully",
-    onSuccessCallback: () => {},
-  });
-
   const [isPromotionalCampaign, setIsPromotionalCampaign] = useState(false);
   const [isFreeTrialLink, setIsFreeTrialLink] = useState(false);
-  const [isPromotion, setIsPromotion] = useState(false);
   const [isBundleModal, setIsBundleModal] = useState(false);
   const [deleteFreeTrialLink, setDeleteFreeTrialLink] = useState(false);
   const [deleteSubBundle, setDeleteSubBundle] = useState(false);
+  const [stopPromotionModal, setStopPromotionModal] = useState(false);
   const [selectedFreeTrialLink, setSelectedFreeTrialLink] = useState("");
   const [selectedBundle, setSelectedBundle] =
     useState<SubscriptionBundle>(EMPTY_BUNDLE);
+  const [selectedCampaign, setSelectedCampaign] = useState();
 
   const toggleModal = (buttonText: string) => {
     if (buttonText === "Start promotion campaign")
@@ -64,18 +60,20 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
   const toggleDeleteFreeTrial = () => {
     setDeleteFreeTrialLink(!deleteFreeTrialLink);
   };
-
   const toggleDeleteSubBundle = () => {
     setDeleteSubBundle(!deleteSubBundle);
   };
 
-  const submitAmount = (data: any) => {
-    subscriptionAmountMutation.mutate({
-      params: {
-        amount: data?.amount,
-      },
-    });
+  const toggleStopPromotionModal = () => {
+    setStopPromotionModal(!stopPromotionModal);
   };
+
+  const subscriptionAmountMutation = useCustomMutation({
+    endpoint: `subscriptions/amount`,
+    useQueryParams: true,
+    successMessage: () => "Subscription Amount updated successfully",
+    onSuccessCallback: () => {},
+  });
 
   const deleteFreeTrialLinkMutation = useCustomMutation({
     endpoint: `subscriptions/freetrial/${selectedFreeTrialLink}`,
@@ -94,6 +92,23 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
       refetch();
     },
   });
+
+  const stopPromotionMutation = useCustomMutation({
+    endpoint: `subscriptions/promotion/stop/${selectedCampaign}`,
+    method: "delete",
+    successMessage: () => "Promotion stopped successfully",
+    onSuccessCallback: () => {
+      refetch();
+    },
+  });
+
+  const submitAmount = (data: any) => {
+    subscriptionAmountMutation.mutate({
+      params: {
+        amount: data?.amount,
+      },
+    });
+  };
 
   return (
     <>
@@ -164,54 +179,69 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                     </CustomButton>
                   </div>
 
-                  {id === 1 && isPromotion && (
-                    <div className="">
-                      <Typography
-                        variant="titleTwo"
-                        className="text-grey_800 py-4"
-                      >
-                        Limited offer for 7 days
-                      </Typography>
-
-                      <div className="flex items-center mb-4">
-                        <Tag text="Free trial" />
-                        <Tag text="New subscribers only" />
-                      </div>
-
-                      {limitedOfferData?.map(({ id, date, name }) => {
+                  {id === 1 &&
+                    data?.data?.creatorProfile?.promotionCampaigns?.map(
+                      (item: PromotionalCampaignType) => {
                         return (
-                          <div
-                            key={id}
-                            className="flex items-center justify-between border-b border-grey_10 py-2"
-                          >
-                            <Typography variant="p2" className="text-grey_500">
-                              {name}
+                          <div key={item?.publicId} className="">
+                            <Typography
+                              variant="titleTwo"
+                              className="text-grey_800 py-4"
+                            >
+                              {`  Limited offer for ${item.duration} days`}
                             </Typography>
-                            <Typography variant="p2" className="text-grey_800">
-                              {date}
-                            </Typography>
+
+                            <div className="flex items-center mb-4">
+                              <Tag text={mapPromotionType(item?.type)} />
+                              <Tag text={mapQualifier(item?.qualifier)} />
+                            </div>
+
+                            {getPromotionalCampaignData(item)?.map(
+                              ({ id, date, name }) => {
+                                return (
+                                  <div
+                                    key={id}
+                                    className="flex items-center justify-between border-b border-grey_10 py-2"
+                                  >
+                                    <Typography
+                                      variant="p2"
+                                      className="text-grey_500"
+                                    >
+                                      {name}
+                                    </Typography>
+                                    <Typography
+                                      variant="p2"
+                                      className="text-grey_800"
+                                    >
+                                      {date}
+                                    </Typography>
+                                  </div>
+                                );
+                              }
+                            )}
+
+                            <div className="flex items-center justify-end mt-8 ml-auto">
+                              <CustomButton
+                                onClick={() => {
+                                  stopPromotionMutation.mutate({});
+                                }}
+                                disabled={stopPromotionMutation?.isPending}
+                                variant="secondary"
+                                className="text-xs mr-4 w-fit"
+                              >
+                                Stop promotion
+                              </CustomButton>
+                              <CustomButton
+                                variant="primary"
+                                className="text-xs px-3 w-fit"
+                              >
+                                Copy link to profile
+                              </CustomButton>
+                            </div>
                           </div>
                         );
-                      })}
-
-                      <div className="flex items-center justify-end mt-8 ml-auto">
-                        <CustomButton
-                          //   onClick={toggleModal}
-                          onClick={() => setIsPromotion(false)}
-                          variant="secondary"
-                          className="text-xs mr-4 w-fit"
-                        >
-                          Stop promotion
-                        </CustomButton>
-                        <CustomButton
-                          variant="primary"
-                          className="text-xs px-3 w-fit"
-                        >
-                          Copy link to profile
-                        </CustomButton>
-                      </div>
-                    </div>
-                  )}
+                      }
+                    )}
 
                   <div className="mt-2">
                     {id === 2 &&
@@ -296,7 +326,7 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                               {`(${item.duration} days free trial)`}
                             </Typography>
 
-                            {getHappyPeopleFeed(item)?.map(
+                            {getFreeTrialData(item)?.map(
                               ({ id, name, value }) => (
                                 <div
                                   key={id}
@@ -381,6 +411,18 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                 title="Delete Free trial link"
                 deleteFn={deleteFreeTrialLinkMutation.mutate}
                 isDeleting={deleteFreeTrialLinkMutation.isPending}
+              />
+            </div>
+          </Modal>
+
+          <Modal show={deleteSubBundle} toggleModal={toggleDeleteSubBundle}>
+            <div className="p-4">
+              <ConfirmDeletion
+                toggleModal={toggleDeleteSubBundle}
+                message=" Are you sure you want to delete this bundle?"
+                title="Delete Subscription Bundle"
+                deleteFn={deleteBundleMutation.mutate}
+                isDeleting={deleteBundleMutation.isPending}
               />
             </div>
           </Modal>

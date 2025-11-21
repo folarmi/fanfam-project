@@ -9,6 +9,7 @@ import {
   reachPromotionsSummary,
 } from "../data";
 import type { GeolocationCoords, LocationResult } from "@/lib/types";
+import moment from "moment";
 
 export const phoneRegex =
   // /^(\+\d{1,3}\s?)?\(?\d{3,4}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
@@ -183,4 +184,20 @@ export const getReadableLocation = async (): Promise<LocationResult> => {
       error: error.message || "An unexpected error occurred.",
     };
   }
+};
+
+export const convertToHumanReadableDate = (date?: string) => {
+  if (!date) return undefined;
+  return moment(date, "YYYY-MM-DD").format("MMM DD YYYY");
+};
+
+export const getRemainingDays = (dateString: string) => {
+  if (!dateString) return undefined;
+
+  const target = moment(dateString, "YYYY-MM-DD");
+  const now = moment();
+
+  const diff = target.diff(now, "days");
+
+  return Math.max(0, diff);
 };

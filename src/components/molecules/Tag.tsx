@@ -1,7 +1,7 @@
 import Typography from "../forms/Typography";
 
 type TagProps = {
-  text: string;
+  text: string | undefined;
   isActive?: boolean;
   onClick?: () => void;
 };

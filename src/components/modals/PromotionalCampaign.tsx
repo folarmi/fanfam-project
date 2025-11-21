@@ -6,14 +6,17 @@ import CustomSelect from "../forms/CustomSelect";
 import CustomInput from "../forms/CustomInput";
 import { useForm } from "react-hook-form";
 import CustomButton from "../forms/CustomButton";
-import { numberOfDays, promotionType, qualifiers } from "@/data";
+import {
+  numberOfDays,
+  promotionType,
+  qualifiers,
+  subscribersLimit,
+} from "@/data";
 import { useState } from "react";
 import { useCustomMutation } from "@/hooks/apiCalls";
-import {
-  mapPromotionTypeNameToType,
-  mapQualifierNameToType,
-} from "@/utils/helperTwo";
+import { mapPromotionType, mapQualifier } from "@/utils/helperTwo";
 import moment from "moment";
+import { useQueryClient } from "@tanstack/react-query";
 
 export type FormValues = {
   name: string;
@@ -26,25 +29,32 @@ export type FormValues = {
 };
 
 const PromotionalCampaign = ({ toggleModal }: any) => {
+  const queryClient = useQueryClient();
+  const { control, handleSubmit } = useForm<FormValues>();
+
   const [activeQualifier, setActiveQualifier] = useState(
     "Both new and expired"
   );
   const [activePromotionType, setActivePromotionType] = useState("Free trial");
-  const { control, handleSubmit } = useForm<FormValues>();
 
   const addPromotionalCampaignMutation = useCustomMutation({
     endpoint: `subscriptions/promotion`,
     successMessage: () => "Promotional Campaign added successfully",
     onSuccessCallback: () => {
       toggleModal("Start promotion campaign");
+      queryClient.invalidateQueries({
+        queryKey: ["viewProfile"],
+        exact: false,
+      });
     },
   });
 
   const submitForm = (data: FormValues) => {
     const formValues = {
       ...data,
-      qualifier: mapQualifierNameToType(activeQualifier),
-      type: mapPromotionTypeNameToType(activePromotionType),
+      name: "testName",
+      qualifier: mapQualifier(activeQualifier),
+      type: mapPromotionType(activePromotionType),
       endDate: moment(data?.endDate, "YYYY-MM-DD").toISOString(),
     };
     addPromotionalCampaignMutation.mutate(formValues);
@@ -86,18 +96,28 @@ const PromotionalCampaign = ({ toggleModal }: any) => {
       </div>
 
       <div className="flex items-center mt-4">
-        <CustomInput
+        <CustomSelect
+          placeholder="Limit Size"
+          name="limitSize"
+          control={control}
+          options={subscribersLimit}
+          className="mr-6"
+          ifLabel
+          label="Offer limit"
+        />
+        {/* <CustomInput
           label="Name of list"
           name="name"
           control={control}
           rules={{
             required: "Name of list is required",
           }}
-        />
+        /> */}
         <CustomInput
           label="Offer expiration"
           name="endDate"
           control={control}
+          className="mt-8"
           type="date"
           rules={{
             required: "Offer expiration is required",

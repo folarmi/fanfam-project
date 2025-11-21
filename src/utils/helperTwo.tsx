@@ -88,58 +88,49 @@ export const parseFormattedNumber = (value?: string | number): number => {
   return Number(str.replace(/,/g, ""));
 };
 
-export const mapQualifierNameToType = (
-  name: string
-): PromotionCampaignQualifier | undefined => {
-  const mapping: Record<string, PromotionCampaignQualifier> = {
+export const mapQualifier = (
+  value: string | PromotionCampaignQualifier
+): string | PromotionCampaignQualifier | undefined => {
+  const nameToType: Record<string, PromotionCampaignQualifier> = {
     "Both new and expired": "BOTH",
     "New subscribers only": "NEW_SUBSCRIBERS",
     "Expired subscribers only": "EXPIRED_SUBSCRIBERS",
   };
-  return mapping[name];
-};
 
-// Map qualifier type to ID
-export const mapQualifierTypeToId = (
-  type: PromotionCampaignQualifier
-): number | undefined => {
-  const mapping: Record<PromotionCampaignQualifier, number> = {
-    BOTH: 1,
-    NEW_SUBSCRIBERS: 2,
-    EXPIRED_SUBSCRIBERS: 3,
+  const typeToName: Record<PromotionCampaignQualifier, string> = {
+    BOTH: "Both new and expired",
+    NEW_SUBSCRIBERS: "New subscribers only",
+    EXPIRED_SUBSCRIBERS: "Expired subscribers only",
   };
-  return mapping[type];
+
+  // If value is a UI label → return backend type
+  if (value in nameToType) {
+    return nameToType[value];
+  }
+
+  // If value is a backend enum → return UI label
+  if (value in typeToName) {
+    return typeToName[value as PromotionCampaignQualifier];
+  }
+
+  return undefined;
 };
 
-// Map promotion type name to backend type
-export const mapPromotionTypeNameToType = (
-  name: string
-): PromotionCampaignType | undefined => {
-  const mapping: Record<string, PromotionCampaignType> = {
+export const mapPromotionType = (
+  value: string | PromotionCampaignType
+): string | PromotionCampaignType | undefined => {
+  const nameToType: Record<string, PromotionCampaignType> = {
     "Free trial": "FREE_TRIAL",
     "First month discount": "FIRST_MONTH_DISCOUNT",
   };
-  return mapping[name];
-};
 
-// Map promotion type ID to type
-export const mapPromotionTypeIdToType = (
-  id: number
-): PromotionCampaignType | undefined => {
-  const mapping: Record<number, PromotionCampaignType> = {
-    1: "FREE_TRIAL",
-    2: "FIRST_MONTH_DISCOUNT",
+  const typeToName: Record<PromotionCampaignType, string> = {
+    FREE_TRIAL: "Free trial",
+    FIRST_MONTH_DISCOUNT: "First month discount",
   };
-  return mapping[id];
-};
 
-// Map promotion type to ID
-export const mapPromotionTypeToId = (
-  type: PromotionCampaignType
-): number | undefined => {
-  const mapping: Record<PromotionCampaignType, number> = {
-    FREE_TRIAL: 1,
-    FIRST_MONTH_DISCOUNT: 2,
-  };
-  return mapping[type];
+  if (value in nameToType) return nameToType[value];
+  if (value in typeToName) return typeToName[value as PromotionCampaignType];
+
+  return undefined;
 };
