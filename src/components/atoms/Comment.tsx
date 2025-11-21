@@ -17,7 +17,7 @@ const Comment = ({ comment, profileData, postId, level = 0 }: CommentProps) => {
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
 
-  const hasReplies = comment.replies && comment.replies.length > 0;
+  const hasReplies = comment?.replies && comment.replies.length > 0;
   const maxNestingLevel = 3; // Limit nesting to prevent excessive indentation
 
   return (
