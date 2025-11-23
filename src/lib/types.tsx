@@ -77,6 +77,22 @@ export interface ReactionItem {
 }
 
 export interface StoryPost {
+  // publicId: string;
+  // createdBy: string;
+  // lastModifiedBy: string;
+  // createdDate: string;
+  // lastModifiedDate: string;
+  // creator: string;
+  // message: string;
+  // mediaFiles: MediaFile[];
+  // comments: Comment[];
+  // reactions: Reaction[];
+  // viewers: string[];
+  // meta: {
+  //   reactionCount: number;
+  //   commentCount: number;
+  //   viewCount: number;
+  // };
   publicId: string;
   createdBy: string;
   lastModifiedBy: string;
@@ -85,22 +101,64 @@ export interface StoryPost {
   creator: string;
   message: string;
   mediaFiles: MediaFile[];
-  comments: Comment[];
+  comments: PostComment[];
   reactions: Reaction[];
   viewers: string[];
-  meta: {
-    reactionCount: number;
-    commentCount: number;
-    viewCount: number;
-  };
+  meta: PostMeta;
 }
 
 // Optional child interfaces if you plan to expand later:
-export interface Comment {
-  id?: string;
-  author?: string;
-  text?: string;
-  createdAt?: string;
+export interface PostComment {
+  publicId: string;
+  createdBy: string;
+  lastModifiedBy: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  message: string;
+  replies: PostComment[];
+  reactions: Reaction[];
+}
+
+export interface PostMeta {
+  reactionCount: number;
+  commentCount: number;
+  viewCount: number;
+}
+
+export interface SortInfo {
+  sorted: boolean;
+  unsorted: boolean;
+  empty: boolean;
+}
+
+export interface Pageable {
+  pageNumber: number;
+  pageSize: number;
+  sort: SortInfo;
+  offset: number;
+  paged: boolean;
+  unpaged: boolean;
+}
+
+export interface StoryPostData {
+  content: StoryPost[];
+  pageable: Pageable;
+  last: boolean;
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  sort: SortInfo;
+  first: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
+export interface StoryPostResponse {
+  data: StoryPostData;
+  message: string;
+  success: boolean;
+  timestamp: string;
 }
 
 export type MediaItem = {

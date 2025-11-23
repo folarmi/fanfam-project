@@ -17,9 +17,9 @@ const Comment = ({ comment, profileData, postId, level = 0 }: CommentProps) => {
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
 
-  const hasReplies = comment?.replies && comment.replies.length > 0;
+  const hasReplies = comment?.comments && comment.comments.length > 0;
   const maxNestingLevel = 3; // Limit nesting to prevent excessive indentation
-
+  console.log(comment);
   return (
     <div
       className={`${level > 0 ? "ml-8 border-l-2 border-grey_10 pl-4" : ""}`}
@@ -50,8 +50,8 @@ const Comment = ({ comment, profileData, postId, level = 0 }: CommentProps) => {
             onClick={() => setShowReplies(!showReplies)}
             className="text-sm text-grey_60 hover:text-primary transition-colors"
           >
-            {showReplies ? "Hide" : "Show"} {comment.replies.length}{" "}
-            {comment.replies.length === 1 ? "reply" : "replies"}
+            {showReplies ? "Hide" : "Show"} {comment?.comments?.length}{" "}
+            {comment?.comments?.length === 1 ? "reply" : "replies"}
           </button>
         )}
       </div>
@@ -71,7 +71,7 @@ const Comment = ({ comment, profileData, postId, level = 0 }: CommentProps) => {
       {/* Nested Replies */}
       {showReplies && hasReplies && (
         <div className="mt-2">
-          {comment.replies.map((reply: StoryPost) => (
+          {comment?.replies?.map((reply: StoryPost) => (
             <Comment
               key={reply.publicId}
               comment={reply}

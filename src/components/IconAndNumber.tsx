@@ -12,7 +12,7 @@ type IconAndNumberProp = {
   className?: string;
   reactionType: ReactionType;
   publicid: string | undefined;
-  isActive: boolean;
+  isActive?: boolean;
 };
 
 const IconAndNumber = ({
