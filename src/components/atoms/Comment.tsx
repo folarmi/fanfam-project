@@ -19,7 +19,6 @@ const Comment = ({ comment, profileData, postId, level = 0 }: CommentProps) => {
 
   const hasReplies = comment?.comments && comment.comments.length > 0;
   const maxNestingLevel = 3; // Limit nesting to prevent excessive indentation
-  console.log(comment);
   return (
     <div
       className={`${level > 0 ? "ml-8 border-l-2 border-grey_10 pl-4" : ""}`}

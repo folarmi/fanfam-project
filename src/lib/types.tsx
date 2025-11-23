@@ -77,22 +77,6 @@ export interface ReactionItem {
 }
 
 export interface StoryPost {
-  // publicId: string;
-  // createdBy: string;
-  // lastModifiedBy: string;
-  // createdDate: string;
-  // lastModifiedDate: string;
-  // creator: string;
-  // message: string;
-  // mediaFiles: MediaFile[];
-  // comments: Comment[];
-  // reactions: Reaction[];
-  // viewers: string[];
-  // meta: {
-  //   reactionCount: number;
-  //   commentCount: number;
-  //   viewCount: number;
-  // };
   publicId: string;
   createdBy: string;
   lastModifiedBy: string;
@@ -107,7 +91,6 @@ export interface StoryPost {
   meta: PostMeta;
 }
 
-// Optional child interfaces if you plan to expand later:
 export interface PostComment {
   publicId: string;
   createdBy: string;

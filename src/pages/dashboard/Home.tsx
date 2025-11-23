@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import defaultLiveAvatar from "../../assets/defaultLiveAvatar.svg";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
 import SearchInput from "../../components/SearchInput";
@@ -124,7 +123,7 @@ const Home = () => {
         <ViewPost
           publicId={data?.publicId}
           profileName={profileData?.data?.displayName}
-          avatar={profileData?.data?.profilePic || defaultLiveAvatar}
+          avatar={profileData?.data?.profilePic}
           handle={`@${profileData?.data?.username}`}
           time={formatTimeAgo(data?.createdDate)}
           paragraphOne={data?.message}
@@ -152,9 +151,6 @@ const Home = () => {
 
   return (
     <>
-      {/* {isLoading || getCreatorContentIsLoading ? (
-        <Loader />
-      ) : ( */}
       <div className="">
         <>
           <SearchInput />
@@ -208,7 +204,6 @@ const Home = () => {
           </div>
         </Modal>
       </div>
-      {/* )} */}
     </>
   );
 };

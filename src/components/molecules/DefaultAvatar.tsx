@@ -13,7 +13,7 @@ const DefaultAvatar: React.FC<DefaultAvatarProps> = ({
   fullName,
   size = "12",
   rounded = "full",
-  bgColor = "bg-blue-600",
+  bgColor = "bg-primary",
   textColor = "text-white",
   className = "",
 }) => {
