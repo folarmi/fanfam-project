@@ -10,6 +10,7 @@ type ConfirmDeletionProps = {
   isDeleting?: boolean;
   title?: string;
   message?: string;
+  buttonText?: string;
 };
 
 const ConfirmDeletion = ({
@@ -18,6 +19,7 @@ const ConfirmDeletion = ({
   isDeleting,
   title = "Delete",
   message = "Are you sure you want to delete this item?",
+  buttonText = "Yes, Delete",
 }: ConfirmDeletionProps) => {
   const { handleSubmit } = useForm();
 
@@ -52,7 +54,7 @@ const ConfirmDeletion = ({
           variant="primary"
           className="text-xs px-3 w-fit"
         >
-          Yes, Delete
+          {buttonText}
         </CustomButton>
       </div>
     </form>

@@ -47,7 +47,7 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
   const [selectedFreeTrialLink, setSelectedFreeTrialLink] = useState("");
   const [selectedBundle, setSelectedBundle] =
     useState<SubscriptionBundle>(EMPTY_BUNDLE);
-  const [selectedCampaign, setSelectedCampaign] = useState();
+  const [selectedCampaign, setSelectedCampaign] = useState("");
 
   const toggleModal = (buttonText: string) => {
     if (buttonText === "Start promotion campaign")
@@ -95,7 +95,7 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
 
   const stopPromotionMutation = useCustomMutation({
     endpoint: `subscriptions/promotion/stop/${selectedCampaign}`,
-    method: "delete",
+    method: "put",
     successMessage: () => "Promotion stopped successfully",
     onSuccessCallback: () => {
       refetch();
@@ -223,7 +223,8 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
                             <div className="flex items-center justify-end mt-8 ml-auto">
                               <CustomButton
                                 onClick={() => {
-                                  stopPromotionMutation.mutate({});
+                                  setSelectedCampaign(item?.publicId);
+                                  toggleStopPromotionModal();
                                 }}
                                 disabled={stopPromotionMutation?.isPending}
                                 variant="secondary"
@@ -427,14 +428,18 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
             </div>
           </Modal>
 
-          <Modal show={deleteSubBundle} toggleModal={toggleDeleteSubBundle}>
+          <Modal
+            show={stopPromotionModal}
+            toggleModal={toggleStopPromotionModal}
+          >
             <div className="p-4">
               <ConfirmDeletion
-                toggleModal={toggleDeleteSubBundle}
-                message=" Are you sure you want to delete this bundle?"
-                title="Delete Subscription Bundle"
-                deleteFn={deleteBundleMutation.mutate}
-                isDeleting={deleteBundleMutation.isPending}
+                toggleModal={toggleStopPromotionModal}
+                message=" Are you sure you want to stop this promotion?"
+                title="Stop Promotion Campaign"
+                deleteFn={stopPromotionMutation.mutate}
+                isDeleting={stopPromotionMutation.isPending}
+                buttonText="Yes, Stop"
               />
             </div>
           </Modal>
