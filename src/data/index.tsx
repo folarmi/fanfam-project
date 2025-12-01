@@ -52,6 +52,7 @@ import blurEmoji from "../assets/icons/blurEmoji.svg";
 import galleryEmoji from "../assets/icons/galleryEmoji.svg";
 import { SettingsIcon } from "../components/svgs/Settings";
 import type {
+  Action,
   DisplayObject,
   FreeTrial,
   NotificationObject,
@@ -65,6 +66,11 @@ import creatorTwo from "@/assets/icons/creatorTwo.svg";
 import creatorThree from "@/assets/icons/creatorThree.svg";
 import creatorFour from "@/assets/icons/creatorFour.svg";
 import { convertToHumanReadableDate, getRemainingDays } from "@/utils/helper";
+import { Link } from "react-router-dom";
+import CustomButton from "@/components/forms/CustomButton";
+import BlueBorderedButton from "@/components/forms/BlueBorderedButton";
+import CircleChat from "@/assets/icons/circleChat";
+import CirclePay from "@/assets/icons/circlePay";
 
 export const sideBarItems = [
   {
@@ -2074,5 +2080,42 @@ export const promotionType = [
   {
     id: 2,
     name: "First month discount",
+  },
+];
+
+export const actions: Action[] = [
+  {
+    type: "chat",
+    component: (
+      // <button className="p-2 rounded-full hover:bg-blue_100">💬</button>
+      <div className="cursor-pointer">
+        <CircleChat className="cursor-pointer hover:fill-blue_200" />
+      </div>
+    ),
+  },
+  {
+    type: "tip",
+    component: (
+      // <button className="p-2 rounded-full hover:bg-blue_100">💰</button>
+      <CirclePay className="cursor-pointer hover:fill-blue_200" />
+    ),
+  },
+  {
+    type: "promote",
+    component: (
+      <Link to="/dashboard/profile/promote">
+        <CustomButton variant="primary" primaryButtonSize="xs px-3">
+          Promote Profile
+        </CustomButton>
+      </Link>
+    ),
+  },
+  {
+    type: "edit",
+    component: (
+      <Link to="/dashboard/profile/edit-profile">
+        <BlueBorderedButton text="Edit Profile" />
+      </Link>
+    ),
   },
 ];

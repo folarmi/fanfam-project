@@ -259,3 +259,66 @@ export const EMPTY_CREATOR_USER_PROFILE: CreatorUserProfile = {
   coverImageUrl: "",
   creatorProfile: null,
 };
+
+export interface Stat {
+  icon: React.ReactNode;
+  count: number;
+}
+
+export interface Action {
+  type: string;
+  component: React.ReactNode;
+}
+
+export interface Recipient {
+  avatar: string;
+  name: string;
+  username: string;
+}
+
+export interface TipData {
+  amount: string;
+  message: string;
+}
+
+export interface ProfileHeaderProps {
+  coverImage: string;
+  stats?: Stat[];
+  children?: React.ReactNode;
+}
+
+export interface ProfileInfoProps {
+  profileData: CreatorUserProfile;
+  isExpanded: boolean;
+  onToggleExpanded: () => void;
+  showReadMore?: boolean;
+}
+
+export interface ProfileActionsProps {
+  actions?: Action[];
+  showLocation?: boolean;
+  location?: string;
+  onActionClick?: (actionType: string) => void;
+}
+
+export interface SubscriptionBundleProps {
+  currentSubscription?: SubscriptionBundle;
+  bundles?: SubscriptionBundle[];
+  onSubscribe?: (bundle: SubscriptionBundle) => void;
+}
+
+export interface TipModalProps {
+  recipient: Recipient;
+  onClose: () => void;
+  onSend?: (data: TipData) => void;
+}
+
+export type IconAndNumberProp = {
+  Icon: any;
+  number?: number;
+  numberColor?: string;
+  className?: string;
+  reactionType: ReactionType;
+  publicid: string | undefined;
+  isActive?: boolean;
+};

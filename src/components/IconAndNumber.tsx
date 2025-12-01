@@ -1,19 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCustomMutation } from "@/hooks/apiCalls";
-import type { ReactionType } from "@/lib/types";
+import type { IconAndNumberProp } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
-
-type IconAndNumberProp = {
-  Icon: any;
-  number?: number;
-  numberColor?: string;
-  className?: string;
-  reactionType: ReactionType;
-  publicid: string | undefined;
-  isActive?: boolean;
-};
 
 const IconAndNumber = ({
   Icon,
