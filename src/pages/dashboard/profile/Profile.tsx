@@ -2,27 +2,12 @@ import { useAppSelector } from "../../../lib/hook";
 import type { RootState } from "../../../lib/store";
 import { useState } from "react";
 import SearchInput from "../../../components/SearchInput";
-// import IconAndNumber from "../../../components/IconAndNumber";
-// import Pictures from "../../../assets/icons/pictures";
-// import Videos from "../../../assets/icons/videos";
-// import Live from "../../../assets/icons/live";
-// import ProfileLike from "../../../assets/icons/profileLike";
 import Typography from "../../../components/forms/Typography";
-// import CircleChat from "../../../assets/icons/circleChat";
-// import CirclePay from "../../../assets/icons/circlePay";
-// import AmountInput from "../../../components/forms/AmountInput";
-// import PaymentMethod from "../../../components/PaymentMethod";
-// import CustomInput from "../../../components/forms/CustomInput";
-// import SubscriptionButton from "../../../components/molecules/SubscriptionButton";
 import Post from "../../../components/Post";
 import Replies from "../../../components/Replies";
 import Media from "../../../components/Media";
 import GiftSubscription from "../../../components/modals/GiftSubscription";
 import suggestTwo from "../../../assets/suggestTwo.svg";
-// import blueVerifiedTick from "../../../assets/blueVerifiedTick.svg";
-// import defaultAvatar from "../../../assets/defaultAvatar.svg";
-// import verifyBlue from "../../../assets/icons/verifyBlue.svg";
-// import blueGift from "../../../assets/icons/blueGift.svg";
 import { Loader } from "@/components/molecules/Loader";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { ProfileHeader } from "@/components/molecules/ProfileHeader";
@@ -30,6 +15,7 @@ import { ProfileActions } from "@/components/molecules/ProfileActions";
 import { TipModal } from "@/components/molecules/TipModal";
 import { actions } from "@/data";
 import type { TipData } from "@/lib/types";
+import { SubscriptionBundle } from "@/components/molecules/SubscriptionBundle";
 
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -56,7 +42,7 @@ const Profile = () => {
   ]);
   const [isActiveTab, setIsActiveTab] = useState("Post");
   // const [linkToProfileModal, setLinkToProfileModal] = useState(false);
-  const [showSubscription] = useState(false);
+  const [showSubscription] = useState(true);
   const [showTipModal, setShowTipModal] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -64,21 +50,49 @@ const Profile = () => {
     setShowModal(!showModal);
   };
 
-  // const toggleCommentModal = () => {
-  //   setCommentModal(!commentModal);
-  // };
+  const test = {
+    amount: "200",
+    durationInMonths: 3,
+    startDate: "2024-06-01",
+    endDate: "2024-09-01",
+    publicId: "abc123",
+    createdDate: "2024-06-01",
+    lastModifiedDate: "2024-06-01",
+    lastModifiedBy: "admin",
+  };
 
-  // const toggleReadMore = () => {
-  //   setIsExpanded(!isExpanded);
-  // };
-
-  // const toggleLinkToProfile = () => {
-  //   setLinkToProfileModal(!linkToProfileModal);
-  // };
-
-  // const toggleTipModal = () => {
-  //   setShowTipModal(!showTipModal);
-  // };
+  const subscriptionData = [
+    {
+      amount: "200",
+      durationInMonths: 3,
+      startDate: "2024-06-01",
+      endDate: "2024-09-01",
+      publicId: "abc123",
+      createdDate: "2024-06-01",
+      lastModifiedDate: "2024-06-01",
+      lastModifiedBy: "admin",
+    },
+    {
+      amount: "200",
+      durationInMonths: 3,
+      startDate: "2024-06-01",
+      endDate: "2024-09-01",
+      publicId: "abc1235",
+      createdDate: "2024-06-01",
+      lastModifiedDate: "2024-06-01",
+      lastModifiedBy: "admin",
+    },
+    {
+      amount: "200",
+      durationInMonths: 3,
+      startDate: "2024-06-01",
+      endDate: "2024-09-01",
+      publicId: "abc12395",
+      createdDate: "2024-06-01",
+      lastModifiedDate: "2024-06-01",
+      lastModifiedBy: "admin",
+    },
+  ];
 
   const handleActionClick = (actionType: string): void => {
     if (actionType === "tip") {
@@ -138,16 +152,25 @@ const Profile = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <h2 className="text-grey_800 font-bold pr-1 text-xl">
+                    <Typography
+                      variant="titleTwo"
+                      className="text-grey_800 font-bold pr-1 text-xl"
+                    >
                       {profileData?.data?.fullName}
-                    </h2>
+                    </Typography>
                   </div>
 
-                  <p className="text-grey_800 pt-1 text-sm">
+                  <Typography
+                    variant="p2"
+                    className="text-grey_800 pt-1 text-sm"
+                  >
                     {profileData?.data?.username}
-                  </p>
+                  </Typography>
 
-                  <p className="text-grey_700 py-4 text-sm">
+                  <Typography
+                    variant="p2"
+                    className="text-grey_700 py-4 text-sm"
+                  >
                     {profileData?.data?.bio}
                     {isExpanded && (
                       <span>
@@ -161,20 +184,17 @@ const Profile = () => {
                     >
                       read {isExpanded ? "less" : "more"}
                     </span>
-                  </p>
+                  </Typography>
                 </section>
               </section>
             </ProfileHeader>
 
-            {/* {showSubscription && (
+            {showSubscription && (
               <SubscriptionBundle
-                currentSubscription={subscriptionData.currentSubscription}
-                bundles={subscriptionData.bundles}
-                onSubscribe={(bundle: SubscriptionBundle) =>
-                  console.log("Subscribe to:", bundle)
-                }
+                currentSubscription={test}
+                data={subscriptionData}
               />
-            )} */}
+            )}
             {/* <img src={suggestTwo} alt="demo" className="w-full" /> */}
 
             {/* <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
@@ -304,43 +324,6 @@ const Profile = () => {
                 </Typography>
               </section>
             </section> */}
-
-            {/* {subscription && (
-              <div className="bg-white drop-shadow-4xl mb-2 py-2">
-                <section className="border-b border-grey_10 pb-4 px-4">
-                  <Typography variant="subtitle2">
-                    Current subscription
-                  </Typography>
-                  <Typography variant="p3" className="pb-2 pt-3 text-grey_500">
-                    Ends: 10 June 2024
-                  </Typography>
-
-                  <SubscriptionButton textOne="RENEW" textTwo="$15 per month" />
-                </section>
-
-                <section className="pt-4 px-4">
-                  <Typography variant="subtitle2" className="pb-4">
-                    Subscription bundles
-                  </Typography>
-
-                  <SubscriptionButton
-                    textOne="1 month"
-                    textTwo="$15"
-                    className="mb-4"
-                  />
-                  <SubscriptionButton
-                    textOne="2 months"
-                    textTwo="$100"
-                    className="mb-4"
-                  />
-                  <SubscriptionButton
-                    textOne="12 months"
-                    textTwo="$150"
-                    className="mb-2"
-                  />
-                </section>
-              </div>
-            )} */}
 
             <div className="flex items-center justify-between bg-grey_20 border-b border-grey_40 mt-2">
               {tabs.map(({ id, name }) => {

@@ -303,8 +303,7 @@ export interface ProfileActionsProps {
 
 export interface SubscriptionBundleProps {
   currentSubscription?: SubscriptionBundle;
-  bundles?: SubscriptionBundle[];
-  onSubscribe?: (bundle: SubscriptionBundle) => void;
+  data?: SubscriptionBundle[];
 }
 
 export interface TipModalProps {
