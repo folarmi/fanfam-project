@@ -4,7 +4,7 @@ import copy from "../../assets/copy.svg";
 import ModalContent from "./ModalContent";
 import { useState } from "react";
 import Modal from "./Modal";
-import { ConfirmDeletion } from "./ConfirmDeletion";
+import { ConfirmActionModal } from "./ConfirmActionModal";
 import { EditPost } from "./EditPost";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useQueryClient } from "@tanstack/react-query";
@@ -82,7 +82,7 @@ const TimeLineHomeModal = ({ publicId }: Prop) => {
 
       <Modal show={showDeleteModal} toggleModal={toggleDeletePostModal}>
         <div className="p-4">
-          <ConfirmDeletion
+          <ConfirmActionModal
             toggleModal={toggleDeletePostModal}
             message=" Are you sure you want to delete this post?"
             title="Delete post"

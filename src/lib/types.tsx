@@ -210,3 +210,52 @@ export const EMPTY_BUNDLE: SubscriptionBundle = {
   lastModifiedDate: "",
   lastModifiedBy: "",
 };
+
+export interface CreatorProfile {
+  monthlyFee: number;
+  personaInquiryId: string;
+  verified: boolean;
+  creatorBankInfo: BankingInfo;
+  subscriptions: any[];
+  freeTrialLinks: FreeTrial[];
+  subscriptionBundles: SubscriptionBundle[];
+  promotionCampaigns: PromotionalCampaignType[];
+}
+
+export interface CreatorUserProfile {
+  phoneNumber: string;
+  usid: string;
+  role: UserRoleType;
+  email: string;
+  residence: string;
+  fullName: string;
+  gender: string;
+  location: string;
+  profilePic: string | null;
+  interest: string;
+  bio: string;
+  username: string;
+  websiteUrl: string;
+  displayName: string;
+  coverImageUrl: string;
+  creatorProfile: CreatorProfile | null;
+}
+
+export const EMPTY_CREATOR_USER_PROFILE: CreatorUserProfile = {
+  phoneNumber: "",
+  usid: "",
+  role: "VIEWER",
+  email: "",
+  residence: "",
+  fullName: "",
+  gender: "",
+  location: "",
+  profilePic: null,
+  interest: "",
+  bio: "",
+  username: "",
+  websiteUrl: "",
+  displayName: "",
+  coverImageUrl: "",
+  creatorProfile: null,
+};

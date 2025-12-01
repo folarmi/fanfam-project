@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import CustomButton from "../forms/CustomButton";
 import Typography from "../forms/Typography";
 
-type ConfirmDeletionProps = {
+type ConfirmActionModalProps = {
   toggleModal: () => void;
   deleteFn: (payload?: any) => void;
   isDeleting?: boolean;
@@ -13,14 +13,14 @@ type ConfirmDeletionProps = {
   buttonText?: string;
 };
 
-const ConfirmDeletion = ({
+const ConfirmActionModal = ({
   toggleModal,
   deleteFn,
   isDeleting,
   title = "Delete",
   message = "Are you sure you want to delete this item?",
   buttonText = "Yes, Delete",
-}: ConfirmDeletionProps) => {
+}: ConfirmActionModalProps) => {
   const { handleSubmit } = useForm();
 
   const submitForm = () => {
@@ -61,4 +61,4 @@ const ConfirmDeletion = ({
   );
 };
 
-export { ConfirmDeletion };
+export { ConfirmActionModal };

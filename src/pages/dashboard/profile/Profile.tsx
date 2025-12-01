@@ -67,7 +67,7 @@ const Profile = () => {
   const [isActiveTab, setIsActiveTab] = useState("Post");
   const [commentModal, setCommentModal] = useState(false);
   // const [linkToProfileModal, setLinkToProfileModal] = useState(false);
-  const [subscription] = useState(false);
+  const [subscription] = useState(true);
   const [tipModal, setTipModal] = useState(false);
   const [addUserToList, setAddUserToList] = useState(false);
   const [showModal, setShowModal] = useState(false);

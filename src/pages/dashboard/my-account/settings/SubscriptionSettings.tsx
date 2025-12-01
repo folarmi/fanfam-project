@@ -25,7 +25,7 @@ import {
   type PromotionalCampaignType,
   type SubscriptionBundle,
 } from "@/lib/types";
-import { ConfirmDeletion } from "@/components/modals/ConfirmDeletion";
+import { ConfirmActionModal } from "@/components/modals/ConfirmActionModal";
 import PromotionalCampaign from "@/components/modals/PromotionalCampaign";
 import { mapPromotionType, mapQualifier } from "@/utils/helperTwo";
 
@@ -406,7 +406,7 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
 
           <Modal show={deleteFreeTrialLink} toggleModal={toggleDeleteFreeTrial}>
             <div className="p-4">
-              <ConfirmDeletion
+              <ConfirmActionModal
                 toggleModal={toggleDeleteFreeTrial}
                 message=" Are you sure you want to delete this free trial link?"
                 title="Delete Free trial link"
@@ -418,7 +418,7 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
 
           <Modal show={deleteSubBundle} toggleModal={toggleDeleteSubBundle}>
             <div className="p-4">
-              <ConfirmDeletion
+              <ConfirmActionModal
                 toggleModal={toggleDeleteSubBundle}
                 message=" Are you sure you want to delete this bundle?"
                 title="Delete Subscription Bundle"
@@ -433,7 +433,7 @@ const SubscriptionSettings = ({ showHeader = true }: Prop) => {
             toggleModal={toggleStopPromotionModal}
           >
             <div className="p-4">
-              <ConfirmDeletion
+              <ConfirmActionModal
                 toggleModal={toggleStopPromotionModal}
                 message=" Are you sure you want to stop this promotion?"
                 title="Stop Promotion Campaign"

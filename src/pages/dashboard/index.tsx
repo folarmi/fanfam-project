@@ -4,6 +4,7 @@ export * from "./SinglePostDetails";
 export * from "./profile/Profile";
 export * from "./profile/EditProfile";
 export * from "./profile/PromoteProfile";
+export * from "./profile/UnsubscribedProfile";
 export * from "./Notifications";
 export * from "./messages/Message";
 export * from "./schedule/Schedule";

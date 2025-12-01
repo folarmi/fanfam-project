@@ -48,6 +48,7 @@ import {
   SetupProfile,
   SetupStrategy,
   SinglePostDetails,
+  UnsubscribedProfile,
 } from "../pages/dashboard";
 import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
@@ -70,6 +71,10 @@ const RoutePage = () => {
           <Route path=":id" element={<SinglePostDetails />} />
           <Route path="profile" element={<Profile />} />
           <Route path="profile/edit-profile" element={<EditProfile />} />
+          <Route
+            path="profile/:id/subscribe"
+            element={<UnsubscribedProfile />}
+          />
           <Route path="promote-profile" element={<PromoteProfile />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
