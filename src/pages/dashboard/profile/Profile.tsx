@@ -15,7 +15,6 @@ import { ProfileActions } from "@/components/molecules/ProfileActions";
 import { TipModal } from "@/components/molecules/TipModal";
 import { actions } from "@/data";
 import type { TipData } from "@/lib/types";
-import { SubscriptionBundle } from "@/components/molecules/SubscriptionBundle";
 
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -42,57 +41,12 @@ const Profile = () => {
   ]);
   const [isActiveTab, setIsActiveTab] = useState("Post");
   // const [linkToProfileModal, setLinkToProfileModal] = useState(false);
-  const [showSubscription] = useState(true);
   const [showTipModal, setShowTipModal] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
 
   const toggleModal = () => {
     setShowModal(!showModal);
   };
-
-  const test = {
-    amount: "200",
-    durationInMonths: 3,
-    startDate: "2024-06-01",
-    endDate: "2024-09-01",
-    publicId: "abc123",
-    createdDate: "2024-06-01",
-    lastModifiedDate: "2024-06-01",
-    lastModifiedBy: "admin",
-  };
-
-  const subscriptionData = [
-    {
-      amount: "200",
-      durationInMonths: 3,
-      startDate: "2024-06-01",
-      endDate: "2024-09-01",
-      publicId: "abc123",
-      createdDate: "2024-06-01",
-      lastModifiedDate: "2024-06-01",
-      lastModifiedBy: "admin",
-    },
-    {
-      amount: "200",
-      durationInMonths: 3,
-      startDate: "2024-06-01",
-      endDate: "2024-09-01",
-      publicId: "abc1235",
-      createdDate: "2024-06-01",
-      lastModifiedDate: "2024-06-01",
-      lastModifiedBy: "admin",
-    },
-    {
-      amount: "200",
-      durationInMonths: 3,
-      startDate: "2024-06-01",
-      endDate: "2024-09-01",
-      publicId: "abc12395",
-      createdDate: "2024-06-01",
-      lastModifiedDate: "2024-06-01",
-      lastModifiedBy: "admin",
-    },
-  ];
 
   const handleActionClick = (actionType: string): void => {
     if (actionType === "tip") {
@@ -108,8 +62,10 @@ const Profile = () => {
         <div>
           <SearchInput ifBlur={false} />
           <div className="w-full relative">
-            {/* <div className="max-w-4xl mx-auto"> */}
-            <ProfileHeader coverImage={suggestTwo}>
+            <ProfileHeader
+              coverImage={profileData?.data?.coverImageUrl || suggestTwo}
+              displayName={profileData?.data?.displayName}
+            >
               <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
                 <div className="relative flex items-center">
                   <div className="absolute -top-8">
@@ -156,7 +112,7 @@ const Profile = () => {
                       variant="titleTwo"
                       className="text-grey_800 font-bold pr-1 text-xl"
                     >
-                      {profileData?.data?.fullName}
+                      {profileData?.data?.displayName}
                     </Typography>
                   </div>
 
@@ -189,12 +145,6 @@ const Profile = () => {
               </section>
             </ProfileHeader>
 
-            {showSubscription && (
-              <SubscriptionBundle
-                currentSubscription={test}
-                data={subscriptionData}
-              />
-            )}
             {/* <img src={suggestTwo} alt="demo" className="w-full" /> */}
 
             {/* <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
@@ -372,35 +322,3 @@ const Profile = () => {
 };
 
 export { Profile };
-
-{
-  /* Gift Subscription */
-}
-{
-  /* {userObject.role !== UserRole.creator && (
-                      <>
-                        <div
-                          className={`flex items-center gap-x-2 border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white `}
-                        >
-                          <img src={blueGift} alt="gift" />
-                          <Typography
-                            variant="subtitle3"
-                            className="text-blue_500"
-                          >
-                            Gift Subscription
-                          </Typography>
-                        </div>
-
-                        <CustomButton
-                          variant="primary"
-                          primaryButtonSize="xs px-3"
-                        >
-                          Subscribe
-                        </CustomButton>
-                      </>
-                    )} */
-}
-
-{
-  /* {userObject.role === UserRole.creator && ( */
-}

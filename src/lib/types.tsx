@@ -283,6 +283,7 @@ export interface TipData {
 
 export interface ProfileHeaderProps {
   coverImage: string;
+  displayName: string;
   stats?: Stat[];
   children?: React.ReactNode;
 }
@@ -304,6 +305,7 @@ export interface ProfileActionsProps {
 export interface SubscriptionBundleProps {
   currentSubscription?: SubscriptionBundle;
   data?: SubscriptionBundle[];
+  onSubscribe?: (bundle: SubscriptionBundle) => void;
 }
 
 export interface TipModalProps {

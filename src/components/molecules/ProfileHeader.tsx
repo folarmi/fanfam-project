@@ -4,10 +4,12 @@ import Pictures from "@/assets/icons/pictures";
 import Videos from "@/assets/icons/videos";
 import Like from "@/assets/icons/like";
 import ProfileLike from "@/assets/icons/profileLike";
+import { DefaultCoverImage } from "../atoms/DefaultCoverImage";
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   coverImage,
   children,
+  displayName,
 }) => {
   const stats: IconAndNumberProp[] = [
     {
@@ -49,7 +51,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   ];
   return (
     <div className="w-full relative">
-      <img src={coverImage} alt="cover" className="w-full" />
+      {coverImage ? (
+        <img
+          src={coverImage}
+          alt="cover"
+          className="w-full h-40 sm:h-56 md:h-64 lg:h-72 object-cover rounded-md"
+        />
+      ) : (
+        <DefaultCoverImage displayName={displayName} theme="modern" />
+      )}
       <div className="flex items-center absolute top-3 pl-4">
         {stats.map((stat) => (
           <div className="" key={stat.publicid}>

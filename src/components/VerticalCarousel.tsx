@@ -484,6 +484,7 @@ const VerticalCarousel = () => {
           return (
             <Link
               to={`profile/${item?.usid}/subscribe`}
+              state={{ email: item?.email }}
               key={item.usid}
               className="relative rounded-lg overflow-hidden group"
             >

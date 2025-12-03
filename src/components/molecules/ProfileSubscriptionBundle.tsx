@@ -2,13 +2,13 @@ import type { SubscriptionBundleProps } from "@/lib/types";
 import Typography from "../forms/Typography";
 import SubscriptionButton from "./SubscriptionButton";
 
-const SubscriptionBundle: React.FC<SubscriptionBundleProps> = ({
-  currentSubscription,
+const ProfileSubscriptionBundle: React.FC<SubscriptionBundleProps> = ({
   data = [],
+  onSubscribe,
 }) => {
   return (
     <div className="bg-white drop-shadow-4xl mb-2 py-2">
-      {currentSubscription && (
+      {/* {currentSubscription && (
         <section className="border-b border-grey_10 pb-4 px-4">
           <Typography variant="subtitle2">Current subscription</Typography>
           <Typography variant="p3" className="pb-2 pt-3 text-grey_500">
@@ -17,7 +17,7 @@ const SubscriptionBundle: React.FC<SubscriptionBundleProps> = ({
 
           <SubscriptionButton textOne="RENEW" textTwo="$15 per month" />
         </section>
-      )}
+      )} */}
 
       <section className="pt-4 px-4">
         <Typography variant="subtitle2" className="pb-4">
@@ -26,9 +26,10 @@ const SubscriptionBundle: React.FC<SubscriptionBundleProps> = ({
         {data?.map((bundle) => (
           <SubscriptionButton
             textOne={`${bundle?.durationInMonths} months`}
-            textTwo={bundle?.amount}
+            textTwo={`${bundle?.amount}`}
             className="mb-4"
             key={bundle?.publicId}
+            onClick={() => onSubscribe?.(bundle)}
           />
         ))}
       </section>
@@ -36,4 +37,4 @@ const SubscriptionBundle: React.FC<SubscriptionBundleProps> = ({
   );
 };
 
-export { SubscriptionBundle };
+export { ProfileSubscriptionBundle };
