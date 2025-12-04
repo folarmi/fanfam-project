@@ -20,6 +20,7 @@ import TextBetweenLines from "../components/molecules/TextBetweenLines";
 // import SocialMedia from "../components/SocialMedia";
 import { useSignIn } from "@/hooks/useSignIn";
 import { GoogleSignIn } from "@/oauth/Google";
+import { getFCMToken } from "@/oauth/firebaseConfig";
 
 const SignIn = () => {
   const { control, handleSubmit, getValues } = useForm();
@@ -55,7 +56,7 @@ const SignIn = () => {
       .catch((err) => setError(err.message || "An unexpected error occurred"));
   }, []);
 
-  const submitForm = (data: any) => {
+  const submitForm = async (data: any) => {
     const formValues = {
       email: data.email,
       password: data.password,
@@ -65,6 +66,7 @@ const SignIn = () => {
         location: location,
         platform: platform,
         browser: browser,
+        firebaseClientToken: await getFCMToken(),
       },
     };
 
