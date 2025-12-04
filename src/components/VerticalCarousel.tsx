@@ -11,7 +11,7 @@
 // import verify from "../assets/icons/verify.svg";
 // import { useGetData } from "@/hooks/apiCalls";
 // import { Loader } from "./molecules/Loader";
-// import type { CreatorUserProfile } from "@/lib/types";
+// import type { UserProfile } from "@/lib/types";
 // // import { useAppSelector } from "../lib/hook";
 // // import CreatorThirdColumn from "./molecules/CreatorThirdColumn";
 // // import { UserRole } from "../data";
@@ -118,7 +118,7 @@
 //             <div className="relative rounded-lg mb-3 overflow-hidden w-4/5 flex flex-col space-y-4">
 //               {getAllCreators?.data
 //                 .slice(currentIndex, currentIndex + 5)
-//                 .map((item: CreatorUserProfile) => (
+//                 .map((item: UserProfile) => (
 //                   <div
 //                     key={item.usid}
 //                     className="relative rounded-lg mb-3 overflow-hidden"
@@ -226,7 +226,7 @@
 // import Typography from "./forms/Typography";
 // import { useGetData } from "@/hooks/apiCalls";
 // import { Loader } from "./molecules/Loader";
-// import type { CreatorUserProfile } from "@/lib/types";
+// import type { UserProfile } from "@/lib/types";
 
 // const ITEMS_PER_PAGE = 5;
 
@@ -294,7 +294,7 @@
 //     <div className="flex gap-4">
 //       {/* Creator Cards */}
 //       <div className="flex-1 flex flex-col space-y-4">
-//         {visibleCreators.map((item: CreatorUserProfile) => (
+//         {visibleCreators.map((item: UserProfile) => (
 //           <div
 //             key={item.usid}
 //             className="relative rounded-lg overflow-hidden group"
@@ -409,7 +409,7 @@ import verify from "../assets/icons/verify.svg";
 import Typography from "./forms/Typography";
 import { useGetData } from "@/hooks/apiCalls";
 import { Loader } from "./molecules/Loader";
-import { type CreatorUserProfile } from "@/lib/types";
+import { type UserProfile } from "@/lib/types";
 import { Link } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 5;
@@ -478,7 +478,7 @@ const VerticalCarousel = () => {
     <div className="flex gap-4">
       {/* Creator Cards */}
       <div className="flex-1 flex flex-col space-y-4 cursor-pointer">
-        {visibleCreators.map((item: CreatorUserProfile) => {
+        {visibleCreators.map((item: UserProfile) => {
           const hasImage = item?.profilePic || item?.coverImageUrl;
 
           return (

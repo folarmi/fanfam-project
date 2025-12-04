@@ -22,7 +22,7 @@ const Notifications = () => {
   const toggleRearrangeModal = () => {
     setShowRearrangeModal(!showRearrangeModal);
   };
-
+  console.log(data);
   const [isActiveTab, setIsActiveTab] = useState("All");
   return (
     <>
@@ -119,3 +119,103 @@ const Notifications = () => {
 };
 
 export { Notifications };
+
+// {
+//     "endDate": "2026-01-02T11:59:00.29544",
+//     "creatorProfile": {
+//         "monthlyFee": 800,
+//         "personaInquiryId": "inq_2P9HD7sfvbt5KVdSpoUz7KKJhuto",
+//         "verified": true,
+//         "creatorBankInfo": {
+//             "country": "Nigeria",
+//             "bankName": "First Bank of Nigeria Limited",
+//             "bankCode": "098",
+//             "accountNo": "1234567890",
+//             "accountName": "Test User"
+//         },
+//         "freeTrialLinks": [
+//             {
+//                 "publicId": "201038TAW0U21201457RXZ23Z1202958O79D171",
+//                 "createdDate": null,
+//                 "lastModifiedDate": "2025-11-20T20:29:58.566577",
+//                 "lastModifiedBy": null,
+//                 "name": "Test two",
+//                 "limitSize": 25,
+//                 "endDate": "2025-11-18",
+//                 "duration": 14
+//             }
+//         ],
+//         "subscriptionBundles": [
+//             {
+//                 "publicId": "201038TAW0U21201457RXZ23Z1202958O79D1712031206UL4821213022UYPQOY1",
+//                 "createdDate": null,
+//                 "lastModifiedDate": "2025-11-20T21:30:22.420443",
+//                 "lastModifiedBy": null,
+//                 "amount": 600000,
+//                 "durationInMonths": 10,
+//                 "startDate": null,
+//                 "endDate": "2026-09-20"
+//             }
+//         ],
+//         "promotionCampaigns": [
+//             {
+//                 "publicId": "125537W126B41",
+//                 "createdDate": null,
+//                 "lastModifiedDate": "2025-11-23T05:47:32.984046",
+//                 "lastModifiedBy": null,
+//                 "name": "testName",
+//                 "limitSize": 10,
+//                 "endDate": "2025-12-23",
+//                 "duration": 30,
+//                 "message": null,
+//                 "qualifier": "EXPIRED_SUBSCRIBERS",
+//                 "type": "FIRST_MONTH_DISCOUNT"
+//             },
+//             {
+//                 "publicId": "173348S60P221",
+//                 "createdDate": null,
+//                 "lastModifiedDate": "2025-11-23T05:48:13.253361",
+//                 "lastModifiedBy": null,
+//                 "name": "testName",
+//                 "limitSize": 50,
+//                 "endDate": "2025-12-23",
+//                 "duration": 14,
+//                 "message": null,
+//                 "qualifier": "NEW_SUBSCRIBERS",
+//                 "type": "FIRST_MONTH_DISCOUNT"
+//             },
+//             {
+//                 "publicId": "201038TAW0U21201457RXZ23Z1202958O79D1712031206UL4821213022UYPQOY121345214CXXD1080458Q8Y75C11124456HY34P1",
+//                 "createdDate": null,
+//                 "lastModifiedDate": "2025-11-23T05:48:18.980767",
+//                 "lastModifiedBy": null,
+//                 "name": "testName",
+//                 "limitSize": 5,
+//                 "endDate": "2025-12-23",
+//                 "duration": 14,
+//                 "message": null,
+//                 "qualifier": "NEW_SUBSCRIBERS",
+//                 "type": "FIRST_MONTH_DISCOUNT"
+//             }
+//         ]
+//     },
+// "subscriber": {
+//     "phoneNumber": "+2348179866543",
+//     "usid": "fafam-202510139Mp2hLCg6N4Vg3YKD9ZeNSLUJPlk74iNYonZifJT",
+//     "role": "VIEWER",
+//     "email": "userFive@mailinator.com",
+//     "residence": null,
+//     "fullName": null,
+//     "gender": null,
+//     "location": null,
+//     "profilePic": null,
+//     "interest": null,
+//     "bio": null,
+//     "username": null,
+//     "websiteUrl": null,
+//     "displayName": null,
+//     "coverImageUrl": null,
+//     "creatorProfile": null
+// },
+//     "fee": 800
+// }

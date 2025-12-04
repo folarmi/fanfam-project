@@ -222,7 +222,7 @@ export interface CreatorProfile {
   promotionCampaigns: PromotionalCampaignType[];
 }
 
-export interface CreatorUserProfile {
+export interface UserProfile {
   phoneNumber: string;
   usid: string;
   role: UserRoleType;
@@ -241,7 +241,7 @@ export interface CreatorUserProfile {
   creatorProfile: CreatorProfile | null;
 }
 
-export const EMPTY_CREATOR_USER_PROFILE: CreatorUserProfile = {
+export const EMPTY_CREATOR_USER_PROFILE: UserProfile = {
   phoneNumber: "",
   usid: "",
   role: "VIEWER",
@@ -258,6 +258,11 @@ export const EMPTY_CREATOR_USER_PROFILE: CreatorUserProfile = {
   displayName: "",
   coverImageUrl: "",
   creatorProfile: null,
+};
+
+export type SubscriberProfile = UserProfile & {
+  endDate: string;
+  fee: string;
 };
 
 export interface Stat {
@@ -289,7 +294,7 @@ export interface ProfileHeaderProps {
 }
 
 export interface ProfileInfoProps {
-  profileData: CreatorUserProfile;
+  profileData: UserProfile;
   isExpanded: boolean;
   onToggleExpanded: () => void;
   showReadMore?: boolean;

@@ -122,7 +122,7 @@ const Home = () => {
       <div className="relative" ref={postRef}>
         <ViewPost
           publicId={data?.publicId}
-          profileName={profileData?.data?.displayName}
+          profileName={profileData?.data?.displayName || "Unknown User"}
           avatar={profileData?.data?.profilePic}
           handle={`@${profileData?.data?.username}`}
           time={formatTimeAgo(data?.createdDate)}

@@ -3,8 +3,26 @@ import avatar from "../../../../assets/avatarOne.svg";
 import { SubscriptionHeader } from "../settings/SubscriptionHeader";
 import Tabs from "../../../../components/forms/Tabs";
 import SubscribedCard from "../../../../components/cards/SubscribedCard";
+import { useGetData } from "@/hooks/apiCalls";
+import type { RootState } from "@/lib/store";
+import { useAppSelector } from "@/lib/hook";
+import { Loader } from "@/components/molecules/Loader";
+import type { SubscriberProfile } from "@/lib/types";
+import { convertToHumanReadableDate } from "@/utils/helper";
 
 const Subscribed = () => {
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+
+  const { data, isLoading: getProfileIsLoading } = useGetData({
+    url: `profile/${userObject?.email}`,
+    queryKey: ["GetProfileByEmail"],
+  });
+
+  const { data: getSubscriptions, isLoading } = useGetData({
+    url: `subscriptions?page=0&size=20`,
+    queryKey: ["GetSubscriptions"],
+  });
+  console.log(data);
   const [tabs] = useState([
     {
       id: 1,
@@ -23,57 +41,41 @@ const Subscribed = () => {
       name: "Attention Required",
     },
   ]);
+
   const [isActiveTab, setIsActiveTab] = useState("All Creators");
   return (
-    <div className="px-7">
-      <SubscriptionHeader />
+    <>
+      {getProfileIsLoading || isLoading ? (
+        <Loader />
+      ) : (
+        <div className="px-7">
+          <SubscriptionHeader />
 
-      <Tabs
-        tabsArray={tabs}
-        setIsActiveTab={setIsActiveTab}
-        isActiveTab={isActiveTab}
-      />
+          <Tabs
+            tabsArray={tabs}
+            setIsActiveTab={setIsActiveTab}
+            isActiveTab={isActiveTab}
+          />
 
-      <div className="mt-6 flex items-center w-full">
-        <SubscribedCard
-          img={avatar}
-          userName="Emmanuel Ekpess"
-          tag="@babyekpess"
-          expiryStatus="No Expiry"
-          buttonText="FOR FREE"
-          freeSub
-        />
-        <SubscribedCard
-          img={avatar}
-          userName="Emmanuel Ekpess"
-          tag="@babyekpess"
-          expiryStatus="31 Sept. 2024"
-          buttonText="$4.55"
-          freeSub
-        />
-      </div>
-
-      <div className="mt-[18px] flex items-center w-full">
-        <SubscribedCard
-          img={avatar}
-          userName="Saver Jesse"
-          tag="@jesseblink"
-          expiryStatus="Expires in 4 days"
-          buttonText="$15 per month"
-          expiryColor="#E19A05"
-          freeSub={false}
-        />
-        <SubscribedCard
-          img={avatar}
-          userName="Saver Jesse"
-          tag="@jesseblink"
-          expiryStatus="Expired"
-          buttonText="$23.45 per month"
-          expiryColor="#D10E0E"
-          freeSub={false}
-        />
-      </div>
-    </div>
+          <div className="mt-6 flex flex-wrap gap-4">
+            {getSubscriptions?.data?.content?.map((item: SubscriberProfile) => {
+              return (
+                <SubscribedCard
+                  img={avatar}
+                  userName={item?.displayName || "N/A"}
+                  tag={item?.username ? `@${item.username}` : "N/A"}
+                  expiryStatus={convertToHumanReadableDate(item?.endDate)}
+                  buttonText={item?.fee ? `$${item.fee} per month` : "FOR FREE"}
+                  freeSub
+                  key={item?.usid}
+                  profileName={item?.displayName || "Unknown User"}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

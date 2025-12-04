@@ -2,11 +2,11 @@ import React from "react";
 
 interface DefaultAvatarProps {
   fullName: string;
-  size?: string; // tailwind size e.g. "12", "14", "16"
-  rounded?: string; // tailwind rounding e.g. "full", "lg", "md"
-  bgColor?: string; // tailwind background e.g. "bg-blue-500"
-  textColor?: string; // tailwind text color e.g. "text-white"
-  className?: string; // extra custom styles
+  size?: string;
+  rounded?: string;
+  bgColor?: string;
+  textColor?: string;
+  className?: string;
 }
 
 const DefaultAvatar: React.FC<DefaultAvatarProps> = ({
@@ -19,9 +19,9 @@ const DefaultAvatar: React.FC<DefaultAvatarProps> = ({
 }) => {
   // Extract initials (supporting 1 or 2 names)
   const getInitials = (name: string) => {
-    const parts = name.trim().split(" ");
-    if (parts.length === 1) return parts[0][0]?.toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    const parts = name?.trim()?.split(" ");
+    if (parts?.length === 1) return parts[0][0]?.toUpperCase();
+    return (parts[0][0] + parts[parts?.length - 1][0])?.toUpperCase();
   };
 
   const initials = getInitials(fullName);

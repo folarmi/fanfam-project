@@ -13,8 +13,8 @@ import withAuth from "@/hoc/withAuth";
 const AccountLayout = () => {
   const dispatch = useAppDispatch();
   const [isActiveTab, setIsActiveTab] = useState("Add Card");
-  // const { userObject } = useAppSelector((state: RootState) => state.auth);
-  const userObject = { role: UserRole.creator }; // Mocked userObject for demonstration
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+  // const userObject = { role: UserRole.creator }; // Mocked userObject for demonstration
   const { showAccountOnMobile } = useAppSelector(
     (state: RootState) => state.settingMobile
   );
@@ -26,13 +26,13 @@ const AccountLayout = () => {
   };
 
   // Filter menu items for display
-  const filteredMenuItems = subscriptionMenu.filter((item) => {
+  const filteredMenuItems = subscriptionMenu?.filter((item) => {
     if (userObject.role === UserRole.creator) {
       // Show items for creators: items meant for creators and shared items
-      return item.isCreator === true || item.isCreator === false;
+      return item.isViewer === true || item.isViewer === false;
     } else {
       // Show items for regular users: items explicitly for users and shared items
-      return item.isCreator === false || item.isCreator === undefined;
+      return item.isViewer === true || item.isViewer === undefined;
     }
   });
 

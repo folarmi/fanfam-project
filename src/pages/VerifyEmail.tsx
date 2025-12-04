@@ -18,6 +18,7 @@ import {
 } from "../utils/helper";
 import { useCustomMutation } from "../hooks/apiCalls";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { getFCMToken } from "@/oauth/firebaseConfig";
 
 const VerifyEmail = () => {
   //   const navigate = useNavigate();
@@ -79,13 +80,14 @@ const VerifyEmailForm = () => {
     },
   });
 
-  const submitForm = () => {
+  const submitForm = async () => {
     const formData = {
       deviceOS: getDeviceOS(),
       deviceIP: ip,
       location: location,
       platform: platform,
       browser: browser,
+      firebaseClientToken: await getFCMToken(),
     };
     verifyUserMutation.mutate(formData);
   };
