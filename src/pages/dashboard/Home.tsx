@@ -28,6 +28,7 @@ const Home = () => {
       }`,
       queryKey: ["GetContents"],
     });
+
   const useRecordContentView = (contentId: string) => {
     return useCustomMutation({
       endpoint: `contents/${contentId}/view`,

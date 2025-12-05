@@ -11,8 +11,21 @@ import Modal from "./modals/Modal";
 import CreateFolder from "./cards/CreateFolder";
 import PersonPostModal from "./modals/PersonPostModal";
 import Timeline from "./cards/ViewPost";
+import { useGetData } from "@/hooks/apiCalls";
+import type { RootState } from "@/lib/store";
+import { useAppSelector } from "@/lib/hook";
+import { Loader } from "./molecules/Loader";
 
 const Post = () => {
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+
+  const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
+    useGetData({
+      url: `${`contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`}`,
+      queryKey: ["GetContents"],
+    });
+
+  console.log(getCreatorContent);
   const [isProfileTabActive, setIsProfileTabActive] = useState("All");
   const [profileTabs] = useState([
     {
@@ -57,112 +70,120 @@ const Post = () => {
   const tabsToDisplay = isMobile ? profileTabs.slice(0, 2) : profileTabs;
 
   return (
-    <div>
-      <div className={`my-4 flex items-center px-4 mr-[14px] justify-between `}>
-        {tabsToDisplay.map(({ id, name, number }) => {
-          return (
-            <div
-              onClick={() => setIsProfileTabActive(name)}
-              className={`flex items-center cursor-pointer px-[14px] py-[7px] rounded-3xl hover:bg-blue_200 ${
-                isProfileTabActive === name ? "bg-blue_200" : "bg-white"
-              }`}
-              key={id}
-            >
-              <Typography variant="p2" className="pr-1 text-grey_500">
-                {name}
-              </Typography>
-              {number && (
-                <Typography
-                  className={`${
-                    isProfileTabActive === name
-                      ? "text-grey_400"
-                      : "text-grey_900"
+    <>
+      {getCreatorContentIsLoading ? (
+        <Loader />
+      ) : (
+        <div>
+          <div
+            className={`my-4 flex items-center px-4 mr-[14px] justify-between `}
+          >
+            {tabsToDisplay.map(({ id, name, number }) => {
+              return (
+                <div
+                  onClick={() => setIsProfileTabActive(name)}
+                  className={`flex items-center cursor-pointer px-[14px] py-[7px] rounded-3xl hover:bg-blue_200 ${
+                    isProfileTabActive === name ? "bg-blue_200" : "bg-white"
                   }`}
-                  variant="subtitle2"
+                  key={id}
                 >
-                  {number}
-                </Typography>
-              )}
-            </div>
-          );
-        })}
+                  <Typography variant="p2" className="pr-1 text-grey_500">
+                    {name}
+                  </Typography>
+                  {number && (
+                    <Typography
+                      className={`${
+                        isProfileTabActive === name
+                          ? "text-grey_400"
+                          : "text-grey_900"
+                      }`}
+                      variant="subtitle2"
+                    >
+                      {number}
+                    </Typography>
+                  )}
+                </div>
+              );
+            })}
 
-        <img src={addFolder} alt="plus" className="md:hidden" />
+            <img src={addFolder} alt="plus" className="md:hidden" />
 
-        <div
-          onClick={toggleModal}
-          className="hidden md:flex items-center border border-grey_10 drop-shadow-7xl
+            <div
+              onClick={toggleModal}
+              className="hidden md:flex items-center border border-grey_10 drop-shadow-7xl
           py-2 px-3 bg-secondary-btn
            rounded-3xl cursor-pointer"
-        >
-          <Typography variant="subtitle3">Create Folder</Typography>
-          <img src={plus} alt="plus" />
+            >
+              <Typography variant="subtitle3">Create Folder</Typography>
+              <img src={plus} alt="plus" />
+            </div>
+
+            <img src={switchList} alt="demo" />
+          </div>
+
+          <div className="relative">
+            <Timeline
+              profileName="Priscilia yummy"
+              avatar={defaultAvatar}
+              handle="@yummychill54 ."
+              time="3 h ago"
+              paragraphOne="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
+        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
+        etra justo pretium sollic itudin digni ssim non solli citudin sit
+        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
+        dictum a."
+              paragraphTwo="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
+        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
+        etra justo pretium sollic itudin digni ssim non solli citudin sit
+        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
+        dictum a."
+              timeLineImage={timelineImage}
+              ifParagraph={true}
+              ifIcon={false}
+              bgColor="#fafafa"
+              showModal={showMoreModal}
+              // fix the  line below
+              toggleModal={toggleModal}
+              // setShowModal={setShowMoreModal}
+              TimeLineModal={<PersonPostModal />}
+            />
+          </div>
+
+          <div className="relative">
+            <Timeline
+              // fix the  line below
+              showModal={showMoreModal}
+              toggleModal={toggleModal}
+              profileName="Priscilia yummy"
+              avatar={defaultAvatar}
+              handle="@yummychill54 ."
+              time="3 h ago"
+              paragraphOne="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
+        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
+        etra justo pretium sollic itudin digni ssim non solli citudin sit
+        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
+        dictum a."
+              paragraphTwo="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
+        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
+        etra justo pretium sollic itudin digni ssim non solli citudin sit
+        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
+        dictum a."
+              timeLineImage={timelineTwo}
+              ifParagraph={true}
+              bgColor="#fafafa"
+              //   setShowMoreModal={setShowMoreModalTwo}
+              //   showMoreModal={showMoreModalTwo}
+            />
+          </div>
+
+          <Modal show={toggleCreateFolderModal} toggleModal={toggleModal}>
+            <div className="p-4">
+              <CreateFolder toggleModal={toggleModal} />
+            </div>
+          </Modal>
         </div>
-
-        <img src={switchList} alt="demo" />
-      </div>
-
-      <div className="relative">
-        <Timeline
-          profileName="Priscilia yummy"
-          avatar={defaultAvatar}
-          handle="@yummychill54 ."
-          time="3 h ago"
-          paragraphOne="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          paragraphTwo="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          timeLineImage={timelineImage}
-          ifParagraph={true}
-          ifIcon={false}
-          bgColor="#fafafa"
-          showModal={showMoreModal}
-          // fix the  line below
-          toggleModal={toggleModal}
-          // setShowModal={setShowMoreModal}
-          TimeLineModal={<PersonPostModal />}
-        />
-      </div>
-
-      <div className="relative">
-        <Timeline
-          // fix the  line below
-          showModal={showMoreModal}
-          toggleModal={toggleModal}
-          profileName="Priscilia yummy"
-          avatar={defaultAvatar}
-          handle="@yummychill54 ."
-          time="3 h ago"
-          paragraphOne="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          paragraphTwo="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          timeLineImage={timelineTwo}
-          ifParagraph={true}
-          bgColor="#fafafa"
-          //   setShowMoreModal={setShowMoreModalTwo}
-          //   showMoreModal={showMoreModalTwo}
-        />
-      </div>
-
-      <Modal show={toggleCreateFolderModal} toggleModal={toggleModal}>
-        <div className="p-4">
-          <CreateFolder toggleModal={toggleModal} />
-        </div>
-      </Modal>
-    </div>
+      )}
+    </>
   );
 };
 

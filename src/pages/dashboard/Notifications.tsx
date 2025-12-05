@@ -121,7 +121,7 @@ const Notifications = () => {
 export { Notifications };
 
 // {
-//     "endDate": "2026-01-02T11:59:00.29544",
+//     "endDate": "2026-01-03T10:21:43.429168",
 //     "creatorProfile": {
 //         "monthlyFee": 800,
 //         "personaInquiryId": "inq_2P9HD7sfvbt5KVdSpoUz7KKJhuto",
@@ -199,23 +199,23 @@ export { Notifications };
 //             }
 //         ]
 //     },
-// "subscriber": {
-//     "phoneNumber": "+2348179866543",
-//     "usid": "fafam-202510139Mp2hLCg6N4Vg3YKD9ZeNSLUJPlk74iNYonZifJT",
-//     "role": "VIEWER",
-//     "email": "userFive@mailinator.com",
-//     "residence": null,
-//     "fullName": null,
-//     "gender": null,
-//     "location": null,
-//     "profilePic": null,
-//     "interest": null,
-//     "bio": null,
-//     "username": null,
-//     "websiteUrl": null,
-//     "displayName": null,
-//     "coverImageUrl": null,
-//     "creatorProfile": null
-// },
+//     "subscriber": {
+//         "phoneNumber": "08184566783",
+//         "usid": "fafam-20251204DIg0dnSbgIaLXgkpg1I87nhfhaIREE6dSgCTIWO6",
+//         "role": "VIEWER",
+//         "email": "subCreator@mailinator.com",
+//         "residence": null,
+//         "fullName": null,
+//         "gender": null,
+//         "location": null,
+//         "profilePic": null,
+//         "interest": null,
+//         "bio": null,
+//         "username": null,
+//         "websiteUrl": null,
+//         "displayName": null,
+//         "coverImageUrl": null,
+//         "creatorProfile": null
+//     },
 //     "fee": 800
 // }

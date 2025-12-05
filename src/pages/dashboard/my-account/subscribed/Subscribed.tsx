@@ -1,5 +1,4 @@
 import { useState } from "react";
-import avatar from "../../../../assets/avatarOne.svg";
 import { SubscriptionHeader } from "../settings/SubscriptionHeader";
 import Tabs from "../../../../components/forms/Tabs";
 import SubscribedCard from "../../../../components/cards/SubscribedCard";
@@ -9,20 +8,34 @@ import { useAppSelector } from "@/lib/hook";
 import { Loader } from "@/components/molecules/Loader";
 import type { SubscriberProfile } from "@/lib/types";
 import { convertToHumanReadableDate } from "@/utils/helper";
+import { UserRole } from "@/data";
 
 const Subscribed = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const isCreator = userObject?.role === UserRole.creator;
 
-  const { data, isLoading: getProfileIsLoading } = useGetData({
-    url: `profile/${userObject?.email}`,
-    queryKey: ["GetProfileByEmail"],
-  });
-
-  const { data: getSubscriptions, isLoading } = useGetData({
-    url: `subscriptions?page=0&size=20`,
+  const {
+    data: getCreatorSubscriptions,
+    isLoading: getCreatorSubscriptionsIsLoading,
+  } = useGetData({
+    url: `subscriptions/creator/${userObject?.usid}/subscribers?page=0&size=20`,
     queryKey: ["GetSubscriptions"],
+    enabled: isCreator,
   });
-  console.log(data);
+
+  const {
+    data: getViewerSubscriptions,
+    isLoading: getViewerSubscriptionsIsLoading,
+  } = useGetData({
+    url: `subscriptions?page=0&size=20&subscriberEmail=${userObject?.email}`,
+    queryKey: ["GetSubscriptionsForViewer"],
+    enabled: !isCreator,
+  });
+
+  const subscribersData = isCreator
+    ? getCreatorSubscriptions
+    : getViewerSubscriptions;
+
   const [tabs] = useState([
     {
       id: 1,
@@ -43,9 +56,11 @@ const Subscribed = () => {
   ]);
 
   const [isActiveTab, setIsActiveTab] = useState("All Creators");
+
+  console.log(subscribersData?.data?.content);
   return (
     <>
-      {getProfileIsLoading || isLoading ? (
+      {getCreatorSubscriptionsIsLoading || getViewerSubscriptionsIsLoading ? (
         <Loader />
       ) : (
         <div className="px-7">
@@ -58,13 +73,15 @@ const Subscribed = () => {
           />
 
           <div className="mt-6 flex flex-wrap gap-4">
-            {getSubscriptions?.data?.content?.map((item: SubscriberProfile) => {
+            {subscribersData?.data?.content?.map((item: SubscriberProfile) => {
               return (
                 <SubscribedCard
-                  img={avatar}
+                  img={item?.profilePic}
                   userName={item?.displayName || "N/A"}
                   tag={item?.username ? `@${item.username}` : "N/A"}
-                  expiryStatus={convertToHumanReadableDate(item?.endDate)}
+                  expiryStatus={`Expires ${convertToHumanReadableDate(
+                    item?.endDate
+                  )}`}
                   buttonText={item?.fee ? `$${item.fee} per month` : "FOR FREE"}
                   freeSub
                   key={item?.usid}
