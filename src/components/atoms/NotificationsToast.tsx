@@ -22,7 +22,7 @@ function NotificationToast() {
 
   //   return cleaned;
   // };
-  console.log("toast", liveNotification);
+
   return (
     <div className="fixed top-4 right-4 bg-primary border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm z-[9999] animate-slide-in">
       <div className="flex items-start justify-between gap-3">
@@ -34,10 +34,10 @@ function NotificationToast() {
               className="w-12 h-12 rounded-full object-cover mb-2"
             />
           )}
-          <h4 className="font-semibold text-gray-900">
+          <h4 className="font-semibold text-white">
             {liveNotification?.title}
           </h4>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-white text-sm mt-1">
             {liveNotification?.body || ""}
           </p>
         </div>

@@ -1,63 +1,50 @@
 import Timeline from "./cards/ViewPost";
 import defaultAvatar from "../assets/defaultAvatar.svg";
-import timelineImage from "../assets/timelineImage.svg";
-import timelineTwo from "../assets/timelineTwo.svg";
+import type { ProfilePostProps, StoryPost } from "@/lib/types";
+import { Loader } from "./molecules/Loader";
+import { transformReactions } from "@/lib/reaction";
+import { formatTimeAgo } from "@/utils/helperTwo";
+import Typography from "./forms/Typography";
 
-const Replies = () => {
+const Replies = ({
+  creatorContent,
+  creatorContentIsLoading,
+}: ProfilePostProps) => {
+  const contentItems: StoryPost[] = creatorContent || [];
+  const postsWithReplies = contentItems?.filter(
+    (item) => item.meta.commentCount > 0
+  );
+
+  if (creatorContentIsLoading) {
+    return <Loader />;
+  }
   return (
     <div>
-      <div className="relative">
-        <Timeline
-          showModal={false}
-          toggleModal={() => {}}
-          profileName="Priscilia yummy"
-          avatar={defaultAvatar}
-          handle="@yummychill54 ."
-          time="3 h ago"
-          paragraphOne="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          paragraphTwo="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          timeLineImage={timelineImage}
-          ifParagraph={true}
-          ifIcon={false}
-          bgColor="#fafafa"
-          //   setShowMoreModal={setShowMoreModalTwo}
-          //   showMoreModal={showMoreModalTwo}
-        />
-      </div>
-
-      <div className="relative">
-        <Timeline
-          showModal={false}
-          toggleModal={() => {}}
-          profileName="Priscilia yummy"
-          avatar={defaultAvatar}
-          handle="@yummychill54 ."
-          time="3 h ago"
-          paragraphOne="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          paragraphTwo="Lorem ipsum dolor sit amet consectetur. Amet dolor arcu praesent
-        mi. Nulla sed cursus quis mas sa nato que at adip iscing. Phar
-        etra justo pretium sollic itudin digni ssim non solli citudin sit
-        pellentesque ipsum. Molestie dui tempus nec maecenas eget justo
-        dictum a."
-          timeLineImage={timelineTwo}
-          ifParagraph={true}
-          bgColor="#fafafa"
-          //   setShowMoreModal={setShowMoreModalTwo}
-          //   showMoreModal={showMoreModalTwo}
-        />
-      </div>
+      {postsWithReplies.length > 0 ? (
+        postsWithReplies.map((item) => (
+          <div className="relative" key={item.publicId}>
+            <Timeline
+              showModal={false}
+              toggleModal={() => {}}
+              profileName={item.creator.split("@")[0]}
+              avatar={defaultAvatar}
+              handle={`@${item.creator.split("@")[0]}`}
+              time={formatTimeAgo(item.createdDate)}
+              paragraphOne={item.message}
+              paragraphTwo=""
+              timeLineImage={item.mediaFiles || ""}
+              ifParagraph={true}
+              ifIcon={false}
+              bgColor="#fafafa"
+              reactionsData={transformReactions(item?.reactions)}
+            />
+          </div>
+        ))
+      ) : (
+        <div className="text-center py-8 text-grey_500">
+          <Typography variant="p2">No replies yet</Typography>
+        </div>
+      )}
     </div>
   );
 };

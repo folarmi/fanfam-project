@@ -1,11 +1,8 @@
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// import ashMore from "../../assets/icons/ashMore.svg";
 import React, { useEffect, useRef } from "react";
 import PostCard, { type PostCardProps } from "./Postcard";
 import { MoreHorizontal } from "lucide-react";
-// import Modal from "../modals/Modal";
-// import { CommentOnPost } from "../modals/CommentOnPost";
 
 interface ViewPostProps extends Omit<PostCardProps, "headerActions"> {
   showModal?: boolean;

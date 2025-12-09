@@ -15,6 +15,7 @@ import { ProfileActions } from "@/components/molecules/ProfileActions";
 import { TipModal } from "@/components/molecules/TipModal";
 import { actions } from "@/data";
 import type { TipData } from "@/lib/types";
+import { useGetData } from "@/hooks/apiCalls";
 
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -53,6 +54,12 @@ const Profile = () => {
       setShowTipModal(!showTipModal);
     }
   };
+
+  const { data: creatorContent, isLoading: creatorContentIsLoading } =
+    useGetData({
+      url: `${`contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`}`,
+      queryKey: ["GetUserContent"],
+    });
 
   return (
     <>
@@ -145,136 +152,6 @@ const Profile = () => {
               </section>
             </ProfileHeader>
 
-            {/* <img src={suggestTwo} alt="demo" className="w-full" /> */}
-
-            {/* <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
-              <div className="relative flex items-center">
-                <div className="absolute -top-8 ">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
-                    <img
-                      src={data?.data?.profilePic}
-                      alt="profilePicture"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-
-                <div className="w-full mt-6 flex items-center justify-between">
-                  <div className="flex items-center gap-x-4 justify-between w-full">
-                    <div className="hidden md:flex items-center ml-28">
-                      <img src={location} alt="location" />
-                      <Typography className="text-grey_400 pl-1" variant="p3">
-                        Nigeria
-                      </Typography>
-                    </div>
-
-                    <div className="cursor-pointer">
-                      <CircleChat className="cursor-pointer hover:fill-blue_200" />
-                    </div>
-
-                    <div className="cursor-pointer" onClick={toggleTipModal}>
-                      <CirclePay className="cursor-pointer hover:fill-blue_200" />
-                    </div>
-
-
-                    <div className="hidden md:block">
-                      <img src={circleStar} alt="circleStar" />
-                    </div>
-
-                    <>
-                      {" "}
-                      <Link to="/dashboard/profile/promote">
-                        <CustomButton
-                          variant="primary"
-                          primaryButtonSize="xs px-3"
-                        >
-                          Promote Profile
-                        </CustomButton>
-                      </Link>
-                      <BlueBorderedButton
-                        onClick={() =>
-                          navigate("/dashboard/profile/edit-profile")
-                        }
-                        text="Edit Profile"
-                      />
-                    </>
-
-                    <div className="relative">
-                      <img
-                        src={moreIcon}
-                        alt="horizontalMore"
-                        className="cursor-pointer"
-                        onClick={toggleCommentModal}
-                        loading="lazy"
-                      />
-                      {commentModal && (
-                        <div className="mt-5 flex flex-col absolute right-[95%] top-[100%] bg-modal-gradient shadow-triple w-[262px] rounded-2xl border-2 border-white z-50">
-                          <div className="flex items-center justify-between py-2 hover:bg-blue_200 hover:rounded-lg cursor-pointer px-6">
-                            <Typography variant="p2" className="text-grey_700">
-                              Copy link to profile
-                            </Typography>
-                            <img src={copy} alt="copy" />
-                          </div>
-                          <ModalContent
-                            content={commentOptions}
-                            onClick={getModalValue}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <section className="mt-10">
-                <div className="md:hidden flex items-center ">
-                  <img src={location} alt="location" />
-                  <Typography className="text-grey_400 pl-1" variant="p3">
-                    {data?.data?.location || "N/A"}
-                  </Typography>
-                </div>
-                <div className="flex items-center">
-                  <Typography
-                    variant="titleTwo"
-                    className="text-grey_800 font-bold pr-1"
-                  >
-                    {data?.data?.fullName || ""}
-                  </Typography>
-                </div>
-
-                <Typography variant="p2" className="text-grey_800 pt-[2px]">
-                  {data?.data?.username || ""}
-                </Typography>
-
-                <Typography variant="p2" className="text-grey_700 py-4">
-                  {data?.data?.bio || "N/A"}
-                  {isExpanded && (
-                    <>
-                      <span>
-                        {" "}
-                        .... Duis lacinia ligula sit amet lacus egestas, non
-                        cursus magna vestibulum. Sed malesuada, eros ut blandit
-                        vehicula, nisi sapien volutpat turpis, non fermentum
-                        lectus ligula sit amet odio. Suspendisse potenti. Nullam
-                        aliquet tincidunt erat, ut condimentum ligula luctus eu.
-                        Nam vitae turpis non urna fermentum volutpat sit amet a
-                        odio. Sed auctor, ex nec blandit aliquam, nisl nunc
-                        dignissim lorem, sed efficitur orci justo ut justo.{" "}
-                      </span>
-                    </>
-                  )}
-                  {isActiveTab === "Replies" && (
-                    <span
-                      onClick={toggleReadMore}
-                      className="font-medium text-sm text-blue_500 cursor-pointer"
-                    >
-                      read {isExpanded ? "less" : "more"}
-                    </span>
-                  )}
-                </Typography>
-              </section>
-            </section> */}
-
             <div className="flex items-center justify-between bg-grey_20 border-b border-grey_40 mt-2">
               {tabs.map(({ id, name }) => {
                 return (
@@ -300,9 +177,24 @@ const Profile = () => {
 
             {/* Stop composing here */}
 
-            {isActiveTab === "Post" && <Post />}
-            {isActiveTab === "Replies" && <Replies />}
-            {isActiveTab === "Media" && <Media />}
+            {isActiveTab === "Post" && (
+              <Post
+                creatorContent={creatorContent?.data?.content}
+                creatorContentIsLoading={creatorContentIsLoading}
+              />
+            )}
+            {isActiveTab === "Replies" && (
+              <Replies
+                creatorContent={creatorContent?.data?.content}
+                creatorContentIsLoading={creatorContentIsLoading}
+              />
+            )}
+            {isActiveTab === "Media" && (
+              <Media
+                creatorContent={creatorContent?.data?.content}
+                creatorContentIsLoading={creatorContentIsLoading}
+              />
+            )}
           </div>
 
           {showModal && (

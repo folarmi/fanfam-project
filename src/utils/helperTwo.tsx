@@ -4,23 +4,37 @@ import type {
   PromotionCampaignQualifier,
   PromotionCampaignType,
 } from "@/lib/types";
-import { formatDistanceToNowStrict } from "date-fns";
+// import { formatDistanceToNowStrict } from "date-fns";
 
-export const formatTimeAgo = (date?: string): string => {
-  if (!date) return "";
-  return formatDistanceToNowStrict(new Date(date), { addSuffix: true })
-    .replace("seconds", "s")
-    .replace("second", "s")
-    .replace("minutes", "m")
-    .replace("minute", "m")
-    .replace("hours", "h")
-    .replace("hour", "h")
-    .replace("days", "d")
-    .replace("day", "d")
-    .replace("months", "mo")
-    .replace("month", "mo")
-    .replace("years", "y")
-    .replace("year", "y");
+// export const formatTimeAgo = (date?: string): string => {
+//   if (!date) return "";
+//   return formatDistanceToNowStrict(new Date(date), { addSuffix: true })
+//     .replace("seconds", "s")
+//     .replace("second", "s")
+//     .replace("minutes", "m")
+//     .replace("minute", "m")
+//     .replace("hours", "h")
+//     .replace("hour", "h")
+//     .replace("days", "d")
+//     .replace("day", "d")
+//     .replace("months", "mo")
+//     .replace("month", "mo")
+//     .replace("years", "y")
+//     .replace("year", "y");
+// };
+
+export const formatTimeAgo = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 };
 
 export const getFileName = (url: string): string => {

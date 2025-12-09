@@ -352,3 +352,8 @@ export type FCMNotificationPayload = {
     time: string;
   };
 };
+
+export type ProfilePostProps = {
+  creatorContent: any;
+  creatorContentIsLoading: boolean;
+};
