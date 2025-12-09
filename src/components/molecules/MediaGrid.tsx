@@ -14,11 +14,12 @@ const MediaGrid: React.FC<MediaGridProps> = ({
     <div className="w-full my-4">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-1">
         {timeLineImage?.slice(0, 6).map((media, index) => {
-          const isImage = media.mediaType === "PHOTO";
-          const isVideo = media.mediaType === "VIDEO";
-          const isDocument = media.mediaType === "DOCUMENT";
+          const isImage = media?.mediaType === "PHOTO";
+          const isVideo = media?.mediaType === "VIDEO";
+          const isDocument = media?.mediaType === "DOCUMENT";
+          const isAudio = media?.mediaType === "AUDIO";
           const hasMore = timeLineImage.length > 6 && index === 5;
-
+          console.log(media);
           return (
             <div
               key={`${media?.mediaLink}-${index}`}
@@ -55,6 +56,21 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                 >
                   Your browser does not support the video tag.
                 </video>
+              )}
+
+              {isAudio && (
+                <div className="w-full h-full bg-gray-100 rounded flex flex-col items-center justify-center p-2">
+                  <audio
+                    controls
+                    src={media?.mediaLink}
+                    className="w-full"
+                    preload="metadata"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <span className="text-xs text-gray-700 mt-1 line-clamp-1">
+                    {getFileName(media?.mediaLink)}
+                  </span>
+                </div>
               )}
 
               {isDocument && (

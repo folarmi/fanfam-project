@@ -32,6 +32,12 @@ const PostUploader = ({
         "doc",
         "docx",
         "txt",
+        // Audio
+        "mp3",
+        "wav",
+        "aac",
+        "m4a",
+        "ogg",
       ]}
       multiple={true}
       onFileUpload={handleFileUpload}
@@ -65,6 +71,13 @@ const PostUploader = ({
                     <video
                       src={preview.url}
                       className="w-20 h-20 object-cover rounded"
+                    />
+                  )}
+                  {preview.file.type.startsWith("audio/") && (
+                    <audio
+                      controls
+                      src={preview.url}
+                      className="w-40 h-10 rounded"
                     />
                   )}
                   {preview.file.type.startsWith("application/") && (
