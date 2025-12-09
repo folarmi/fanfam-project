@@ -12,7 +12,7 @@ const PostUploader = ({
 }: PostUploaderProps) => {
   return (
     <CustomFileUploader
-      maxSizeMB={50}
+      maxSizeMB={20}
       acceptFormats={[
         // Images
         "jpg",

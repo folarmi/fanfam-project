@@ -10,6 +10,7 @@ import MediaUploadGrid from "./molecules/MediaUploadGrid";
 import { getMediaType } from "@/utils/helperTwo";
 import { useUploadFiles } from "@/hooks/useUploadFiles";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 type CommentBoxProp = {
   ifPoll?: boolean;
@@ -42,11 +43,11 @@ const CommentBox = ({
     reset: resetFiles,
   } = useUploadFiles({
     usid: userObject?.usid,
-    onSuccess: (mediaItems) => {
-      console.log("Upload successful:", mediaItems);
+    onSuccess: () => {
+      resetFiles();
     },
     onError: (error) => {
-      console.error("Upload failed:", error);
+      toast.error(error?.message);
       // Show toast notification
     },
   });
