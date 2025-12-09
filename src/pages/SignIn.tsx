@@ -21,6 +21,7 @@ import TextBetweenLines from "../components/molecules/TextBetweenLines";
 import { useSignIn } from "@/hooks/useSignIn";
 import { GoogleSignIn } from "@/oauth/Google";
 import { getFCMToken } from "@/oauth/firebaseConfig";
+import { toast } from "react-toastify";
 
 const SignIn = () => {
   const { control, handleSubmit, getValues } = useForm();
@@ -57,6 +58,37 @@ const SignIn = () => {
   }, []);
 
   const submitForm = async (data: any) => {
+    let fcmToken = null;
+
+    try {
+      // Check current permission
+
+      // If permission is blocked, inform user
+      if (Notification.permission === "denied") {
+        console.warn(
+          "⚠️ Notification permission is blocked. User needs to enable it in browser settings."
+        );
+        // You can show a toast or message to the user here
+        toast.warning(
+          "Please enable notifications in your browser settings to receive updates"
+        );
+      } else if (Notification.permission === "default") {
+        // Request permission if not yet asked
+        const permission = await Notification.requestPermission();
+        console.log("Permission request result:", permission);
+
+        if (permission === "granted") {
+          fcmToken = await getFCMToken();
+        }
+      } else if (Notification.permission === "granted") {
+        // Permission already granted
+        fcmToken = await getFCMToken();
+      }
+    } catch (error) {
+      console.error("Error getting FCM token:", error);
+      // Don't block login if FCM token fails
+    }
+
     const formValues = {
       email: data.email,
       password: data.password,
@@ -66,7 +98,7 @@ const SignIn = () => {
         location: location,
         platform: platform,
         browser: browser,
-        firebaseClientToken: await getFCMToken(),
+        firebaseClientToken: fcmToken,
       },
     };
 

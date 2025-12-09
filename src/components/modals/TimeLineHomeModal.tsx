@@ -8,14 +8,20 @@ import { ConfirmActionModal } from "./ConfirmActionModal";
 import { EditPost } from "./EditPost";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useQueryClient } from "@tanstack/react-query";
+import type { RootState } from "@/lib/store";
+import { useAppSelector } from "@/lib/hook";
 
 type Prop = {
   publicId: string;
+  createdBy: string;
   toggleTimelineHomeModal: () => void;
 };
 
-const TimeLineHomeModal = ({ publicId }: Prop) => {
+const TimeLineHomeModal = ({ publicId, createdBy }: Prop) => {
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const isOwner = userObject?.email === createdBy;
   const queryClient = useQueryClient();
+  // console.log(createdBy);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -60,6 +66,18 @@ const TimeLineHomeModal = ({ publicId }: Prop) => {
         console.warn("Unknown action:", item);
     }
   };
+
+  const menuItems = [
+    { id: 1, name: "Add Bookmark" },
+    { id: 2, name: "Repost" },
+    ...(isOwner
+      ? [
+          { id: 3, name: "Edit post" },
+          { id: 4, name: "Delete post" },
+        ]
+      : []),
+  ];
+
   return (
     <>
       <div className="flex items-center justify-between py-2 hover:bg-blue_200 hover:rounded-lg cursor-pointer px-6">
@@ -69,12 +87,7 @@ const TimeLineHomeModal = ({ publicId }: Prop) => {
         <img src={copy} alt="copy" />
       </div>
       <ModalContent
-        content={[
-          { id: 1, name: "Add Bookmark" },
-          { id: 2, name: "Repost" },
-          { id: 3, name: "Edit post" },
-          { id: 4, name: "Delete post" },
-        ]}
+        content={menuItems}
         onClick={(item: string) => {
           handleModal(item);
         }}

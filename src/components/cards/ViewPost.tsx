@@ -45,13 +45,6 @@ const ViewPost: React.FC<ViewPostProps> = ({
     };
   }, [showModal, toggleModal]);
 
-  // const reactionsData: ReactionItem[] = [
-  //   { type: "LIKE", icon: Like, number: 0 },
-  //   { type: "DISLIKE", icon: Dislike, number: 0 },
-  //   { type: "LOL", icon: Lol, number: 0 },
-  //   { type: "LOVE", icon: Love, number: 0 },
-  // ];
-
   return (
     <PostCard
       {...postProps}

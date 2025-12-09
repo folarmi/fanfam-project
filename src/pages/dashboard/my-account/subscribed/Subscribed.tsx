@@ -31,7 +31,7 @@ const Subscribed = () => {
     queryKey: ["GetSubscriptionsForViewer"],
     enabled: !isCreator,
   });
-
+  console.log(getViewerSubscriptions?.data?.content);
   const subscribersData = isCreator
     ? getCreatorSubscriptions
     : getViewerSubscriptions;
@@ -57,7 +57,6 @@ const Subscribed = () => {
 
   const [isActiveTab, setIsActiveTab] = useState("All Creators");
 
-  console.log(subscribersData?.data?.content);
   return (
     <>
       {getCreatorSubscriptionsIsLoading || getViewerSubscriptionsIsLoading ? (

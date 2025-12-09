@@ -328,3 +328,27 @@ export type IconAndNumberProp = {
   publicid: string | undefined;
   isActive?: boolean;
 };
+
+export interface NotificationType {
+  subject: string;
+  to: string;
+  from: string;
+  message: string;
+  createdAt: string;
+  attachments: string[] | null;
+  updatedAt: string;
+}
+
+export type FCMNotificationPayload = {
+  from: string;
+  messageId: string;
+  notification: {
+    title: string;
+    body: string;
+    image: string;
+  };
+  data: {
+    Post: string;
+    time: string;
+  };
+};

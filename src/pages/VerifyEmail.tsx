@@ -88,6 +88,8 @@ const VerifyEmailForm = () => {
       platform: platform,
       browser: browser,
       firebaseClientToken: await getFCMToken(),
+      // firebaseClientToken:
+      //   "BIzRklo4oMu3MoSqf6_Y6FAJfhEgWxhoOiWB8oXunj2FedcHAi3Xxd40Bj9NAxwy7Sw7ID13Pc1xI22bhnW11HI",
     };
     verifyUserMutation.mutate(formData);
   };

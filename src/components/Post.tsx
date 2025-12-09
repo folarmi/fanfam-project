@@ -25,7 +25,6 @@ const Post = () => {
       queryKey: ["GetContents"],
     });
 
-  console.log(getCreatorContent);
   const [isProfileTabActive, setIsProfileTabActive] = useState("All");
   const [profileTabs] = useState([
     {

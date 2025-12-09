@@ -65,7 +65,7 @@ const PostCard: React.FC<PostCardProps> = ({
     >
       {/* Header Section */}
       <header className="flex items-start px-4 relative">
-        {avatar === null ? (
+        {!avatar ? (
           <DefaultAvatar fullName={profileName} />
         ) : (
           <img

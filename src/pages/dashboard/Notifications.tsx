@@ -1,28 +1,27 @@
 import { useState } from "react";
 import SearchInput from "../../components/SearchInput";
-import { notificationSampleData, notificationTabs } from "../../data";
+import { notificationTabs } from "../../data";
 import Typography from "../../components/forms/Typography";
 import Modal from "../../components/modals/Modal";
 import RearrangeNotificationCategories from "../../components/modals/RearrangeNotificationCategories";
 import block from "../../assets/icons/block.svg";
-import verifyBlue from "../../assets/icons/verifyBlue.svg";
-import { useGetData } from "@/hooks/apiCalls";
+import defaultAvatar from "../../assets/defaultAvatar.svg";
 import { Loader } from "@/components/molecules/Loader";
-import type { RootState } from "@/lib/store";
-import { useAppSelector } from "@/lib/hook";
+import type { NotificationType } from "@/lib/types";
+import { convertToHumanReadableDate } from "@/utils/helper";
+import { useNotifications } from "@/context/NotificationsContext";
 
 const Notifications = () => {
   const [showRearrangeModal, setShowRearrangeModal] = useState(false);
-  const { userObject } = useAppSelector((state: RootState) => state.auth);
-  const { data, isLoading: getNotificationsIsLoading } = useGetData({
-    url: `notifications?email=${userObject?.email}`,
-    queryKey: ["GetNotificationsByEmail"],
-  });
+  const {
+    notifications: notificationsData,
+    isLoading: getNotificationsIsLoading,
+  } = useNotifications();
 
   const toggleRearrangeModal = () => {
     setShowRearrangeModal(!showRearrangeModal);
   };
-  console.log(data);
+
   const [isActiveTab, setIsActiveTab] = useState("All");
   return (
     <>
@@ -58,11 +57,18 @@ const Notifications = () => {
             </div>
 
             <div className="">
-              {notificationSampleData.map(
-                ({ id, name, message, photo, tag, time }) => {
+              {notificationsData?.map(
+                ({ message, createdAt, from }: NotificationType) => {
                   return (
-                    <div key={id} className="flex py-4 border-b border-grey_10">
-                      <img src={photo} alt="demo" className="w-10 h-10" />
+                    <div
+                      key={createdAt}
+                      className="flex py-4 border-b border-grey_10"
+                    >
+                      <img
+                        src={defaultAvatar}
+                        alt="demo"
+                        className="w-10 h-10"
+                      />
 
                       <div className="ml-3">
                         <div className="flex items-center mb-1">
@@ -70,24 +76,12 @@ const Notifications = () => {
                             variant="titleTwo"
                             className="text-grey_900"
                           >
-                            {name}
+                            {from}
                           </Typography>
 
-                          <img
-                            src={verifyBlue}
-                            alt="demo"
-                            className="ml-[1px] h-4 w-4"
-                          />
-
-                          <Typography
-                            variant="p2"
-                            className="text-grey_400 pl-2"
-                          >
-                            {tag}
-                          </Typography>
                           <div className="w-[2px] h-[2px] bg-grey_300 mx-[6px]"></div>
                           <Typography variant="p2" className="text-grey_400">
-                            {time}
+                            {convertToHumanReadableDate(createdAt)}
                           </Typography>
                         </div>
 
@@ -119,103 +113,3 @@ const Notifications = () => {
 };
 
 export { Notifications };
-
-// {
-//     "endDate": "2026-01-03T10:21:43.429168",
-//     "creatorProfile": {
-//         "monthlyFee": 800,
-//         "personaInquiryId": "inq_2P9HD7sfvbt5KVdSpoUz7KKJhuto",
-//         "verified": true,
-//         "creatorBankInfo": {
-//             "country": "Nigeria",
-//             "bankName": "First Bank of Nigeria Limited",
-//             "bankCode": "098",
-//             "accountNo": "1234567890",
-//             "accountName": "Test User"
-//         },
-//         "freeTrialLinks": [
-//             {
-//                 "publicId": "201038TAW0U21201457RXZ23Z1202958O79D171",
-//                 "createdDate": null,
-//                 "lastModifiedDate": "2025-11-20T20:29:58.566577",
-//                 "lastModifiedBy": null,
-//                 "name": "Test two",
-//                 "limitSize": 25,
-//                 "endDate": "2025-11-18",
-//                 "duration": 14
-//             }
-//         ],
-//         "subscriptionBundles": [
-//             {
-//                 "publicId": "201038TAW0U21201457RXZ23Z1202958O79D1712031206UL4821213022UYPQOY1",
-//                 "createdDate": null,
-//                 "lastModifiedDate": "2025-11-20T21:30:22.420443",
-//                 "lastModifiedBy": null,
-//                 "amount": 600000,
-//                 "durationInMonths": 10,
-//                 "startDate": null,
-//                 "endDate": "2026-09-20"
-//             }
-//         ],
-//         "promotionCampaigns": [
-//             {
-//                 "publicId": "125537W126B41",
-//                 "createdDate": null,
-//                 "lastModifiedDate": "2025-11-23T05:47:32.984046",
-//                 "lastModifiedBy": null,
-//                 "name": "testName",
-//                 "limitSize": 10,
-//                 "endDate": "2025-12-23",
-//                 "duration": 30,
-//                 "message": null,
-//                 "qualifier": "EXPIRED_SUBSCRIBERS",
-//                 "type": "FIRST_MONTH_DISCOUNT"
-//             },
-//             {
-//                 "publicId": "173348S60P221",
-//                 "createdDate": null,
-//                 "lastModifiedDate": "2025-11-23T05:48:13.253361",
-//                 "lastModifiedBy": null,
-//                 "name": "testName",
-//                 "limitSize": 50,
-//                 "endDate": "2025-12-23",
-//                 "duration": 14,
-//                 "message": null,
-//                 "qualifier": "NEW_SUBSCRIBERS",
-//                 "type": "FIRST_MONTH_DISCOUNT"
-//             },
-//             {
-//                 "publicId": "201038TAW0U21201457RXZ23Z1202958O79D1712031206UL4821213022UYPQOY121345214CXXD1080458Q8Y75C11124456HY34P1",
-//                 "createdDate": null,
-//                 "lastModifiedDate": "2025-11-23T05:48:18.980767",
-//                 "lastModifiedBy": null,
-//                 "name": "testName",
-//                 "limitSize": 5,
-//                 "endDate": "2025-12-23",
-//                 "duration": 14,
-//                 "message": null,
-//                 "qualifier": "NEW_SUBSCRIBERS",
-//                 "type": "FIRST_MONTH_DISCOUNT"
-//             }
-//         ]
-//     },
-//     "subscriber": {
-//         "phoneNumber": "08184566783",
-//         "usid": "fafam-20251204DIg0dnSbgIaLXgkpg1I87nhfhaIREE6dSgCTIWO6",
-//         "role": "VIEWER",
-//         "email": "subCreator@mailinator.com",
-//         "residence": null,
-//         "fullName": null,
-//         "gender": null,
-//         "location": null,
-//         "profilePic": null,
-//         "interest": null,
-//         "bio": null,
-//         "username": null,
-//         "websiteUrl": null,
-//         "displayName": null,
-//         "coverImageUrl": null,
-//         "creatorProfile": null
-//     },
-//     "fee": 800
-// }

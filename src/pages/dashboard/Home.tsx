@@ -32,9 +32,7 @@ const Home = () => {
   const useRecordContentView = (contentId: string) => {
     return useCustomMutation({
       endpoint: `contents/${contentId}/view`,
-      onSuccessCallback: () => {
-        console.log("Content view recorded for", contentId);
-      },
+      onSuccessCallback: () => {},
     });
   };
 
@@ -142,6 +140,7 @@ const Home = () => {
             <TimeLineHomeModal
               toggleTimelineHomeModal={toggleTimelineHomeModal}
               publicId={data?.publicId}
+              createdBy={data?.createdBy}
             />
           }
           reactionsData={transformReactions(data?.reactions)}

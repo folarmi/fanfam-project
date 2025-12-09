@@ -11,10 +11,17 @@ import CustomButton from "@/components/forms/CustomButton";
 // import { SubscriptionBundle } from "@/components/molecules/SubscriptionBundle";
 import { EMPTY_BUNDLE, type SubscriptionBundle } from "@/lib/types";
 import { ProfileSubscriptionBundle } from "@/components/molecules/ProfileSubscriptionBundle";
+import type { RootState } from "@/lib/store";
+import { useAppSelector } from "@/lib/hook";
+import { isActivelySubscribed } from "@/utils/helperTwo";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UnsubscribedProfile = () => {
   const { id } = useParams();
   const { email } = useLocation().state;
+  const queryClient = useQueryClient();
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+
   const [confirmSubscription, setConfirmSubscription] = useState(false);
   const [selectedBundle, setSelectedBundle] = useState(EMPTY_BUNDLE);
   const [showSubscription] = useState(true);
@@ -28,10 +35,37 @@ const UnsubscribedProfile = () => {
     queryKey: ["GetProfileByEmail", email],
   });
 
+  const {
+    data: getViewerSubscriptions,
+    isLoading: getViewerSubscriptionsIsLoading,
+  } = useGetData({
+    url: `subscriptions?page=0&size=20&subscriberEmail=${userObject?.email}`,
+    queryKey: ["GetSubscriptionsForViewer"],
+    // enabled: !isCreator,
+  });
+
+  const currentSub = isActivelySubscribed(
+    getViewerSubscriptions?.data?.content,
+    id
+  );
+  const isSubscribed = currentSub ? currentSub.isActive : false;
+
   const subscribeToCreatorMutation = useCustomMutation({
     endpoint: `subscriptions/subscribe/${id}?planPass=${selectedBundle?.amount}`,
-    // method: "delete",
-    successMessage: () => "Subscription successfull",
+    successMessage: () => "Subscription successful",
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["GetSubscriptionsForViewer"],
+        exact: false,
+      });
+    },
+  });
+
+  const unSubscribeFromCreatorMutation = useCustomMutation({
+    method: "delete",
+    endpoint: `subscriptions/unsubscribe/${currentSub?.subscription?.publicId}`,
+    // endpoint: `subscriptions/unsubscribe/fafam-20251204DIg0dnSbgIaLXgkpg1I87nhfhaIREE6dSgCTIWO6`,
+    successMessage: () => "You have been unsubscribed",
     onSuccessCallback: () => {
       // refetch();
     },
@@ -39,7 +73,7 @@ const UnsubscribedProfile = () => {
 
   return (
     <>
-      {getCreatorIsLoading ? (
+      {getCreatorIsLoading || getViewerSubscriptionsIsLoading ? (
         <Loader />
       ) : (
         <div className="w-full relative">
@@ -82,7 +116,7 @@ const UnsubscribedProfile = () => {
                     variant="primary"
                     primaryButtonSize="xs px-3 "
                   >
-                    Subscribe
+                    {isSubscribed ? " Unsubscribe" : "Subscribe"}
                   </CustomButton>
                 </div>
 
@@ -141,11 +175,21 @@ const UnsubscribedProfile = () => {
             <div className="p-4">
               <ConfirmActionModal
                 toggleModal={toggleSubscriptionModal}
-                message=" Are you sure you want to subscribe to this creator?"
-                title="Subscribe to Creator"
-                deleteFn={subscribeToCreatorMutation.mutate}
+                message={`Are you sure you want to ${
+                  isSubscribed ? "unsubscribe from" : "subscribe to"
+                } this creator?`}
+                title={`${
+                  isSubscribed ? "Unsubscribe" : "Subscribe "
+                } to Creator?`}
+                deleteFn={
+                  isSubscribed
+                    ? unSubscribeFromCreatorMutation.mutate
+                    : subscribeToCreatorMutation.mutate
+                }
                 isDeleting={subscribeToCreatorMutation.isPending}
-                buttonText="Yes, Subscribe"
+                buttonText={`${
+                  isSubscribed ? "Yes, unsubscribe" : "Yes, Subscribe"
+                }`}
               />
             </div>
           </Modal>
