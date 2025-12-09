@@ -34,8 +34,8 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
   };
 
   return (
-    <div className="w-full mt-6 flex items-center justify-between">
-      <div className="flex items-center gap-x-4 justify-between w-full">
+    <div className="w-full mt-6 flex items-center ">
+      <div className="flex items-center gap-x-4 w-full">
         {showLocation && location && (
           <div className="hidden md:flex items-center ml-28">
             <img src={locationIcon} alt="location" />
@@ -46,14 +46,14 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
         {actions?.map((action, index) => (
           <div
             key={index}
-            className="cursor-pointer"
+            className="cursor-pointer ml-auto"
             onClick={() => onActionClick?.(action.type)}
           >
             {action.component}
           </div>
         ))}
 
-        <div className="relative">
+        <div className="relative ">
           <img
             src={moreIcon}
             alt="horizontalMore"

@@ -65,6 +65,8 @@ export const useUploadFiles = (
             ? "PHOTO"
             : file.type.startsWith("video/")
             ? "VIDEO"
+            : file.type.startsWith("audio/")
+            ? "AUDIO"
             : "DOCUMENT";
 
           mediaLinks?.push({

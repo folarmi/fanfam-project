@@ -1,10 +1,10 @@
 import { useState } from "react";
 import SearchInput from "../../components/SearchInput";
-import { notificationTabs } from "../../data";
+// import { notificationTabs } from "../../data";
 import Typography from "../../components/forms/Typography";
 import Modal from "../../components/modals/Modal";
 import RearrangeNotificationCategories from "../../components/modals/RearrangeNotificationCategories";
-import block from "../../assets/icons/block.svg";
+// import block from "../../assets/icons/block.svg";
 import defaultAvatar from "../../assets/defaultAvatar.svg";
 import { Loader } from "@/components/molecules/Loader";
 import type { NotificationType } from "@/lib/types";
@@ -22,7 +22,7 @@ const Notifications = () => {
     setShowRearrangeModal(!showRearrangeModal);
   };
 
-  const [isActiveTab, setIsActiveTab] = useState("All");
+  // const [isActiveTab, setIsActiveTab] = useState("All");
   return (
     <>
       {getNotificationsIsLoading ? (
@@ -32,7 +32,7 @@ const Notifications = () => {
           <SearchInput ifBlur={false} />
 
           <section className="bg-grey_20 drop-shadow-4xl p-4">
-            <div className="flex items-center overflow-x-scroll">
+            {/* <div className="flex items-center overflow-x-scroll">
               {notificationTabs?.map(({ id, name }) => {
                 return (
                   <div
@@ -54,7 +54,7 @@ const Notifications = () => {
                 className="w-6 h-6 cursor-pointer"
                 onClick={toggleRearrangeModal}
               />
-            </div>
+            </div> */}
 
             <div className="">
               {notificationsData?.map(

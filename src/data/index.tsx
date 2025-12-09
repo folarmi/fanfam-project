@@ -23,9 +23,9 @@ import NIG from "../assets/icons/NIG.svg";
 import GH from "../assets/icons/GH.svg";
 import Home from "../components/svgs/Home";
 import Notification from "../components/svgs/Notification";
-import Messages from "../components/svgs/Messages";
-import Collections from "../components/svgs/Collections";
-import Schedule from "../components/svgs/Schedule";
+// import Messages from "../components/svgs/Messages";
+// import Collections from "../components/svgs/Collections";
+// import Schedule from "../components/svgs/Schedule";
 import MyAccount from "../components/svgs/MyAccount";
 import Profile from "../components/svgs/Profile";
 import all from "../assets/all.svg";
@@ -69,8 +69,6 @@ import { convertToHumanReadableDate, getRemainingDays } from "@/utils/helper";
 import { Link } from "react-router-dom";
 import CustomButton from "@/components/forms/CustomButton";
 import BlueBorderedButton from "@/components/forms/BlueBorderedButton";
-import CircleChat from "@/assets/icons/circleChat";
-import CirclePay from "@/assets/icons/circlePay";
 
 export const sideBarItems = [
   {
@@ -87,27 +85,27 @@ export const sideBarItems = [
     link: "/dashboard/notifications",
     roles: ["CREATOR", "VIEWER"],
   },
-  {
-    id: 3,
-    name: "Messages",
-    image: <Messages />,
-    link: "/dashboard/messages",
-    roles: ["CREATOR", "VIEWER"],
-  },
-  {
-    id: 4,
-    name: "Collections",
-    image: <Collections />,
-    link: "/dashboard/collections",
-    roles: ["CREATOR", "VIEWER"],
-  },
-  {
-    id: 8,
-    name: "Schedule",
-    image: <Schedule />,
-    link: "/dashboard/schedule",
-    roles: ["CREATOR", "VIEWER"],
-  },
+  // {
+  //   id: 3,
+  //   name: "Messages",
+  //   image: <Messages />,
+  //   link: "/dashboard/messages",
+  //   roles: ["CREATOR", "VIEWER"],
+  // },
+  // {
+  //   id: 4,
+  //   name: "Collections",
+  //   image: <Collections />,
+  //   link: "/dashboard/collections",
+  //   roles: ["CREATOR", "VIEWER"],
+  // },
+  // {
+  //   id: 8,
+  //   name: "Schedule",
+  //   image: <Schedule />,
+  //   link: "/dashboard/schedule",
+  //   roles: ["CREATOR", "VIEWER"],
+  // },
   {
     id: 5,
     name: "My Account",
@@ -2084,22 +2082,18 @@ export const promotionType = [
 ];
 
 export const actions: Action[] = [
-  {
-    type: "chat",
-    component: (
-      // <button className="p-2 rounded-full hover:bg-blue_100">💬</button>
-      <div className="cursor-pointer">
-        <CircleChat className="cursor-pointer hover:fill-blue_200" />
-      </div>
-    ),
-  },
-  {
-    type: "tip",
-    component: (
-      // <button className="p-2 rounded-full hover:bg-blue_100">💰</button>
-      <CirclePay className="cursor-pointer hover:fill-blue_200" />
-    ),
-  },
+  // {
+  //   type: "chat",
+  //   component: (
+  //     <div className="cursor-pointer">
+  //       <CircleChat className="cursor-pointer hover:fill-blue_200" />
+  //     </div>
+  //   ),
+  // },
+  // {
+  //   type: "tip",
+  //   component: <CirclePay className="cursor-pointer hover:fill-blue_200" />,
+  // },
   {
     type: "promote",
     component: (

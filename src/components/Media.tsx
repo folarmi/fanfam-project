@@ -539,10 +539,10 @@ const Media = ({
               // Get the first media file based on current tab
               const firstMedia =
                 isMediaTabActive === "All"
-                  ? item.mediaFiles.find((m) => m.mediaType !== "AUDIO")
+                  ? item?.mediaFiles.find((m) => m.mediaType !== "AUDIO")
                   : isMediaTabActive === "Photos"
-                  ? item.mediaFiles.find((m) => m.mediaType === "PHOTO")
-                  : item.mediaFiles.find((m) => m.mediaType === "VIDEO");
+                  ? item?.mediaFiles.find((m) => m.mediaType === "PHOTO")
+                  : item?.mediaFiles.find((m) => m.mediaType === "VIDEO");
 
               if (!firstMedia) return null;
 

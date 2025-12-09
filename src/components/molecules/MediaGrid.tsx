@@ -19,7 +19,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({
           const isDocument = media?.mediaType === "DOCUMENT";
           const isAudio = media?.mediaType === "AUDIO";
           const hasMore = timeLineImage.length > 6 && index === 5;
-          console.log(media);
+
           return (
             <div
               key={`${media?.mediaLink}-${index}`}

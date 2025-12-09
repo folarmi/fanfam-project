@@ -92,6 +92,7 @@ export const getMediaType = (files: File[]): MediaType => {
 
   if (fileType.startsWith("image/")) return "PHOTO";
   if (fileType.startsWith("video/")) return "VIDEO";
+  if (fileType.startsWith("audio/")) return "AUDIO";
   return "DOCUMENT";
 };
 
