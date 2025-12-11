@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Typography from "../forms/Typography";
 import CustomButton from "../forms/CustomButton";
-import verifyBlue from "../../assets/icons/verifyBlue.svg";
-import defaultAvatar from "../../assets/defaultAvatar.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCustomMutation } from "../../hooks/apiCalls";
 import type { RootState } from "../../lib/store";
@@ -10,13 +8,15 @@ import { useAppSelector } from "../../lib/hook";
 import { sideBarItems } from "../../data";
 import { useDispatch } from "react-redux";
 import { logout } from "@/lib/features/auth/authSlice";
+import { useFetchProfile } from "@/hooks/apiHooks";
+import DefaultAvatar from "./DefaultAvatar";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { isCreator } = useAppSelector((state: RootState) => state.auth);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const { data: profileData } = useFetchProfile(userObject);
 
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
@@ -36,22 +36,31 @@ const Sidebar = () => {
       {/* User Avatar */}
       {
         <div className="flex items-center my-6 bg-white">
-          <img src={defaultAvatar} alt="defaultAvatar" className="" />
+          {!profileData?.data?.coverImageUrl ? (
+            <DefaultAvatar fullName={profileData?.data?.fullName} />
+          ) : (
+            <img
+              src={profileData?.data?.coverImageUrl}
+              alt="defaultAvatar"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
+            />
+          )}
+
           <div className="ml-3">
             <div className="flex items-center mb-1">
               <Typography
                 variant="titleTwo"
                 className="text-grey_900 whitespace-nowrap"
               >
-                Priscilia yummy
+                {profileData?.data?.displayName || "John Doe"}
               </Typography>
 
-              {isCreator && (
+              {/* {isCreator && (
                 <img src={verifyBlue} alt="demo" className=" h-4 w-4" />
-              )}
+              )} */}
             </div>
             <Typography variant="p2" className="text-grey_400">
-              @yummychill54
+              {profileData?.data?.username || "John Doe"}
             </Typography>
           </div>
         </div>
