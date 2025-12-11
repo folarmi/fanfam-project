@@ -340,17 +340,20 @@ export interface NotificationType {
 }
 
 export type FCMNotificationPayload = {
-  from: string;
-  messageId: string;
-  notification: {
-    title: string;
-    body: string;
-    image: string;
-  };
-  data: {
-    Post: string;
-    time: string;
-  };
+  // from: string;
+  // messageId: string;
+  // notification: {
+  //   title: string;
+  //   body: string;
+  //   image: string;
+  // };
+  // data: {
+  //   Post: string;
+  //   time: string;
+  // };
+  title: string;
+  body: string;
+  image: string;
 };
 
 export type ProfilePostProps = {

@@ -27,7 +27,8 @@ function NotificationToast() {
     <div className="fixed top-4 right-4 bg-primary border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm z-[9999] animate-slide-in">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
-          {liveNotification.notification?.image && (
+          {/* {liveNotification.notification?.image && ( */}
+          {liveNotification?.image && (
             <img
               src={liveNotification?.image}
               alt="notification"

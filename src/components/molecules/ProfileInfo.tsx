@@ -12,7 +12,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <div className="absolute -top-8">
           <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
             <img
-              src={profileData?.profilePic}
+              src={profileData?.profilePic || ""}
               alt="profile"
               className="w-full h-full object-cover"
             />
