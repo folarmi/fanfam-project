@@ -34,7 +34,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
   };
 
   return (
-    <div className="w-full mt-6 flex items-center ">
+    <div className="w-full mt-6 flex items-center">
       <div className="flex items-center gap-x-4 w-full">
         {showLocation && location && (
           <div className="hidden md:flex items-center ml-28">
@@ -43,15 +43,17 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
           </div>
         )}
 
-        {actions?.map((action, index) => (
-          <div
-            key={index}
-            className="cursor-pointer ml-auto"
-            onClick={() => onActionClick?.(action.type)}
-          >
-            {action.component}
-          </div>
-        ))}
+        <div className="ml-auto flex items-center gap-x-2">
+          {actions?.map((action, index) => (
+            <div
+              key={index}
+              className="cursor-pointer"
+              onClick={() => onActionClick?.(action.type)}
+            >
+              {action.component}
+            </div>
+          ))}
+        </div>
 
         <div className="relative ">
           <img

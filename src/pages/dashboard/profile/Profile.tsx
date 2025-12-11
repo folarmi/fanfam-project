@@ -16,6 +16,7 @@ import { TipModal } from "@/components/molecules/TipModal";
 import { actions } from "@/data";
 import type { TipData } from "@/lib/types";
 import { useGetData } from "@/hooks/apiCalls";
+import DefaultAvatar from "@/components/molecules/DefaultAvatar";
 
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -76,13 +77,20 @@ const Profile = () => {
               <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
                 <div className="relative flex items-center">
                   <div className="absolute -top-8">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
-                      <img
-                        src={profileData?.data?.profilePic}
-                        alt="profile"
-                        className="w-full h-full object-cover"
+                    {!profileData?.data?.profilePic ? (
+                      <DefaultAvatar
+                        size="24"
+                        fullName={profileData?.data?.fullName}
                       />
-                    </div>
+                    ) : (
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
+                        <img
+                          src={profileData?.data?.profilePic}
+                          alt="profile"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <ProfileActions
