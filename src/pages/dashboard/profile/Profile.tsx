@@ -7,7 +7,6 @@ import Post from "../../../components/Post";
 import Replies from "../../../components/Replies";
 import Media from "../../../components/Media";
 import GiftSubscription from "../../../components/modals/GiftSubscription";
-import suggestTwo from "../../../assets/suggestTwo.svg";
 import { Loader } from "@/components/molecules/Loader";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { ProfileHeader } from "@/components/molecules/ProfileHeader";
@@ -17,6 +16,7 @@ import { actions } from "@/data";
 import type { TipData } from "@/lib/types";
 import { useGetData } from "@/hooks/apiCalls";
 import DefaultAvatar from "@/components/molecules/DefaultAvatar";
+import { MAX_LENGTH } from "@/utils/helperTwo";
 
 const Profile = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -62,6 +62,10 @@ const Profile = () => {
       queryKey: ["GetUserContent"],
     });
 
+  const bio = profileData?.data?.bio ?? "";
+  const shouldTruncate = bio.length > MAX_LENGTH;
+  const visibleBio = isExpanded ? bio : bio.slice(0, MAX_LENGTH);
+
   return (
     <>
       {isLoading ? (
@@ -71,8 +75,10 @@ const Profile = () => {
           <SearchInput ifBlur={false} />
           <div className="w-full relative">
             <ProfileHeader
-              coverImage={profileData?.data?.coverImageUrl || suggestTwo}
-              displayName={profileData?.data?.displayName}
+              coverImage={profileData?.data?.coverImageUrl}
+              displayName={
+                profileData?.data?.displayName || profileData?.data?.email
+              }
             >
               <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
                 <div className="relative flex items-center">
@@ -80,7 +86,10 @@ const Profile = () => {
                     {!profileData?.data?.profilePic ? (
                       <DefaultAvatar
                         size="24"
-                        fullName={profileData?.data?.fullName}
+                        fullName={
+                          profileData?.data?.fullName ||
+                          profileData?.data?.email
+                        }
                       />
                     ) : (
                       <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
@@ -121,7 +130,6 @@ const Profile = () => {
                       📍 {profileData?.data?.location}
                     </span>
                   </div>
-
                   <div className="flex items-center">
                     <Typography
                       variant="titleTwo"
@@ -130,15 +138,13 @@ const Profile = () => {
                       {profileData?.data?.displayName}
                     </Typography>
                   </div>
-
                   <Typography
                     variant="p2"
                     className="text-grey_800 pt-1 text-sm"
                   >
                     {profileData?.data?.username}
                   </Typography>
-
-                  <Typography
+                  {/* <Typography
                     variant="p2"
                     className="text-grey_700 py-4 text-sm"
                   >
@@ -155,7 +161,26 @@ const Profile = () => {
                     >
                       read {isExpanded ? "less" : "more"}
                     </span>
-                  </Typography>
+                  </Typography> */}
+
+                  {bio && (
+                    <Typography
+                      variant="p2"
+                      className="text-grey_700 py-4 text-sm"
+                    >
+                      {visibleBio}
+                      {!isExpanded && shouldTruncate && "..."}
+
+                      {shouldTruncate && (
+                        <span
+                          onClick={() => setIsExpanded(!isExpanded)}
+                          className="font-medium text-sm text-blue_500 cursor-pointer ml-1"
+                        >
+                          read {isExpanded ? "less" : "more"}
+                        </span>
+                      )}
+                    </Typography>
+                  )}
                 </section>
               </section>
             </ProfileHeader>

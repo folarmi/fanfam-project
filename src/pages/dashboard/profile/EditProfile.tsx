@@ -22,9 +22,11 @@ const EditProfile = () => {
   // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data, isLoading } = useFetchProfile(userObject);
-  const { control, getValues, reset, setError, clearErrors } = useForm({
-    defaultValues: data?.data,
-  });
+  const { control, getValues, reset, setError, clearErrors, trigger } = useForm(
+    {
+      defaultValues: data?.data,
+    }
+  );
 
   const { mutate: uploadProfilePicture, isPending: profilePictureIsPending } =
     useFileUpload({
@@ -102,10 +104,16 @@ const EditProfile = () => {
         queryKey: ["viewProfile"],
         exact: false,
       });
+      reset();
     },
   });
 
-  const submitForm = () => {
+  const submitForm = async () => {
+    const isValid = await trigger(); // triggers validation for all fields
+
+    if (!isValid) {
+      return;
+    }
     const formValues = {
       ...getValues(),
       profileImageUrl: data?.data?.profilePic,
@@ -145,7 +153,6 @@ const EditProfile = () => {
       ) : (
         <div className="mb-2">
           <div className="max-w-4xl mx-auto">
-            {/* Banner Section - Make this sticky */}
             <div className="sticky top-0 z-50 bg-white">
               <div className="relative">
                 <div className="relative w-full h-[174px] overflow-hidden bg-gray-200">
@@ -174,10 +181,8 @@ const EditProfile = () => {
                   />
                 </div>
 
-                {/* Profile Picture - Overlapping Banner */}
                 <div className="absolute -bottom-16 left-6">
                   <div className="relative w-32 h-32">
-                    {/* Profile Image Display */}
                     <div className="w-full h-full rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
                       <img
                         src={data?.data?.profilePic}
@@ -186,7 +191,6 @@ const EditProfile = () => {
                       />
                     </div>
 
-                    {/* Profile Picture Edit Overlay with CustomFileUploader */}
                     <CustomFileUploader
                       maxSizeMB={1}
                       acceptFormats={["png", "jpeg", "jpg", "gif", "svg"]}
@@ -207,7 +211,6 @@ const EditProfile = () => {
                 </div>
               </div>
 
-              {/* Action Bar */}
               <div className="flex items-center justify-end px-6 py-8 bg-gray-50 border-b">
                 <div className="flex items-center gap-3">
                   <button
@@ -248,14 +251,14 @@ const EditProfile = () => {
                 </div>
               </div>
             </div>
-            {/* End of sticky section */}
 
-            {/* Form section - this will scroll normally - NOW INSIDE THE SAME CONTAINER */}
             <form className="bg-grey_20 drop-shadow-4xl pt-8 px-4 pb-[61px] mt-3">
               <CustomInput
                 label="Full Name"
                 name="fullName"
                 control={control}
+                required
+                rules={{ required: "Fullname is required" }}
               />
 
               <CustomInput
@@ -272,6 +275,7 @@ const EditProfile = () => {
                 placeholder="This is your unique username"
                 readOnly={data?.data?.username ? true : false}
                 isVerified={setUsernameMutation.isSuccess}
+                rules={{ required: "Username is required" }}
               />
 
               <CustomSelect
@@ -280,6 +284,7 @@ const EditProfile = () => {
                 control={control}
                 label="Gender"
                 ifLabel
+                rules={{ required: "Gender is required" }}
               />
 
               <CustomInput
@@ -294,6 +299,7 @@ const EditProfile = () => {
                 name="location"
                 control={control}
                 placeholder="Location"
+                rules={{ required: "Location is required" }}
               />
 
               <CustomInput
@@ -308,6 +314,12 @@ const EditProfile = () => {
                 name="bio"
                 control={control}
                 placeholder="What are your interests?"
+                rules={{
+                  maxLength: {
+                    value: 255,
+                    message: "Bio must not exceed 255 characters",
+                  },
+                }}
               />
 
               <CustomInput

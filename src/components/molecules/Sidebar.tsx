@@ -37,7 +37,9 @@ const Sidebar = () => {
       {
         <div className="flex items-center my-6 bg-white">
           {!profileData?.data?.coverImageUrl ? (
-            <DefaultAvatar fullName={profileData?.data?.fullName} />
+            <DefaultAvatar
+              fullName={profileData?.data?.fullName || profileData?.data?.email}
+            />
           ) : (
             <img
               src={profileData?.data?.coverImageUrl}
