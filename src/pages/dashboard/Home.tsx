@@ -128,7 +128,7 @@ const Home = () => {
           publicId={data?.publicId}
           profileName={profileData?.data?.displayName || "Unknown User"}
           avatar={profileData?.data?.profilePic}
-          handle={`@${profileData?.data?.username}`}
+          handle={profileData?.data?.username}
           time={formatTimeAgo(data?.createdDate)}
           paragraphOne={data?.message}
           timeLineImage={data?.mediaFiles}
@@ -162,6 +162,15 @@ const Home = () => {
           <CommentOnPost
             publicId={data?.publicId}
             toggleModal={() => toggleShowCommentModal(null)}
+            data={{
+              id: data?.publicId,
+              message: data?.message,
+              avatar: profileData?.data?.profilePic,
+              handle: profileData?.data?.username,
+              profileName: profileData?.data?.displayName || "Unknown User",
+              time: formatTimeAgo(data?.createdDate),
+              timeLineImage: data?.mediaFiles,
+            }}
           />
         </Modal>
       </div>

@@ -1,11 +1,10 @@
 import type { MediaFile, ReactionItem } from "@/lib/types";
-import Typography from "../forms/Typography";
 import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
 import Chat from "@/assets/icons/chat";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
-import DefaultAvatar from "../molecules/DefaultAvatar";
+import PostHeader from "../molecules/PostHeader";
 
 // interface PostCardProps {
 //   // Core data as object
@@ -88,70 +87,16 @@ const PostCard: React.FC<PostCardProps> = ({
       aria-label={`Post by ${profileName}`}
       onClick={onCardClick}
     >
-      <header className="flex items-start px-4 relative">
-        {!avatar ? (
-          <DefaultAvatar fullName={profileName} />
-        ) : (
-          <img
-            src={avatar}
-            alt={`${profileName}'s avatar`}
-            className="w-10 h-10 rounded-full flex-shrink-0"
-            loading="lazy"
-          />
-        )}
-
-        <div className="flex justify-between w-full items-start ml-2">
-          <section className="flex-1 min-w-0">
-            {/* Profile Info */}
-            <div className="flex items-center flex-wrap gap-x-1.5">
-              <Typography variant="titleTwo" className="font-semibold truncate">
-                {profileName}
-              </Typography>
-
-              <Typography
-                variant="p2"
-                className="hidden md:inline text-grey_500 truncate"
-              >
-                {handle}
-              </Typography>
-
-              <Typography
-                variant="p2"
-                className="text-grey_500 ml-auto md:ml-0"
-              >
-                {time}
-              </Typography>
-            </div>
-
-            {/* Mobile handle */}
-            <Typography
-              variant="p2"
-              className="md:hidden text-grey_500 truncate"
-            >
-              {handle}
-            </Typography>
-
-            {/* Content Paragraphs */}
-            {ifParagraph && (paragraphOne || paragraphTwo) && (
-              <div className="mt-2 space-y-2">
-                {paragraphOne && (
-                  <p className="font-normal text-sm text-grey_30 leading-5">
-                    {paragraphOne}
-                  </p>
-                )}
-                {paragraphTwo && (
-                  <p className="font-normal text-sm text-grey_700 leading-5">
-                    {paragraphTwo}
-                  </p>
-                )}
-              </div>
-            )}
-          </section>
-
-          {/* Header Actions (More button) */}
-          {headerActions}
-        </div>
-      </header>
+      <PostHeader
+        avatar={avatar}
+        profileName={profileName}
+        handle={handle}
+        time={time}
+        ifParagraph={ifParagraph}
+        paragraphOne={paragraphOne}
+        paragraphTwo={paragraphTwo}
+        headerActions={headerActions}
+      />
 
       {/* Media Section */}
       {hasImages && (

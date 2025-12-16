@@ -47,68 +47,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
-// api.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config;
-
-//     // Check for token expiration (401 Unauthorized)
-//     if (error.response?.status === 401 && !originalRequest._retry) {
-//       originalRequest._retry = true; // Mark the request as retried
-
-//       if (!isRefreshing) {
-//         isRefreshing = true;
-
-//         try {
-//           const refreshToken = localStorage.getItem("refreshToken");
-
-//           if (!refreshToken) {
-//             throw new Error("No refresh token available");
-//           }
-
-//           // Make a request to refresh the token
-//           const { data } = await axios.post(
-//             `${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`,
-//             { token: refreshToken }
-//           );
-
-//           const newToken = data.accessToken;
-
-//           // Store new tokens
-//           localStorage.setItem("token", newToken);
-//           localStorage.setItem("refreshToken", data.refreshToken);
-
-//           // Notify all subscribers
-//           refreshSubscribers.forEach((callback) => callback(newToken));
-//           refreshSubscribers = []; // Clear the queue
-
-//           return api(originalRequest); // Retry the original request
-//         } catch (refreshError) {
-//           console.error("Token refresh failed:", refreshError);
-//           localStorage.removeItem("token");
-//           localStorage.removeItem("refreshToken");
-//           // Redirect to login
-//           window.location.href = "/";
-//           return Promise.reject(refreshError);
-//         } finally {
-//           isRefreshing = false;
-//         }
-//       }
-
-//       // Queue the request until the token is refreshed
-//       return new Promise((resolve) => {
-//         refreshSubscribers.push((newToken) => {
-//           originalRequest.headers.Authorization = `Bearer ${newToken}`;
-//           resolve(api(originalRequest)); // Retry the original request
-//         });
-//       });
-//     }
-
-//     return Promise.reject(error); // For other errors, reject the promise
-//   }
-// );
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -117,7 +55,6 @@ api.interceptors.response.use(
     const isLoginRequest =
       originalRequest.url?.includes("auth/login") ||
       originalRequest.url?.includes("auth/refresh");
-
     // Check for token expiration (401 Unauthorized)
     if (
       error.response?.status === 401 &&
