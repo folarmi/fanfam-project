@@ -3,25 +3,23 @@
 import React, { useEffect, useRef } from "react";
 import PostCard, { type PostCardProps } from "./Postcard";
 import { MoreHorizontal } from "lucide-react";
-import { CommentOnPost } from "../modals/CommentOnPost";
-import Modal from "../modals/Modal";
 
 interface ViewPostProps extends Omit<PostCardProps, "headerActions"> {
   showModal?: boolean;
   toggleModal?: () => void;
-  showCommentModal?: string | null;
-  toggleShowCommentModal?: (postId?: string) => void;
   TimeLineModal?: React.ReactNode;
+  onCommentClick?: () => void;
+  onCardClick?: () => void;
 }
 
 const ViewPost: React.FC<ViewPostProps> = ({
   showModal,
-  showCommentModal,
   toggleModal,
   TimeLineModal,
-  toggleShowCommentModal,
   publicId,
   reactionsData,
+  onCardClick,
+  onCommentClick,
   ...postProps
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -50,9 +48,15 @@ const ViewPost: React.FC<ViewPostProps> = ({
     <>
       <PostCard
         {...postProps}
+        onCommentClick={(e) => {
+          e.stopPropagation();
+          onCommentClick?.();
+        }}
+        onCardClick={() => {
+          onCardClick?.();
+        }}
         ifIcon
         reactionsData={reactionsData}
-        toggleShowCommentModal={toggleShowCommentModal}
         publicId={publicId}
         headerActions={
           <>
@@ -83,28 +87,6 @@ const ViewPost: React.FC<ViewPostProps> = ({
           </>
         }
       />
-      {/* <Modal
-        show={showCommentModal === publicId}
-        // toggleModal={() => toggleShowCommentModal?.(publicId)}
-        toggleModal={() => toggleShowCommentModal?.(null)}
-      >
-        <CommentOnPost
-          publicId={publicId}
-          toggleModal={() => toggleShowCommentModal?.(publicId)}
-        />
-      </Modal> */}
-
-      {toggleShowCommentModal && (
-        <Modal
-          show={showCommentModal === publicId}
-          toggleModal={() => toggleShowCommentModal(null)}
-        >
-          <CommentOnPost
-            publicId={publicId}
-            toggleModal={() => toggleShowCommentModal(null)}
-          />
-        </Modal>
-      )}
     </>
   );
 };

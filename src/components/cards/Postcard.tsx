@@ -3,7 +3,6 @@ import Typography from "../forms/Typography";
 import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
 import Chat from "@/assets/icons/chat";
-import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import DefaultAvatar from "../molecules/DefaultAvatar";
@@ -22,8 +21,10 @@ export interface PostCardProps {
   ifParagraph?: boolean;
   ifIcon?: boolean;
   headerActions?: React.ReactNode;
-  toggleShowCommentModal?: (id: string | undefined) => void;
+  // toggleShowCommentModal?: (id: string | undefined) => void;
   className?: string;
+  onCommentClick?: (e: React.MouseEvent) => void;
+  onCardClick?: (e: React.MouseEvent) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -41,11 +42,11 @@ const PostCard: React.FC<PostCardProps> = ({
   ifIcon = true,
   headerActions,
   className,
-  toggleShowCommentModal,
+  onCommentClick,
+  onCardClick,
 }) => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
-  const navigate = useNavigate();
   const hasImages = Array.isArray(timeLineImage) && timeLineImage.length > 0;
 
   const userReaction = reactionsData?.find((reaction) =>
@@ -57,11 +58,7 @@ const PostCard: React.FC<PostCardProps> = ({
       style={{ backgroundColor: bgColor }}
       className={`pt-4 mb-2 drop-shadow-4xl cursor-pointer ${className || ""}`}
       aria-label={`Post by ${profileName}`}
-      onClick={() => {
-        // toggleShowCommentModal?.(null as any);
-        toggleShowCommentModal?.(null);
-        navigate(`/dashboard/${publicId}`);
-      }}
+      onClick={onCardClick}
     >
       <header className="flex items-start px-4 relative">
         {!avatar ? (
@@ -136,13 +133,7 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Action Icons (Reactions) */}
       {ifIcon && reactionsData && (
         <footer className="flex items-center py-4 ml-16">
-          <Chat
-            number={99}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleShowCommentModal?.(publicId);
-            }}
-          />
+          <Chat number={99} onClick={(e) => onCommentClick?.(e)} />
 
           {reactionsData?.map(({ type, icon: Icon, number }) => (
             <IconAndNumber

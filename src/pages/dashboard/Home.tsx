@@ -16,8 +16,11 @@ import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import ViewPost from "../../components/cards/ViewPost";
 import { transformReactions } from "@/lib/reaction";
+import { CommentOnPost } from "@/components/modals/CommentOnPost";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
     useGetData({
@@ -131,13 +134,16 @@ const Home = () => {
           timeLineImage={data?.mediaFiles}
           ifParagraph={true}
           showModal={showMoreModal === data?.publicId}
-          // showCommentModal={showCommentModal}
           toggleModal={() =>
             setShowMoreModal(
               showMoreModal === data?.publicId ? null : data?.publicId
             )
           }
-          toggleShowCommentModal={toggleShowCommentModal}
+          onCommentClick={() => toggleShowCommentModal(data?.publicId)}
+          onCardClick={() => {
+            toggleShowCommentModal(null);
+            navigate(`/dashboard/${data?.publicId}`);
+          }}
           TimeLineModal={
             <TimeLineHomeModal
               toggleTimelineHomeModal={toggleTimelineHomeModal}
@@ -147,6 +153,16 @@ const Home = () => {
           }
           reactionsData={transformReactions(data?.reactions)}
         />
+
+        <Modal
+          show={showCommentModal === data?.publicId}
+          toggleModal={() => toggleShowCommentModal(null)}
+        >
+          <CommentOnPost
+            publicId={data?.publicId}
+            toggleModal={() => toggleShowCommentModal(null)}
+          />
+        </Modal>
       </div>
     );
   };

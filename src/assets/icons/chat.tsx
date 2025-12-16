@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type Prop = {
   className?: string;
   number?: number;
   numberColor?: string;
-  onClick: (e: any) => void;
+  onClick: (e: React.MouseEvent) => void;
 };
 
 const Chat = ({
