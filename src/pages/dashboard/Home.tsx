@@ -132,7 +132,7 @@ const Home = () => {
           time={formatTimeAgo(data?.createdDate)}
           paragraphOne={data?.message}
           timeLineImage={data?.mediaFiles}
-          ifParagraph={true}
+          ifParagraph
           showModal={showMoreModal === data?.publicId}
           toggleModal={() =>
             setShowMoreModal(
@@ -144,6 +144,7 @@ const Home = () => {
             toggleShowCommentModal(null);
             navigate(`/dashboard/${data?.publicId}`);
           }}
+          commentslength={data?.comments?.length}
           TimeLineModal={
             <TimeLineHomeModal
               toggleTimelineHomeModal={toggleTimelineHomeModal}

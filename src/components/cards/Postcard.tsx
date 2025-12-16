@@ -7,22 +7,49 @@ import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import DefaultAvatar from "../molecules/DefaultAvatar";
 
+// interface PostCardProps {
+//   // Core data as object
+//   post: {
+//     publicId: string;
+//     content: string;
+//     media: MediaFile[];
+//     createdAt: string;
+//     reactions: ReactionItem[];
+//   };
+
+//   // Author data as separate object (might come from different API)
+//   author: {
+//     avatar: string;
+//     displayName: string;
+//     username: string;
+//   };
+
+//   // UI/behavior props separate (not part of data model)
+//   ifParagraph?: boolean;
+//   ifIcon?: boolean;
+//   className?: string;
+
+//   onCommentClick?: () => void;
+//   onCardClick?: () => void;
+//   headerActions?: React.ReactNode;
+// }
+
 export interface PostCardProps {
+  publicId?: string;
+  paragraphOne?: string;
+  paragraphTwo?: string;
+  timeLineImage?: string | MediaFile[];
+  reactionsData?: ReactionItem[];
   avatar: string;
   profileName: string;
   handle: string;
   time: string;
   bgColor?: string;
-  paragraphOne?: string;
-  paragraphTwo?: string;
-  timeLineImage?: string | MediaFile[];
-  publicId?: string;
-  reactionsData?: ReactionItem[];
   ifParagraph?: boolean;
   ifIcon?: boolean;
-  headerActions?: React.ReactNode;
-  // toggleShowCommentModal?: (id: string | undefined) => void;
   className?: string;
+  commentslength?: number;
+  headerActions?: React.ReactNode;
   onCommentClick?: (e: React.MouseEvent) => void;
   onCardClick?: (e: React.MouseEvent) => void;
 }
@@ -42,6 +69,7 @@ const PostCard: React.FC<PostCardProps> = ({
   ifIcon = true,
   headerActions,
   className,
+  commentslength,
   onCommentClick,
   onCardClick,
 }) => {
@@ -133,7 +161,7 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Action Icons (Reactions) */}
       {ifIcon && reactionsData && (
         <footer className="flex items-center py-4 ml-16">
-          <Chat number={99} onClick={(e) => onCommentClick?.(e)} />
+          <Chat number={commentslength} onClick={(e) => onCommentClick?.(e)} />
 
           {reactionsData?.map(({ type, icon: Icon, number }) => (
             <IconAndNumber
