@@ -52,7 +52,9 @@ const Home = () => {
       name: "Option Two",
     },
   ]);
-  // const [showCommentModal, setShowCommentModal] = useState<string | null>(null);
+  const [showCommentModal, setShowCommentModal] = useState<
+    string | null | undefined
+  >(null);
   const [activePoll, setActivePoll] = useState(pollOptions[0].name);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const toggleInterestModal = () => {
@@ -72,13 +74,13 @@ const Home = () => {
     setShowMoreModal(!showMoreModal);
   };
 
-  // const toggleShowCommentModal = (postId?: string | null) => {
-  //   if (!postId) {
-  //     setShowCommentModal(null);
-  //     return;
-  //   }
-  //   setShowCommentModal(showCommentModal === postId ? null : postId);
-  // };
+  const toggleShowCommentModal = (postId: string | null) => {
+    if (postId === null || postId === undefined) {
+      setShowCommentModal(null);
+      return;
+    }
+    setShowCommentModal(showCommentModal === postId ? null : postId);
+  };
 
   const PostItem = ({ data }: { data: StoryPost }) => {
     const postRef = useRef<HTMLDivElement>(null);
@@ -135,7 +137,7 @@ const Home = () => {
               showMoreModal === data?.publicId ? null : data?.publicId
             )
           }
-          // toggleShowCommentModal={toggleShowCommentModal}
+          toggleShowCommentModal={toggleShowCommentModal}
           TimeLineModal={
             <TimeLineHomeModal
               toggleTimelineHomeModal={toggleTimelineHomeModal}

@@ -15,6 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { MediaItem, MediaType } from "@/lib/types";
 import { useUploadFiles } from "@/hooks/useUploadFiles";
 import EditMediaGrid from "../molecules/EditMediaGrid";
+import DefaultAvatar from "../molecules/DefaultAvatar";
 
 export interface EditPostProps {
   publicId: string;
@@ -205,12 +206,16 @@ export const EditPost: React.FC<EditPostProps> = ({
         >
           {/* Header Section */}
           <header className="flex items-start px-4 relative mb-4">
-            <img
-              src={profileData?.data?.profilePic}
-              alt={`${profileData?.data?.displayName}'s avatar`}
-              className="w-10 h-10 rounded-full flex-shrink-0"
-              loading="lazy"
-            />
+            {!profileData?.data?.profilePic ? (
+              <DefaultAvatar fullName={profileData?.data?.displayName} />
+            ) : (
+              <img
+                src={profileData?.data?.profilePic}
+                alt={`${profileData?.data?.displayName}'s avatar`}
+                className="w-10 h-10 rounded-full flex-shrink-0"
+                loading="lazy"
+              />
+            )}
 
             <div className="flex justify-between w-full items-start ml-2">
               <section className="flex-1 min-w-0">
@@ -232,7 +237,6 @@ export const EditPost: React.FC<EditPostProps> = ({
                     </Typography>
                   </div>
 
-                  {/* Close Button */}
                   <button
                     onClick={toggleModal}
                     className="cursor-pointer ml-auto p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -243,7 +247,6 @@ export const EditPost: React.FC<EditPostProps> = ({
                   </button>
                 </div>
 
-                {/* Mobile handle */}
                 <Typography
                   variant="p2"
                   className="md:hidden text-grey_500 truncate"
