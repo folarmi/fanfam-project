@@ -67,7 +67,7 @@ import creatorThree from "@/assets/icons/creatorThree.svg";
 import creatorFour from "@/assets/icons/creatorFour.svg";
 import { convertToHumanReadableDate, getRemainingDays } from "@/utils/helper";
 import { Link } from "react-router-dom";
-import CustomButton from "@/components/forms/CustomButton";
+// import CustomButton from "@/components/forms/CustomButton";
 import BlueBorderedButton from "@/components/forms/BlueBorderedButton";
 
 export const sideBarItems = [
@@ -2094,16 +2094,16 @@ export const actions: Action[] = [
   //   type: "tip",
   //   component: <CirclePay className="cursor-pointer hover:fill-blue_200" />,
   // },
-  {
-    type: "promote",
-    component: (
-      <Link to="/dashboard/profile/promote">
-        <CustomButton variant="primary" primaryButtonSize="xs px-3">
-          Promote Profile
-        </CustomButton>
-      </Link>
-    ),
-  },
+  // {
+  //   type: "promote",
+  //   component: (
+  //     <Link to="/dashboard/profile/promote">
+  //       <CustomButton variant="primary" primaryButtonSize="xs px-3">
+  //         Promote Profile
+  //       </CustomButton>
+  //     </Link>
+  //   ),
+  // },
   {
     type: "edit",
     component: (

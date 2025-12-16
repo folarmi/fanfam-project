@@ -83,7 +83,7 @@ const Profile = () => {
               <section className="px-4 bg-grey_20 drop-shadow-4xl mb-2">
                 <div className="relative flex items-center">
                   <div className="absolute -top-8">
-                    {!profileData?.data?.profilePic ? (
+                    {!profileData?.data?.profileImageUrl ? (
                       <DefaultAvatar
                         size="24"
                         fullName={
@@ -94,7 +94,7 @@ const Profile = () => {
                     ) : (
                       <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
                         <img
-                          src={profileData?.data?.profilePic}
+                          src={profileData?.data?.profileImageUrl}
                           alt="profile"
                           className="w-full h-full object-cover"
                         />

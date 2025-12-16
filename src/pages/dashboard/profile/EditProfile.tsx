@@ -185,7 +185,7 @@ const EditProfile = () => {
                   <div className="relative w-32 h-32">
                     <div className="w-full h-full rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
                       <img
-                        src={data?.data?.profilePic}
+                        src={data?.data?.profileImageUrl}
                         alt="Profile"
                         className="w-full h-full object-cover"
                       />

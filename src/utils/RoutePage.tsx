@@ -75,7 +75,7 @@ const RoutePage = () => {
             path="profile/:id/subscribe"
             element={<UnsubscribedProfile />}
           />
-          <Route path="promote-profile" element={<PromoteProfile />} />
+          <Route path="profile/promote" element={<PromoteProfile />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
 

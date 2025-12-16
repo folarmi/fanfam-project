@@ -260,10 +260,43 @@ export const EMPTY_CREATOR_USER_PROFILE: UserProfile = {
   creatorProfile: null,
 };
 
-export type SubscriberProfile = UserProfile & {
+export interface CreatorInfo {
+  phoneNumber: string | null;
+  usid: string;
+  email: string;
+  fullName: string;
+  gender: string;
+  location: string;
+  profilePic: string;
+  bio: string;
+  username: string;
+  websiteUrl: string;
+  displayName: string;
+  coverImageUrl: string;
+}
+
+export interface SubscriberInfo {
+  phoneNumber: string;
+  usid: string;
+  role: UserRoleType;
+  email: string;
+  residence: string;
+  fullName: string;
+  gender: string;
+  location: string;
+  interest: string;
+  bio: string;
+  username: string;
+  displayName: string;
+}
+
+export interface SubscriberProfile {
+  publicId: string;
   endDate: string;
-  fee: string;
-};
+  creator: CreatorInfo;
+  subscriber: SubscriberInfo;
+  fee: number;
+}
 
 export interface Stat {
   icon: React.ReactNode;
@@ -360,3 +393,29 @@ export type ProfilePostProps = {
   creatorContent: any;
   creatorContentIsLoading: boolean;
 };
+
+// A subscriber for a creator that isn't a creator
+// {
+//     "publicId": "180520V21E37118583726ZUV91191024KAWA7S119144174Y6JE1193648P3K32B1",
+//     "endDate": "2026-01-04T19:36:48.962465",
+//     "creator": {
+//         "phoneNumber": "08176544345",
+//         "usid": "fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL",
+//         "email": "theCreator@mailinator.com",
+//         "fullName": "ALEXANDER J SAMPLE",
+//         "gender": "Male",
+//         "location": "Lagos",
+//         "profilePic": "http://res.cloudinary.com/dezb6qbwe/image/upload/c_fill,h_250,w_200/v1765289045/image_id_fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL",
+//         "bio": "sbdjhfbsdf",
+//         "username": "creator002",
+//         "displayName": "TheCreator",
+//         "coverImageUrl": "https://res.cloudinary.com/dezb6qbwe/image/upload/v1763493625/0778edc3-10c3-47c4-a321-c0d52a1ecf61fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL.jpg"
+//     },
+//     "subscriber": {
+//         "phoneNumber": "08109712100",
+//         "usid": "fafam-20251202XlD4UXCdmP3Beg2Wbc1idEHoBId4iZXCkniVTLl2",
+//         "role": "VIEWER",
+//         "email": "damilolaabdulmolik@gmail.com"
+//     },
+//     "fee": 800
+// }
