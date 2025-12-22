@@ -8,8 +8,8 @@ import TimeLineHomeModal from "../../components/modals/TimeLineHomeModal";
 import { UserRole } from "../../data";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
-import StoryModal from "../../components/modals/StoryModal";
-import { StoryUploader } from "@/components/molecules/StoryUploader";
+// import StoryModal from "../../components/modals/StoryModal";
+// import { StoryUploader } from "@/components/molecules/StoryUploader";
 import { useCustomMutation, useGetData } from "@/hooks/apiCalls";
 import { Loader } from "@/components/molecules/Loader";
 import type { StoryPost } from "@/lib/types";
@@ -17,19 +17,41 @@ import { formatTimeAgo } from "@/utils/helperTwo";
 import ViewPost from "../../components/cards/ViewPost";
 import { transformReactions } from "@/lib/reaction";
 import { CommentOnPost } from "@/components/modals/CommentOnPost";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // const [activeSearchTerm, setActiveSearchTerm] = useState("");
+
+  // value shown in input
+  const searchTerm = searchParams.get("search") ?? "";
+
+  // value used for querying
+  const activeSearchTerm = searchTerm;
+
+  // const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
+  //   useGetData({
+  //     url: `${
+  //       userObject?.role === UserRole.creator
+  //         ? `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc&search=${activeSearchTerm}`
+  //         : "contents?page=0&size=20&sort=createdDate,desc"
+  //     }`,
+  //     queryKey: ["GetContents", activeSearchTerm],
+  //   });
+
   const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
     useGetData({
-      url: `${
+      url:
         userObject?.role === UserRole.creator
-          ? `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc`
-          : "contents?page=0&size=20&sort=createdDate,desc"
-      }`,
-      queryKey: ["GetContents"],
+          ? `contents?creator=${
+              userObject?.email
+            }&page=0&size=20&sort=createdDate,desc${
+              activeSearchTerm ? `&search=${activeSearchTerm}` : ""
+            }`
+          : `contents?page=0&size=20&sort=createdDate,desc`,
+      queryKey: ["GetContents", activeSearchTerm],
     });
 
   const useRecordContentView = (contentId: string) => {
@@ -39,7 +61,7 @@ const Home = () => {
     });
   };
 
-  const [isEditingStory, setIsEditingStory] = useState(false);
+  // const [isEditingStory, setIsEditingStory] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
     null
   );
@@ -59,19 +81,19 @@ const Home = () => {
     string | null | undefined
   >(null);
   const [activePoll, setActivePoll] = useState(pollOptions[0].name);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const toggleInterestModal = () => {
     setShowInterestModal(!showInterestModal);
   };
 
-  const toggleIsEditingStoryModal = () => {
-    setIsEditingStory(!isEditingStory);
-  };
+  // const toggleIsEditingStoryModal = () => {
+  //   setIsEditingStory(!isEditingStory);
+  // };
 
-  const handleFileUpload = (file: File) => {
-    setUploadedFile(file);
-    toggleIsEditingStoryModal();
-  };
+  // const handleFileUpload = (file: File) => {
+  //   setUploadedFile(file);
+  //   toggleIsEditingStoryModal();
+  // };
 
   const toggleTimelineHomeModal = () => {
     setShowMoreModal(!showMoreModal);
@@ -176,12 +198,26 @@ const Home = () => {
       </div>
     );
   };
+  const handleSearchChange = (value: string) => {
+    // update input visually ONLY (no query trigger)
+    setSearchParams(value ? { search: value } : {}, { replace: true });
+  };
+
+  const handleSearch = (value: string) => {
+    // commit search (URL already updated)
+    setSearchParams(value ? { search: value } : {}, { replace: false });
+  };
 
   return (
     <>
       <div className="">
         <>
-          <SearchInput />
+          <SearchInput
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+            onSearch={handleSearch}
+            placeholder="Search..."
+          />
           {ifUserIsCreatingPoll ? (
             <Poll
               pollOptions={pollOptions}
@@ -200,11 +236,11 @@ const Home = () => {
             )
           )}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             {userObject.role === UserRole.creator && (
               <StoryUploader onFileUpload={handleFileUpload} />
             )}
-          </div>
+          </div> */}
 
           {getCreatorContent?.data?.content?.map((data: StoryPost) => (
             <PostItem key={data?.publicId} data={data} />
@@ -219,7 +255,7 @@ const Home = () => {
           </Modal>
         )}
 
-        <Modal
+        {/* <Modal
           ifClose={false}
           show={isEditingStory}
           toggleModal={toggleIsEditingStoryModal}
@@ -230,7 +266,7 @@ const Home = () => {
               uploadedFile={uploadedFile}
             />
           </div>
-        </Modal>
+        </Modal> */}
       </div>
     </>
   );

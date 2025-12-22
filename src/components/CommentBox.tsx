@@ -113,9 +113,7 @@ const CommentBox = ({
       onSuccess?.();
     },
     successMessage: () => {
-      return commentId
-        ? "Reply added successfully"
-        : "Posted added successfully";
+      return commentId ? "Reply added successfully" : "Post added successfully";
     },
     onError: () => {},
   });
