@@ -241,7 +241,6 @@ const Home = () => {
               <StoryUploader onFileUpload={handleFileUpload} />
             )}
           </div> */}
-
           {getCreatorContent?.data?.content?.map((data: StoryPost) => (
             <PostItem key={data?.publicId} data={data} />
           ))}

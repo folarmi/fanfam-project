@@ -52,6 +52,7 @@ export default {
         blue_600: "#2599F6",
         blue_900: "#011220",
         blue_10: "#A7D4FC",
+        blue_20: "#34A0F7",
         green_10: "#F5FBF5",
         green_50: "#EFFAED",
         green_100: "#1CF417",
@@ -66,6 +67,8 @@ export default {
         slate_600: "#D9D9E0",
         slate_1100: "#60646C",
         bloomTextHeading: "#1C2024",
+        brown_100: "#3a1f37",
+        brown_200: "#27061b",
       },
       boxShadow: {
         custom: "0px 2px 1px 0px #00000040",

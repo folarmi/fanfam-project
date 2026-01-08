@@ -6,6 +6,7 @@ import {
   ResetPassword,
   ForgotPassword,
   EmailSent,
+  LiveStreaming,
 } from "../pages";
 import DashboardLayout from "../layouts/DashboardLayout";
 import {
@@ -151,6 +152,8 @@ const RoutePage = () => {
             element={<SetupStrategy />}
           />
         </Route>
+
+        <Route path="livestreaming" element={<LiveStreaming />} />
       </Route>
 
       {/* <Route element={<ProtectedRoute />}></Route> */}

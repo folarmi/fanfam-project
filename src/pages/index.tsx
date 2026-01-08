@@ -6,3 +6,4 @@ export * from "./VerifyEmail";
 export * from "./ResetPassword";
 export * from "./Forgotpassword";
 export * from "./EmailSent";
+export * from "./LiveStreaming";

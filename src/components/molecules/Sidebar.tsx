@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/lib/features/auth/authSlice";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import DefaultAvatar from "./DefaultAvatar";
+import { LogOutIcon } from "lucide-react";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -98,8 +99,7 @@ const Sidebar = () => {
         className="flex items-center py-2 pl-4 cursor-pointer"
         onClick={() => logOutMutation.mutate({})}
       >
-        {/* <Image src={image} alt="icon" className="" /> */}
-        ff
+        <LogOutIcon />
         <Typography variant="subtitle2" className="text-grey_400 pl-4">
           Logout
         </Typography>

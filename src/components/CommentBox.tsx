@@ -11,6 +11,9 @@ import { getMediaType } from "@/utils/helperTwo";
 import { useUploadFiles } from "@/hooks/useUploadFiles";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import video from "@/assets/icons/video.svg";
+import Typography from "./forms/Typography";
+import { useNavigate } from "react-router-dom";
 
 type CommentBoxProp = {
   ifPoll?: boolean;
@@ -31,11 +34,18 @@ const CommentBox = ({
   onSuccess,
   placeholder = "Write a Post..",
 }: CommentBoxProp) => {
-  const [isActive, setIsActive] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { handleSubmit, control, reset } = useForm();
+
+  const [isActive, setIsActive] = useState(false);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
+  const [showLiveStreaming, setShowLiveStreaming] = useState(true);
+
+  const toggleReportUserModal = () => {
+    setShowLiveStreaming(!showLiveStreaming);
+  };
 
   const {
     uploadFiles,
@@ -146,15 +156,30 @@ const CommentBox = ({
           setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
         />
 
-        <div className="w-fit">
-          <CustomButton
-            variant={isActive ? "primary" : "disabled"}
-            className=" bg-grey_90 px-6"
-            disabled={createContentMutation.isPending || isUploading}
-            loading={createContentMutation.isPending || isUploading}
+        <div className="flex items-center">
+          <div className="w-fit">
+            <CustomButton
+              variant={isActive ? "primary" : "disabled"}
+              className=" bg-grey_90 px-6"
+              disabled={createContentMutation.isPending || isUploading}
+              loading={createContentMutation.isPending || isUploading}
+            >
+              Post
+            </CustomButton>
+          </div>
+          <div
+            onClick={toggleReportUserModal}
+            className="border border-blue_20 py-2 px-4 flex items-center rounded-3xl ml-3 cursor-pointer"
           >
-            Post
-          </CustomButton>
+            <img src={video} alt="video" className="mr-1" />
+            <Typography
+              variant="subtitle3"
+              className="text-blue_20"
+              onClick={() => navigate("livestreaming")}
+            >
+              Go Live
+            </Typography>
+          </div>
         </div>
       </div>
     </form>

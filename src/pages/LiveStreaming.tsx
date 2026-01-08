@@ -1,0 +1,927 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+// import CustomButton from "@/components/forms/CustomButton";
+// import Typography from "@/components/forms/Typography";
+// import { ArrowLeft, EyeIcon, Mic, MicOff, Video, VideoOff } from "lucide-react";
+// import { useEffect, useRef, useState } from "react";
+// import AgoraRTC from "agora-rtc-sdk-ng";
+
+// const LiveStreaming = () => {
+//   const [streamDescription, setStreamDescription] = useState("");
+//   const [showTips, setShowTips] = useState(true);
+//   const [isStreaming, setIsStreaming] = useState(false);
+//   const [visibility, setVisibility] = useState("All Subscribers");
+//   const [isMicOn, setIsMicOn] = useState(true);
+//   const [isCameraOn, setIsCameraOn] = useState(true);
+//   const [viewerCount, setViewerCount] = useState(0);
+//   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+
+//   const videoRef = useRef<HTMLVideoElement | null>(null);
+//   const agoraClientRef = useRef<any>(null);
+//   const localAudioTrackRef = useRef<any>(null);
+//   const localVideoTrackRef = useRef<any>(null);
+
+//   // Agora Configuration
+//   const APP_ID = "52b5b9fdce814c3ab777b6fd8469c0b8";
+//   const TEMP_TOKEN =
+//     "007eJxTYMj181vx13xmc79a8jWm8t6rbdY73nVt5lB7raEYqDNhr5ACg6lRkmmSZVpKcqqFoUmycWKSubl5kllaioWJmWWyQZLFm3MxmQ2BjAw/tucxMjJAIIjPzVCSWlzinJGYl5eaw8AAADNRIuY=";
+//   const [channelName] = useState("testChannel"); // Must match the channel name you used when generating token
+//   const [token] = useState(TEMP_TOKEN); // Token will be fetched
+
+//   useEffect(() => {
+//     // Get user's camera stream
+//     navigator.mediaDevices
+//       .getUserMedia({ video: true, audio: true })
+//       .then((stream) => {
+//         setLocalStream(stream);
+//         if (videoRef.current) {
+//           videoRef.current.srcObject = stream;
+//         }
+//       })
+//       .catch((err) => {
+//         console.error("Error accessing media devices:", err);
+//       });
+
+//     return () => {
+//       if (localStream) {
+//         localStream.getTracks().forEach((track) => track.stop());
+//       }
+//     };
+//   }, []);
+
+//   const handleStartLive = async () => {
+//     try {
+//       // Validate App ID
+//       if (!APP_ID) {
+//         alert("Please set your Agora App ID in the code");
+//         return;
+//       }
+
+//       // Validate Token
+//       if (!token || token === "YOUR_TEMP_TOKEN") {
+//         alert(
+//           "Please generate a temp token from Agora Console and add it to the code"
+//         );
+//         return;
+//       }
+
+//       // Stop preview stream
+//       if (localStream) {
+//         localStream.getTracks().forEach((track) => track.stop());
+//       }
+
+//       // Initialize Agora Client
+//       const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+//       agoraClientRef.current = client;
+
+//       // Set client role to host (broadcaster)
+//       await client.setClientRole("host");
+
+//       // Join channel with token
+//       await client.join(APP_ID, channelName, token, null);
+
+//       // Create and publish audio/video tracks
+//       const [audioTrack, videoTrack] =
+//         await AgoraRTC.createMicrophoneAndCameraTracks();
+//       localAudioTrackRef.current = audioTrack;
+//       localVideoTrackRef.current = videoTrack;
+
+//       // Play local video
+//       if (videoRef.current) {
+//         videoTrack.play(videoRef.current);
+//       }
+
+//       // Publish tracks to the channel
+//       await client.publish([audioTrack, videoTrack]);
+
+//       // Listen for remote users joining
+//       client.on("user-joined", (user) => {
+//         console.log("Viewer joined:", user.uid);
+//         setViewerCount((prev) => prev + 1);
+//       });
+
+//       client.on("user-left", (user) => {
+//         console.log("Viewer left:", user.uid);
+//         setViewerCount((prev) => Math.max(0, prev - 1));
+//       });
+
+//       setIsStreaming(true);
+//       console.log("Live stream started! Channel:", channelName);
+
+//       // You can save channelName to database so viewers can join
+//       // Share this channel name with your viewers
+//     } catch (error) {
+//       console.error("Error starting live stream:", error);
+//       alert("Failed to start live stream. Check console for details.");
+//     }
+//   };
+
+//   const handleStopLive = async () => {
+//     try {
+//       // Unpublish and close tracks
+//       if (localAudioTrackRef.current) {
+//         localAudioTrackRef.current.close();
+//       }
+//       if (localVideoTrackRef.current) {
+//         localVideoTrackRef.current.close();
+//       }
+
+//       // Leave channel
+//       if (agoraClientRef.current) {
+//         await agoraClientRef.current.leave();
+//       }
+
+//       setIsStreaming(false);
+//       setViewerCount(0);
+
+//       // Restart preview
+//       const stream = await navigator.mediaDevices.getUserMedia({
+//         video: true,
+//         audio: true,
+//       });
+//       setLocalStream(stream);
+//       if (videoRef.current) {
+//         videoRef.current.srcObject = stream;
+//       }
+//     } catch (error) {
+//       console.error("Error stopping stream:", error);
+//     }
+//   };
+
+//   const toggleMic = async () => {
+//     if (isStreaming && localAudioTrackRef.current) {
+//       await localAudioTrackRef.current.setEnabled(!isMicOn);
+//     }
+//     setIsMicOn(!isMicOn);
+//   };
+
+//   const toggleCamera = async () => {
+//     if (isStreaming && localVideoTrackRef.current) {
+//       await localVideoTrackRef.current.setEnabled(!isCameraOn);
+//     }
+//     setIsCameraOn(!isCameraOn);
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-brown_200 flex">
+//       {/* Left Side - Video Preview */}
+//       <div className="flex-1 flex flex-col items-center justify-center p-8">
+//         <div className="w-full max-w-3xl">
+//           {/* Header */}
+//           <div className="flex items-center justify-between mb-6">
+//             {!isStreaming && (
+//               <div className="flex items-center">
+//                 <ArrowLeft className="text-white cursor-pointer" />
+//                 <Typography
+//                   variant="subtitle2"
+//                   className="text-white uppercase pl-2"
+//                 >
+//                   Live Video
+//                 </Typography>
+//               </div>
+//             )}
+
+//             {isStreaming && (
+//               <div className="flex items-center gap-3">
+//                 <div className="flex items-center gap-2 bg-red-600 px-3 py-1 rounded-full">
+//                   <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+//                   <span className="text-white text-sm font-semibold">LIVE</span>
+//                 </div>
+//                 <div className="bg-white/10 backdrop-blur px-3 py-1 rounded-full">
+//                   <span className="text-white text-sm">
+//                     👁 {viewerCount} watching
+//                   </span>
+//                 </div>
+//               </div>
+//             )}
+//           </div>
+
+//           {/* Video Preview */}
+//           <div className="relative bg-black/40 backdrop-blur rounded-2xl overflow-hidden aspect-video shadow-2xl border border-white/10">
+//             <video
+//               ref={videoRef}
+//               autoPlay
+//               muted
+//               playsInline
+//               className="w-full h-full object-cover"
+//             />
+
+//             {/* Camera Icon Overlay (only when camera is off) */}
+//             {!isCameraOn && (
+//               <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+//                 <div className="bg-white/10 backdrop-blur-md p-8 rounded-full">
+//                   <VideoOff className="w-16 h-16 text-white/60" />
+//                 </div>
+//               </div>
+//             )}
+//           </div>
+
+//           {/* Control Buttons */}
+//           <div className="flex items-center justify-center gap-4 mt-6">
+//             {/* Mic Button */}
+//             <button
+//               onClick={toggleMic}
+//               className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
+//                 isMicOn
+//                   ? "bg-gray-700/50 hover:bg-gray-600/50"
+//                   : "bg-red-600 hover:bg-red-700"
+//               }`}
+//             >
+//               {isMicOn ? (
+//                 <Mic className="w-6 h-6 text-white" />
+//               ) : (
+//                 <MicOff className="w-6 h-6 text-white" />
+//               )}
+//             </button>
+
+//             {/* Start/Stop Live Video Button */}
+//             {!isStreaming ? (
+//               <CustomButton
+//                 className="text-xs w-fit px-6"
+//                 onClick={handleStartLive}
+//               >
+//                 Start Live Video
+//               </CustomButton>
+//             ) : (
+//               <CustomButton
+//                 className="text-xs w-fit px-6 bg-red-600 hover:bg-red-700"
+//                 onClick={handleStopLive}
+//               >
+//                 End Live Stream
+//               </CustomButton>
+//             )}
+
+//             {/* Camera Button */}
+//             <button
+//               onClick={toggleCamera}
+//               className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
+//                 isCameraOn
+//                   ? "bg-gray-700/50 hover:bg-gray-600/50"
+//                   : "bg-red-600 hover:bg-red-700"
+//               }`}
+//             >
+//               {isCameraOn ? (
+//                 <Video className="w-6 h-6 text-white" />
+//               ) : (
+//                 <VideoOff className="w-6 h-6 text-white" />
+//               )}
+//             </button>
+//           </div>
+
+//           {/* Channel Info (when streaming) */}
+//           {isStreaming && (
+//             <div className="mt-4 bg-white/10 backdrop-blur rounded-lg p-4">
+//               <p className="text-white text-sm">
+//                 <strong>Channel:</strong> {channelName}
+//               </p>
+//               <p className="text-white/70 text-xs mt-1">
+//                 Share this channel name with viewers to let them join your
+//                 stream
+//               </p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+
+//       {/* Right Side - Settings Panel */}
+//       <div className="w-96 bg-brown_200 p-6 border-l border-white/10">
+//         {/* Visibility Dropdown */}
+//         <div className="mb-6 w-full bg-brown_100 border border-white/20 text-white px-4 py-2 rounded-lg cursor-pointer">
+//           <div className="flex items-center gap-2">
+//             <EyeIcon className="w-6 h-6 text-white" />
+//             <p className="text-grey_100 font-medium text-sm whitespace-nowrap">
+//               Available To
+//             </p>
+
+//             <select
+//               value={visibility}
+//               onChange={(e) => setVisibility(e.target.value)}
+//               className="w-full bg-transparent focus:outline-none text-grey_100 font-medium text-sm cursor-pointer"
+//               disabled={isStreaming}
+//             >
+//               <option>All Subscribers</option>
+//               <option>Members Only</option>
+//               <option>Public</option>
+//               <option>Private</option>
+//             </select>
+//           </div>
+//         </div>
+
+//         {/* Stream Description */}
+//         <div className="mb-6">
+//           <textarea
+//             value={streamDescription}
+//             onChange={(e) => setStreamDescription(e.target.value)}
+//             placeholder="Add stream description"
+//             maxLength={500}
+//             disabled={isStreaming}
+//             className="w-full bg-brown_100 text-white placeholder-white/40 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-32 disabled:opacity-50"
+//           />
+//           <div className="text-right text-white/60 text-sm mt-1">
+//             {streamDescription.length}/500
+//           </div>
+//         </div>
+
+//         {/* Show Tips Toggle */}
+//         <div className="flex items-center justify-between bg-brown_100 border border-white/20 px-4 py-3 rounded-lg">
+//           <p className="text-white font-medium text-sm">
+//             Show Tips collected to viewers
+//           </p>
+//           <button
+//             onClick={() => setShowTips(!showTips)}
+//             className={`relative w-12 h-6 rounded-full transition-all ${
+//               showTips ? "bg-brown_200" : "bg-gray-600"
+//             }`}
+//           >
+//             <div
+//               className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+//                 showTips ? "translate-x-6" : ""
+//               }`}
+//             />
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export { LiveStreaming };
+
+// Step 1: Install Agora SDK
+// npm install agora-rtc-sdk-ng
+
+import CustomButton from "@/components/forms/CustomButton";
+import Typography from "@/components/forms/Typography";
+import {
+  ArrowLeft,
+  EyeIcon,
+  Mic,
+  Video,
+  MicOff,
+  VideoOff,
+  Users,
+  Settings,
+  MessageCircle,
+  Send,
+  DollarSign,
+  Phone,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import AgoraRTC from "agora-rtc-sdk-ng";
+
+const LiveStreaming = () => {
+  const [streamDuration, setStreamDuration] = useState(0);
+  const [streamDescription, setStreamDescription] = useState("");
+  const [showTips, setShowTips] = useState(true);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [visibility, setVisibility] = useState("All Subscribers");
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [isCameraOn, setIsCameraOn] = useState(true);
+  const [viewerCount, setViewerCount] = useState(0);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [tipsReceived] = useState(2345);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState([
+    {
+      id: 1,
+      user: "Mike_R",
+      badge: "SUB",
+      message: "This is awesome! 🔥",
+      time: "06:04 PM",
+    },
+    {
+      id: 2,
+      user: "Emma_W",
+      badge: "SUB",
+      message: "Love the energy today!",
+      time: "06:04 PM",
+    },
+    {
+      id: 3,
+      user: "Mike_R",
+      message: "🔥 Fire",
+      time: "06:04 PM",
+      isGift: true,
+    },
+    {
+      id: 4,
+      user: "Chris_L",
+      message: "Can someone explain what's happening?",
+      time: "06:05 PM",
+    },
+    {
+      id: 5,
+      user: "Jessica_T",
+      badge: "SUB",
+      message: "So glad I subscribed! Worth every penny",
+      time: "06:06 PM",
+    },
+  ]);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const agoraClientRef = useRef<any>(null);
+  const localAudioTrackRef = useRef<any>(null);
+  const localVideoTrackRef = useRef<any>(null);
+  const streamTimerRef = useRef<any>(null);
+
+  // Agora Configuration
+  const APP_ID = "52b5b9fdce814c3ab777b6fd8469c0b8";
+  const TEMP_TOKEN =
+    "007eJxTYMj181vx13xmc79a8jWm8t6rbdY73nVt5lB7raEYqDNhr5ACg6lRkmmSZVpKcqqFoUmycWKSubl5kllaioWJmWWyQZLFm3MxmQ2BjAw/tucxMjJAIIjPzVCSWlzinJGYl5eaw8AAADNRIuY=";
+  const [channelName] = useState("testChannel"); // Must match the channel name you used when generating token
+  const [token] = useState(TEMP_TOKEN); // Token will be fetched
+
+  useEffect(() => {
+    // Initialize preview stream
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        setLocalStream(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      })
+      .catch((err) => {
+        console.error("Error accessing media devices:", err);
+        alert("Please allow camera and microphone access");
+      });
+
+    return () => {
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
+      if (agoraClientRef.current) {
+        agoraClientRef.current.leave();
+      }
+      if (streamTimerRef.current) {
+        clearInterval(streamTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Stream duration timer
+  useEffect(() => {
+    if (isStreaming) {
+      streamTimerRef.current = setInterval(() => {
+        setStreamDuration((prev) => prev + 1);
+      }, 1000);
+    } else {
+      if (streamTimerRef.current) {
+        clearInterval(streamTimerRef.current);
+      }
+      setStreamDuration(0);
+    }
+    return () => {
+      if (streamTimerRef.current) {
+        clearInterval(streamTimerRef.current);
+      }
+    };
+  }, [isStreaming]);
+
+  const formatDuration = (seconds: any) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
+
+  const handleStartLive = async () => {
+    try {
+      // Validate App ID
+      if (!APP_ID) {
+        alert("Please set your Agora App ID in the code");
+        return;
+      }
+
+      // Validate Token
+      if (!token || token === "YOUR_TEMP_TOKEN") {
+        alert(
+          "Please generate a temp token from Agora Console and add it to the code"
+        );
+        return;
+      }
+
+      // Stop preview stream
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
+
+      // Initialize Agora Client
+      const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+      agoraClientRef.current = client;
+
+      // Set client role to host (broadcaster)
+      await client.setClientRole("host");
+
+      // Join channel with token
+      await client.join(APP_ID, channelName, token, null);
+
+      // Create and publish audio/video tracks
+      const [audioTrack, videoTrack] =
+        await AgoraRTC.createMicrophoneAndCameraTracks();
+      localAudioTrackRef.current = audioTrack;
+      localVideoTrackRef.current = videoTrack;
+
+      // Play local video
+      if (videoRef.current) {
+        videoTrack.play(videoRef.current);
+      }
+
+      // Publish tracks to the channel
+      await client.publish([audioTrack, videoTrack]);
+
+      // Listen for remote users joining
+      client.on("user-joined", (user) => {
+        console.log("Viewer joined:", user.uid);
+        setViewerCount((prev) => prev + 1);
+      });
+
+      client.on("user-left", (user) => {
+        console.log("Viewer left:", user.uid);
+        setViewerCount((prev) => Math.max(0, prev - 1));
+      });
+
+      setIsStreaming(true);
+      console.log("Live stream started! Channel:", channelName);
+    } catch (error) {
+      console.error("Error starting live stream:", error);
+      alert("Failed to start live stream. Check console for details.");
+    }
+  };
+
+  const handleStopLive = async () => {
+    try {
+      // Unpublish and close tracks
+      if (localAudioTrackRef.current) {
+        localAudioTrackRef.current.close();
+      }
+      if (localVideoTrackRef.current) {
+        localVideoTrackRef.current.close();
+      }
+
+      // Leave channel
+      if (agoraClientRef.current) {
+        await agoraClientRef.current.leave();
+      }
+
+      setIsStreaming(false);
+      setViewerCount(0);
+
+      // Restart preview
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      setLocalStream(stream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (error) {
+      console.error("Error stopping stream:", error);
+    }
+  };
+
+  const toggleMic = async () => {
+    if (isStreaming && localAudioTrackRef.current) {
+      await localAudioTrackRef.current.setEnabled(!isMicOn);
+    }
+    setIsMicOn(!isMicOn);
+  };
+
+  const toggleCamera = async () => {
+    if (isStreaming && localVideoTrackRef.current) {
+      await localVideoTrackRef.current.setEnabled(!isCameraOn);
+    }
+    setIsCameraOn(!isCameraOn);
+  };
+
+  const handleSendMessage = () => {
+    if (chatMessage.trim()) {
+      setChatMessages([
+        ...chatMessages,
+        {
+          id: Date.now(),
+          user: "You",
+          message: chatMessage,
+          time: new Date().toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
+      setChatMessage("");
+    }
+  };
+
+  // Pre-stream setup UI
+  if (!isStreaming) {
+    return (
+      <div className="min-h-screen bg-brown_200 flex">
+        {/* Left Side - Video Preview */}
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <div className="w-full max-w-3xl">
+            {/* Header */}
+            <div className="flex mb-6">
+              <ArrowLeft className="text-white cursor-pointer" />
+              <Typography
+                variant="subtitle2"
+                className="text-white uppercase pl-2"
+              >
+                Live Video
+              </Typography>
+            </div>
+
+            {/* Video Preview */}
+            <div className="relative bg-black/40 backdrop-blur rounded-2xl overflow-hidden aspect-video shadow-2xl border border-white/10">
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+
+              {/* Camera Icon Overlay */}
+              {!isCameraOn && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                  <div className="bg-white/10 backdrop-blur-md p-8 rounded-full">
+                    <VideoOff className="w-16 h-16 text-white/60" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Control Buttons */}
+            <div className="flex items-center justify-center gap-4 mt-6">
+              {/* Mic Button */}
+              <button
+                onClick={toggleMic}
+                className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
+                  isMicOn
+                    ? "bg-gray-700/50 hover:bg-gray-600/50"
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
+              >
+                {isMicOn ? (
+                  <Mic className="w-6 h-6 text-white" />
+                ) : (
+                  <MicOff className="w-6 h-6 text-white" />
+                )}
+              </button>
+
+              {/* Start Live Video Button */}
+              <CustomButton
+                className="text-xs w-fit px-6"
+                onClick={handleStartLive}
+              >
+                Start Live Video
+              </CustomButton>
+
+              {/* Camera Button */}
+              <button
+                onClick={toggleCamera}
+                className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
+                  isCameraOn
+                    ? "bg-gray-700/50 hover:bg-gray-600/50"
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
+              >
+                {isCameraOn ? (
+                  <Video className="w-6 h-6 text-white" />
+                ) : (
+                  <VideoOff className="w-6 h-6 text-white" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side - Settings Panel */}
+        <div className="w-96 bg-brown_200 p-6 border-l border-white/10">
+          {/* Visibility Dropdown */}
+          <div className="mb-6 w-full bg-brown_100 border border-white/20 text-white px-4 py-2 rounded-lg cursor-pointer">
+            <div className="flex items-center gap-2">
+              <EyeIcon className="w-6 h-6 text-white" />
+              <p className="text-grey_100 font-medium text-sm whitespace-nowrap">
+                Available To
+              </p>
+
+              <select
+                value={visibility}
+                onChange={(e) => setVisibility(e.target.value)}
+                className="w-full bg-transparent focus:outline-none text-grey_100 font-medium text-sm cursor-pointer"
+              >
+                <option>All Subscribers</option>
+                <option>Members Only</option>
+                <option>Public</option>
+                <option>Private</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Stream Description */}
+          <div className="mb-6">
+            <textarea
+              value={streamDescription}
+              onChange={(e) => setStreamDescription(e.target.value)}
+              placeholder="Add stream description"
+              maxLength={500}
+              className="w-full bg-brown_100 text-white placeholder-white/40 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-32"
+            />
+            <div className="text-right text-white/60 text-sm mt-1">
+              {streamDescription.length}/500
+            </div>
+          </div>
+
+          {/* Show Tips Toggle */}
+          <div className="flex items-center justify-between bg-brown_100 border border-white/20 px-4 py-3 rounded-lg">
+            <p className="text-white font-medium text-sm">
+              Show Tips collected to viewers
+            </p>
+            <button
+              onClick={() => setShowTips(!showTips)}
+              className={`relative w-12 h-6 rounded-full transition-all ${
+                showTips ? "bg-brown_200" : "bg-gray-600"
+              }`}
+            >
+              <div
+                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                  showTips ? "translate-x-6" : ""
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Live streaming UI
+  return (
+    <div className="min-h-screen bg-gray-900 flex flex-col">
+      {/* Video Area */}
+      <div className="flex-1 flex">
+        {/* Main Video Stream */}
+        <div className="flex-1 relative bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
+          {/* Top Bar */}
+          <div className="absolute top-4 left-4 flex items-center gap-3 z-10">
+            <div className="bg-red-600 px-3 py-1 rounded text-white text-sm font-bold flex items-center gap-2">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+              LIVE
+            </div>
+            <div className="bg-gray-900/80 backdrop-blur px-3 py-1 rounded text-white text-sm flex items-center gap-2">
+              <DollarSign className="w-4 h-4" />${tipsReceived.toLocaleString()}{" "}
+              Received
+            </div>
+          </div>
+
+          {/* Video */}
+          <div className="w-full h-full flex items-center justify-center">
+            {isCameraOn ? (
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center">
+                <Video className="w-32 h-32 text-white/30" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Chat Sidebar */}
+        <div className="w-80 bg-white flex flex-col">
+          {/* Chat Header */}
+          <div className="p-4 border-b">
+            <h3 className="font-semibold text-lg">Live Chat</h3>
+            <p className="text-sm text-gray-500">
+              {chatMessages.length} messages
+            </p>
+          </div>
+
+          {/* Chat Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {chatMessages.map((msg) => (
+              <div
+                key={msg.id}
+                className={msg.isGift ? "bg-orange-100 p-3 rounded-lg" : ""}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-semibold text-sm">{msg.user}</span>
+                  {msg.badge && (
+                    <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded">
+                      {msg.badge}
+                    </span>
+                  )}
+                  {msg.isGift && <span className="text-xs">sent 🔥 Fire</span>}
+                  <span className="text-xs text-gray-500 ml-auto">
+                    {msg.time}
+                  </span>
+                </div>
+                {!msg.isGift && (
+                  <p className="text-sm text-gray-800">{msg.message}</p>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Chat Input */}
+          <div className="p-4 border-t">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                placeholder="Send a message..."
+                className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={handleSendMessage}
+                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Control Bar */}
+      <div className="bg-gray-800 border-t border-gray-700 px-6 py-4">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          {/* Left - Stats */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 text-white">
+              <Users className="w-5 h-5" />
+              <span className="font-semibold">
+                {viewerCount.toLocaleString()}
+              </span>
+            </div>
+            <div className="text-white font-mono">
+              {formatDuration(streamDuration)}
+            </div>
+          </div>
+
+          {/* Center - Controls */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleCamera}
+              className={`p-3 rounded-full transition-all ${
+                isCameraOn
+                  ? "bg-gray-700 hover:bg-gray-600 text-white"
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
+            >
+              {isCameraOn ? (
+                <Video className="w-5 h-5" />
+              ) : (
+                <VideoOff className="w-5 h-5" />
+              )}
+            </button>
+
+            <button
+              onClick={toggleMic}
+              className={`p-3 rounded-full transition-all ${
+                isMicOn
+                  ? "bg-gray-700 hover:bg-gray-600 text-white"
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
+            >
+              {isMicOn ? (
+                <Mic className="w-5 h-5" />
+              ) : (
+                <MicOff className="w-5 h-5" />
+              )}
+            </button>
+
+            <button className="p-3 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition-all">
+              <MessageCircle className="w-5 h-5" />
+            </button>
+
+            <button className="p-3 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition-all">
+              <Settings className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={handleStopLive}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-all"
+            >
+              <Phone className="w-5 h-5" />
+              End Stream
+            </button>
+          </div>
+
+          {/* Right - Placeholder */}
+          <div className="w-32"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export { LiveStreaming };
