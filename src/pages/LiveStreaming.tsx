@@ -1,356 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
-// import CustomButton from "@/components/forms/CustomButton";
-// import Typography from "@/components/forms/Typography";
-// import { ArrowLeft, EyeIcon, Mic, MicOff, Video, VideoOff } from "lucide-react";
-// import { useEffect, useRef, useState } from "react";
-// import AgoraRTC from "agora-rtc-sdk-ng";
-
-// const LiveStreaming = () => {
-//   const [streamDescription, setStreamDescription] = useState("");
-//   const [showTips, setShowTips] = useState(true);
-//   const [isStreaming, setIsStreaming] = useState(false);
-//   const [visibility, setVisibility] = useState("All Subscribers");
-//   const [isMicOn, setIsMicOn] = useState(true);
-//   const [isCameraOn, setIsCameraOn] = useState(true);
-//   const [viewerCount, setViewerCount] = useState(0);
-//   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-
-//   const videoRef = useRef<HTMLVideoElement | null>(null);
-//   const agoraClientRef = useRef<any>(null);
-//   const localAudioTrackRef = useRef<any>(null);
-//   const localVideoTrackRef = useRef<any>(null);
-
-//   // Agora Configuration
-//   const APP_ID = "52b5b9fdce814c3ab777b6fd8469c0b8";
-//   const TEMP_TOKEN =
-//     "007eJxTYMj181vx13xmc79a8jWm8t6rbdY73nVt5lB7raEYqDNhr5ACg6lRkmmSZVpKcqqFoUmycWKSubl5kllaioWJmWWyQZLFm3MxmQ2BjAw/tucxMjJAIIjPzVCSWlzinJGYl5eaw8AAADNRIuY=";
-//   const [channelName] = useState("testChannel"); // Must match the channel name you used when generating token
-//   const [token] = useState(TEMP_TOKEN); // Token will be fetched
-
-//   useEffect(() => {
-//     // Get user's camera stream
-//     navigator.mediaDevices
-//       .getUserMedia({ video: true, audio: true })
-//       .then((stream) => {
-//         setLocalStream(stream);
-//         if (videoRef.current) {
-//           videoRef.current.srcObject = stream;
-//         }
-//       })
-//       .catch((err) => {
-//         console.error("Error accessing media devices:", err);
-//       });
-
-//     return () => {
-//       if (localStream) {
-//         localStream.getTracks().forEach((track) => track.stop());
-//       }
-//     };
-//   }, []);
-
-//   const handleStartLive = async () => {
-//     try {
-//       // Validate App ID
-//       if (!APP_ID) {
-//         alert("Please set your Agora App ID in the code");
-//         return;
-//       }
-
-//       // Validate Token
-//       if (!token || token === "YOUR_TEMP_TOKEN") {
-//         alert(
-//           "Please generate a temp token from Agora Console and add it to the code"
-//         );
-//         return;
-//       }
-
-//       // Stop preview stream
-//       if (localStream) {
-//         localStream.getTracks().forEach((track) => track.stop());
-//       }
-
-//       // Initialize Agora Client
-//       const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
-//       agoraClientRef.current = client;
-
-//       // Set client role to host (broadcaster)
-//       await client.setClientRole("host");
-
-//       // Join channel with token
-//       await client.join(APP_ID, channelName, token, null);
-
-//       // Create and publish audio/video tracks
-//       const [audioTrack, videoTrack] =
-//         await AgoraRTC.createMicrophoneAndCameraTracks();
-//       localAudioTrackRef.current = audioTrack;
-//       localVideoTrackRef.current = videoTrack;
-
-//       // Play local video
-//       if (videoRef.current) {
-//         videoTrack.play(videoRef.current);
-//       }
-
-//       // Publish tracks to the channel
-//       await client.publish([audioTrack, videoTrack]);
-
-//       // Listen for remote users joining
-//       client.on("user-joined", (user) => {
-//         console.log("Viewer joined:", user.uid);
-//         setViewerCount((prev) => prev + 1);
-//       });
-
-//       client.on("user-left", (user) => {
-//         console.log("Viewer left:", user.uid);
-//         setViewerCount((prev) => Math.max(0, prev - 1));
-//       });
-
-//       setIsStreaming(true);
-//       console.log("Live stream started! Channel:", channelName);
-
-//       // You can save channelName to database so viewers can join
-//       // Share this channel name with your viewers
-//     } catch (error) {
-//       console.error("Error starting live stream:", error);
-//       alert("Failed to start live stream. Check console for details.");
-//     }
-//   };
-
-//   const handleStopLive = async () => {
-//     try {
-//       // Unpublish and close tracks
-//       if (localAudioTrackRef.current) {
-//         localAudioTrackRef.current.close();
-//       }
-//       if (localVideoTrackRef.current) {
-//         localVideoTrackRef.current.close();
-//       }
-
-//       // Leave channel
-//       if (agoraClientRef.current) {
-//         await agoraClientRef.current.leave();
-//       }
-
-//       setIsStreaming(false);
-//       setViewerCount(0);
-
-//       // Restart preview
-//       const stream = await navigator.mediaDevices.getUserMedia({
-//         video: true,
-//         audio: true,
-//       });
-//       setLocalStream(stream);
-//       if (videoRef.current) {
-//         videoRef.current.srcObject = stream;
-//       }
-//     } catch (error) {
-//       console.error("Error stopping stream:", error);
-//     }
-//   };
-
-//   const toggleMic = async () => {
-//     if (isStreaming && localAudioTrackRef.current) {
-//       await localAudioTrackRef.current.setEnabled(!isMicOn);
-//     }
-//     setIsMicOn(!isMicOn);
-//   };
-
-//   const toggleCamera = async () => {
-//     if (isStreaming && localVideoTrackRef.current) {
-//       await localVideoTrackRef.current.setEnabled(!isCameraOn);
-//     }
-//     setIsCameraOn(!isCameraOn);
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-brown_200 flex">
-//       {/* Left Side - Video Preview */}
-//       <div className="flex-1 flex flex-col items-center justify-center p-8">
-//         <div className="w-full max-w-3xl">
-//           {/* Header */}
-//           <div className="flex items-center justify-between mb-6">
-//             {!isStreaming && (
-//               <div className="flex items-center">
-//                 <ArrowLeft className="text-white cursor-pointer" />
-//                 <Typography
-//                   variant="subtitle2"
-//                   className="text-white uppercase pl-2"
-//                 >
-//                   Live Video
-//                 </Typography>
-//               </div>
-//             )}
-
-//             {isStreaming && (
-//               <div className="flex items-center gap-3">
-//                 <div className="flex items-center gap-2 bg-red-600 px-3 py-1 rounded-full">
-//                   <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-//                   <span className="text-white text-sm font-semibold">LIVE</span>
-//                 </div>
-//                 <div className="bg-white/10 backdrop-blur px-3 py-1 rounded-full">
-//                   <span className="text-white text-sm">
-//                     👁 {viewerCount} watching
-//                   </span>
-//                 </div>
-//               </div>
-//             )}
-//           </div>
-
-//           {/* Video Preview */}
-//           <div className="relative bg-black/40 backdrop-blur rounded-2xl overflow-hidden aspect-video shadow-2xl border border-white/10">
-//             <video
-//               ref={videoRef}
-//               autoPlay
-//               muted
-//               playsInline
-//               className="w-full h-full object-cover"
-//             />
-
-//             {/* Camera Icon Overlay (only when camera is off) */}
-//             {!isCameraOn && (
-//               <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-//                 <div className="bg-white/10 backdrop-blur-md p-8 rounded-full">
-//                   <VideoOff className="w-16 h-16 text-white/60" />
-//                 </div>
-//               </div>
-//             )}
-//           </div>
-
-//           {/* Control Buttons */}
-//           <div className="flex items-center justify-center gap-4 mt-6">
-//             {/* Mic Button */}
-//             <button
-//               onClick={toggleMic}
-//               className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
-//                 isMicOn
-//                   ? "bg-gray-700/50 hover:bg-gray-600/50"
-//                   : "bg-red-600 hover:bg-red-700"
-//               }`}
-//             >
-//               {isMicOn ? (
-//                 <Mic className="w-6 h-6 text-white" />
-//               ) : (
-//                 <MicOff className="w-6 h-6 text-white" />
-//               )}
-//             </button>
-
-//             {/* Start/Stop Live Video Button */}
-//             {!isStreaming ? (
-//               <CustomButton
-//                 className="text-xs w-fit px-6"
-//                 onClick={handleStartLive}
-//               >
-//                 Start Live Video
-//               </CustomButton>
-//             ) : (
-//               <CustomButton
-//                 className="text-xs w-fit px-6 bg-red-600 hover:bg-red-700"
-//                 onClick={handleStopLive}
-//               >
-//                 End Live Stream
-//               </CustomButton>
-//             )}
-
-//             {/* Camera Button */}
-//             <button
-//               onClick={toggleCamera}
-//               className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
-//                 isCameraOn
-//                   ? "bg-gray-700/50 hover:bg-gray-600/50"
-//                   : "bg-red-600 hover:bg-red-700"
-//               }`}
-//             >
-//               {isCameraOn ? (
-//                 <Video className="w-6 h-6 text-white" />
-//               ) : (
-//                 <VideoOff className="w-6 h-6 text-white" />
-//               )}
-//             </button>
-//           </div>
-
-//           {/* Channel Info (when streaming) */}
-//           {isStreaming && (
-//             <div className="mt-4 bg-white/10 backdrop-blur rounded-lg p-4">
-//               <p className="text-white text-sm">
-//                 <strong>Channel:</strong> {channelName}
-//               </p>
-//               <p className="text-white/70 text-xs mt-1">
-//                 Share this channel name with viewers to let them join your
-//                 stream
-//               </p>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-
-//       {/* Right Side - Settings Panel */}
-//       <div className="w-96 bg-brown_200 p-6 border-l border-white/10">
-//         {/* Visibility Dropdown */}
-//         <div className="mb-6 w-full bg-brown_100 border border-white/20 text-white px-4 py-2 rounded-lg cursor-pointer">
-//           <div className="flex items-center gap-2">
-//             <EyeIcon className="w-6 h-6 text-white" />
-//             <p className="text-grey_100 font-medium text-sm whitespace-nowrap">
-//               Available To
-//             </p>
-
-//             <select
-//               value={visibility}
-//               onChange={(e) => setVisibility(e.target.value)}
-//               className="w-full bg-transparent focus:outline-none text-grey_100 font-medium text-sm cursor-pointer"
-//               disabled={isStreaming}
-//             >
-//               <option>All Subscribers</option>
-//               <option>Members Only</option>
-//               <option>Public</option>
-//               <option>Private</option>
-//             </select>
-//           </div>
-//         </div>
-
-//         {/* Stream Description */}
-//         <div className="mb-6">
-//           <textarea
-//             value={streamDescription}
-//             onChange={(e) => setStreamDescription(e.target.value)}
-//             placeholder="Add stream description"
-//             maxLength={500}
-//             disabled={isStreaming}
-//             className="w-full bg-brown_100 text-white placeholder-white/40 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-32 disabled:opacity-50"
-//           />
-//           <div className="text-right text-white/60 text-sm mt-1">
-//             {streamDescription.length}/500
-//           </div>
-//         </div>
-
-//         {/* Show Tips Toggle */}
-//         <div className="flex items-center justify-between bg-brown_100 border border-white/20 px-4 py-3 rounded-lg">
-//           <p className="text-white font-medium text-sm">
-//             Show Tips collected to viewers
-//           </p>
-//           <button
-//             onClick={() => setShowTips(!showTips)}
-//             className={`relative w-12 h-6 rounded-full transition-all ${
-//               showTips ? "bg-brown_200" : "bg-gray-600"
-//             }`}
-//           >
-//             <div
-//               className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-//                 showTips ? "translate-x-6" : ""
-//               }`}
-//             />
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export { LiveStreaming };
-
-// Step 1: Install Agora SDK
-// npm install agora-rtc-sdk-ng
-
 import CustomButton from "@/components/forms/CustomButton";
 import Typography from "@/components/forms/Typography";
 import {
@@ -369,8 +19,15 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
+import type { RootState } from "@/lib/store";
+import { useAppSelector } from "@/lib/hook";
+import { useGetData } from "@/hooks/apiCalls";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const LiveStreaming = () => {
+  const navigate = useNavigate();
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [streamDuration, setStreamDuration] = useState(0);
   const [streamDescription, setStreamDescription] = useState("");
   const [showTips, setShowTips] = useState(true);
@@ -418,6 +75,7 @@ const LiveStreaming = () => {
       time: "06:06 PM",
     },
   ]);
+  const [channelName] = useState(`live_${userObject?.uid}_${Date.now()}`);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const agoraClientRef = useRef<any>(null);
@@ -425,12 +83,15 @@ const LiveStreaming = () => {
   const localVideoTrackRef = useRef<any>(null);
   const streamTimerRef = useRef<any>(null);
 
-  // Agora Configuration
-  const APP_ID = "52b5b9fdce814c3ab777b6fd8469c0b8";
-  const TEMP_TOKEN =
-    "007eJxTYMj181vx13xmc79a8jWm8t6rbdY73nVt5lB7raEYqDNhr5ACg6lRkmmSZVpKcqqFoUmycWKSubl5kllaioWJmWWyQZLFm3MxmQ2BjAw/tucxMjJAIIjPzVCSWlzinJGYl5eaw8AAADNRIuY=";
-  const [channelName] = useState("testChannel"); // Must match the channel name you used when generating token
-  const [token] = useState(TEMP_TOKEN); // Token will be fetched
+  const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
+  const {
+    data: agoraTokenData,
+    // isLoading: isLoadingToken,
+  } = useGetData({
+    url: `/agora/rtc-token?channel=${channelName}&uid=${userObject?.uid}`,
+    queryKey: ["GetAgoraRTCToken"],
+    enabled: !!userObject?.uid && !!channelName,
+  });
 
   useEffect(() => {
     // Initialize preview stream
@@ -448,6 +109,7 @@ const LiveStreaming = () => {
       });
 
     return () => {
+      stopAllTracks();
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
       }
@@ -489,15 +151,14 @@ const LiveStreaming = () => {
     try {
       // Validate App ID
       if (!APP_ID) {
-        alert("Please set your Agora App ID in the code");
+        alert("App ID is missing");
         return;
       }
 
-      // Validate Token
-      if (!token || token === "YOUR_TEMP_TOKEN") {
-        alert(
-          "Please generate a temp token from Agora Console and add it to the code"
-        );
+      const token = agoraTokenData?.token;
+      console.log("here is th etoken ", token);
+      if (!token) {
+        alert("Failed to obtain streaming token");
         return;
       }
 
@@ -545,7 +206,7 @@ const LiveStreaming = () => {
       console.log("Live stream started! Channel:", channelName);
     } catch (error) {
       console.error("Error starting live stream:", error);
-      alert("Failed to start live stream. Check console for details.");
+      toast.error("Failed to start live stream. Check console for details.");
     }
   };
 
@@ -613,6 +274,21 @@ const LiveStreaming = () => {
     }
   };
 
+  const stopAllTracks = () => {
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  const handleGoBack = () => {
+    stopAllTracks();
+    navigate(-1);
+  };
+
   // Pre-stream setup UI
   if (!isStreaming) {
     return (
@@ -622,7 +298,10 @@ const LiveStreaming = () => {
           <div className="w-full max-w-3xl">
             {/* Header */}
             <div className="flex mb-6">
-              <ArrowLeft className="text-white cursor-pointer" />
+              <ArrowLeft
+                className="text-white cursor-pointer"
+                onClick={handleGoBack}
+              />
               <Typography
                 variant="subtitle2"
                 className="text-white uppercase pl-2"

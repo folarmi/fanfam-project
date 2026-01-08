@@ -169,7 +169,7 @@ const CommentBox = ({
           </div>
           <div
             onClick={toggleReportUserModal}
-            className="border border-blue_20 py-2 px-4 flex items-center rounded-3xl ml-3 cursor-pointer"
+            className="border border-blue_1000 py-2 px-4 flex items-center rounded-3xl ml-3 cursor-pointer"
           >
             <img src={video} alt="video" className="mr-1" />
             <Typography

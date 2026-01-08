@@ -32,3 +32,10 @@ export const useFetchPrivacyAndSafetySettings = (userObject: UserObject) => {
     userObject,
   });
 };
+
+export const useFetchAgoraRTCToken = (uid: string, channelName: string) => {
+  return useFetchSettings({
+    endpoint: `/agora/rtc-token?channel=${channelName}&uid=${uid}`,
+    queryKeyPrefix: "fetchAgoraRTCToken",
+  });
+};
