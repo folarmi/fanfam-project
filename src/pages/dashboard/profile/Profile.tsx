@@ -66,13 +66,20 @@ const Profile = () => {
   const shouldTruncate = bio.length > MAX_LENGTH;
   const visibleBio = isExpanded ? bio : bio.slice(0, MAX_LENGTH);
 
+  const test = () => {};
+
   return (
     <>
       {isLoading ? (
         <Loader />
       ) : (
         <div>
-          <SearchInput ifBlur={false} />
+          <SearchInput
+            ifBlur={false}
+            onSearch={test}
+            onSearchChange={test}
+            searchTerm=""
+          />
           <div className="w-full relative">
             <ProfileHeader
               coverImage={profileData?.data?.coverImageUrl}

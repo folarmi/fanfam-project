@@ -93,7 +93,8 @@ const Subscribed = () => {
                     />
                   ) : (
                     <SubscribedCard
-                      img={item?.subscriber?.profilePic}
+                      // img={item?.subscriber?.profilePic}
+                      img=""
                       userName={item?.subscriber?.username || "N/A"}
                       tag={item?.subscriber?.displayName || "N/A"}
                       expiryStatus={`Expires ${convertToHumanReadableDate(
