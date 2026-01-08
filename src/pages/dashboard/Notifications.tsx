@@ -22,6 +22,8 @@ const Notifications = () => {
     setShowRearrangeModal(!showRearrangeModal);
   };
 
+  const test = () => {};
+
   // const [isActiveTab, setIsActiveTab] = useState("All");
   return (
     <>
@@ -29,7 +31,12 @@ const Notifications = () => {
         <Loader />
       ) : (
         <div>
-          <SearchInput ifBlur={false} />
+          <SearchInput
+            ifBlur={false}
+            onSearch={test}
+            onSearchChange={test}
+            searchTerm=""
+          />
 
           <section className="bg-grey_20 drop-shadow-4xl p-4">
             {/* <div className="flex items-center overflow-x-scroll">

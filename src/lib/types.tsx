@@ -89,6 +89,7 @@ export interface StoryPost {
   reactions: Reaction[];
   viewers: string[];
   meta: PostMeta;
+  replies: StoryPost[];
 }
 
 export interface PostComment {

@@ -20,6 +20,8 @@ const AddParticipant = ({
   const toggleShowList = () => {
     setShowList(!showList);
   };
+
+  const test = () => {};
   return (
     <section>
       <div
@@ -52,7 +54,12 @@ const AddParticipant = ({
 
       {showList ? (
         <div className="bg-grey_20">
-          <SearchInput ifBlur={false} />
+          <SearchInput
+            onSearch={test}
+            onSearchChange={test}
+            searchTerm=""
+            ifBlur={false}
+          />
 
           <div className="flex items-center justify-between mx-4">
             <Typography variant="subtitle2" className="text-grey_500">
