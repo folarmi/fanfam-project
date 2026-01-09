@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -28,6 +29,10 @@ import { toast } from "react-toastify";
 const LiveStreaming = () => {
   const navigate = useNavigate();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
+  // const [channelName] = useState(`live_${userObject?.usid}_${Date.now()}`);
+  const [channelName] = useState(`testChannel`);
+
   const [streamDuration, setStreamDuration] = useState(0);
   const [streamDescription, setStreamDescription] = useState("");
   const [showTips, setShowTips] = useState(true);
@@ -75,7 +80,6 @@ const LiveStreaming = () => {
       time: "06:06 PM",
     },
   ]);
-  const [channelName] = useState(`live_${userObject?.uid}_${Date.now()}`);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const agoraClientRef = useRef<any>(null);
@@ -83,14 +87,13 @@ const LiveStreaming = () => {
   const localVideoTrackRef = useRef<any>(null);
   const streamTimerRef = useRef<any>(null);
 
-  const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const {
     data: agoraTokenData,
     // isLoading: isLoadingToken,
   } = useGetData({
-    url: `/agora/rtc-token?channel=${channelName}&uid=${userObject?.uid}`,
+    url: `/agora/rtc-token?channel=${channelName}&uid=${userObject?.usid}`,
     queryKey: ["GetAgoraRTCToken"],
-    enabled: !!userObject?.uid && !!channelName,
+    // enabled: !!userObject?.uid && !!channelName,
   });
 
   useEffect(() => {
@@ -103,9 +106,9 @@ const LiveStreaming = () => {
           videoRef.current.srcObject = stream;
         }
       })
-      .catch((err) => {
-        console.error("Error accessing media devices:", err);
-        alert("Please allow camera and microphone access");
+      .catch((_err) => {
+        // console.error("Error accessing media devices:", err);
+        toast.error("Please allow camera and microphone access");
       });
 
     return () => {
@@ -151,14 +154,14 @@ const LiveStreaming = () => {
     try {
       // Validate App ID
       if (!APP_ID) {
-        alert("App ID is missing");
+        toast.error("App ID is missing");
         return;
       }
 
       const token = agoraTokenData?.token;
-      console.log("here is th etoken ", token);
+      // console.log("here is th etoken ", token);
       if (!token) {
-        alert("Failed to obtain streaming token");
+        toast.error("Failed to obtain streaming token");
         return;
       }
 
@@ -175,7 +178,7 @@ const LiveStreaming = () => {
       await client.setClientRole("host");
 
       // Join channel with token
-      await client.join(APP_ID, channelName, token, null);
+      await client.join(APP_ID, channelName, token, userObject?.usid);
 
       // Create and publish audio/video tracks
       const [audioTrack, videoTrack] =
@@ -192,20 +195,20 @@ const LiveStreaming = () => {
       await client.publish([audioTrack, videoTrack]);
 
       // Listen for remote users joining
-      client.on("user-joined", (user) => {
-        console.log("Viewer joined:", user.uid);
+      client.on("user-joined", (_user) => {
+        // console.log("Viewer joined:", user.uid);
         setViewerCount((prev) => prev + 1);
       });
 
-      client.on("user-left", (user) => {
-        console.log("Viewer left:", user.uid);
+      client.on("user-left", (_user) => {
+        // console.log("Viewer left:", user.uid);
         setViewerCount((prev) => Math.max(0, prev - 1));
       });
 
       setIsStreaming(true);
-      console.log("Live stream started! Channel:", channelName);
+      // console.log("Live stream started! Channel:", channelName);
     } catch (error) {
-      console.error("Error starting live stream:", error);
+      // console.error("Error starting live stream:", error);
       toast.error("Failed to start live stream. Check console for details.");
     }
   };
@@ -238,7 +241,7 @@ const LiveStreaming = () => {
         videoRef.current.srcObject = stream;
       }
     } catch (error) {
-      console.error("Error stopping stream:", error);
+      // console.error("Error stopping stream:", error);
     }
   };
 
@@ -604,3 +607,5 @@ const LiveStreaming = () => {
 };
 
 export { LiveStreaming };
+
+// 52b5b9fdce814c3ab777b6fd8469c0b8
