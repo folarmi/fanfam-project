@@ -6,7 +6,6 @@ import CustomButton from "@/components/forms/CustomButton";
 import Typography from "@/components/forms/Typography";
 import {
   ArrowLeft,
-  EyeIcon,
   Mic,
   Video,
   MicOff,
@@ -25,19 +24,21 @@ import { useAppSelector } from "@/lib/hook";
 import { useGetData } from "@/hooks/apiCalls";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { MAX_CHANNEL_LENGTH } from "@/utils/helper";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
+
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   // const [channelName] = useState(`live_${userObject?.usid}_${Date.now()}`);
-  const [channelName] = useState(`testChannel`);
+  const [channelName, setChannelName] = useState("");
 
   const [streamDuration, setStreamDuration] = useState(0);
   const [streamDescription, setStreamDescription] = useState("");
   const [showTips, setShowTips] = useState(true);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [visibility, setVisibility] = useState("All Subscribers");
+  // const [visibility, setVisibility] = useState("All Subscribers");
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [viewerCount, setViewerCount] = useState(0);
@@ -89,10 +90,12 @@ const LiveStreaming = () => {
 
   const {
     data: agoraTokenData,
-    // isLoading: isLoadingToken,
+    isLoading: isLoadingToken,
+    refetch: fetchToken,
   } = useGetData({
     url: `/agora/rtc-token?channel=${channelName}&uid=${userObject?.usid}`,
-    queryKey: ["GetAgoraRTCToken"],
+    queryKey: ["GetAgoraRTCToken", channelName, userObject?.usid],
+    enabled: false,
     // enabled: !!userObject?.uid && !!channelName,
   });
 
@@ -158,8 +161,11 @@ const LiveStreaming = () => {
         return;
       }
 
-      const token = agoraTokenData?.token;
-      // console.log("here is th etoken ", token);
+      const res = await fetchToken();
+      console.log(res);
+      const token = res?.data?.token;
+      console.log(token);
+
       if (!token) {
         toast.error("Failed to obtain streaming token");
         return;
@@ -355,6 +361,7 @@ const LiveStreaming = () => {
               <CustomButton
                 className="text-xs w-fit px-6"
                 onClick={handleStartLive}
+                disabled={!channelName.trim() || isLoadingToken}
               >
                 Start Live Video
               </CustomButton>
@@ -378,10 +385,9 @@ const LiveStreaming = () => {
           </div>
         </div>
 
-        {/* Right Side - Settings Panel */}
         <div className="w-96 bg-brown_200 p-6 border-l border-white/10">
           {/* Visibility Dropdown */}
-          <div className="mb-6 w-full bg-brown_100 border border-white/20 text-white px-4 py-2 rounded-lg cursor-pointer">
+          {/* <div className="mb-6 w-full bg-brown_100 border border-white/20 text-white px-4 py-2 rounded-lg cursor-pointer">
             <div className="flex items-center gap-2">
               <EyeIcon className="w-6 h-6 text-white" />
               <p className="text-grey_100 font-medium text-sm whitespace-nowrap">
@@ -398,6 +404,32 @@ const LiveStreaming = () => {
                 <option>Public</option>
                 <option>Private</option>
               </select>
+            </div>
+          </div> */}
+
+          <div className="mb-6">
+            <input
+              type="text"
+              value={channelName}
+              onChange={(e) => {
+                const value = e.target.value
+                  .toLowerCase()
+                  .replace(/[^a-z0-9_]/g, "_"); // Agora-safe
+
+                if (value.length <= MAX_CHANNEL_LENGTH) {
+                  setChannelName(value);
+                }
+              }}
+              placeholder="Enter channel name"
+              className="w-full bg-brown_100 text-white placeholder-white/40 px-4 py-3 rounded-lg
+               focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <div className="flex justify-between text-white/60 text-sm mt-1">
+              <span>Only letters, numbers & underscores</span>
+              <span>
+                {channelName.length}/{MAX_CHANNEL_LENGTH}
+              </span>
             </div>
           </div>
 
@@ -607,5 +639,3 @@ const LiveStreaming = () => {
 };
 
 export { LiveStreaming };
-
-// 52b5b9fdce814c3ab777b6fd8469c0b8

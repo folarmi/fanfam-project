@@ -201,3 +201,5 @@ export const getRemainingDays = (dateString: string) => {
 
   return Math.max(0, diff);
 };
+
+export const MAX_CHANNEL_LENGTH = 64;
