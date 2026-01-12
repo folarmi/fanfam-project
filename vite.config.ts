@@ -14,4 +14,16 @@ export default defineConfig({
       "@pages": path.resolve(__dirname, "./src/pages"),
     },
   },
+  define: {
+    global: "globalThis",
+  },
+  // server: {
+  //   proxy: {
+  //     "/api/v1/ws": {
+  //       target: "http://fanfam.biyartech.com:7639",
+  //       changeOrigin: true,
+  //       ws: true,
+  //     },
+  //   },
+  // },
 });

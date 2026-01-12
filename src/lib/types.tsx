@@ -395,28 +395,29 @@ export type ProfilePostProps = {
   creatorContentIsLoading: boolean;
 };
 
-// A subscriber for a creator that isn't a creator
-// {
-//     "publicId": "180520V21E37118583726ZUV91191024KAWA7S119144174Y6JE1193648P3K32B1",
-//     "endDate": "2026-01-04T19:36:48.962465",
-//     "creator": {
-//         "phoneNumber": "08176544345",
-//         "usid": "fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL",
-//         "email": "theCreator@mailinator.com",
-//         "fullName": "ALEXANDER J SAMPLE",
-//         "gender": "Male",
-//         "location": "Lagos",
-//         "profilePic": "http://res.cloudinary.com/dezb6qbwe/image/upload/c_fill,h_250,w_200/v1765289045/image_id_fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL",
-//         "bio": "sbdjhfbsdf",
-//         "username": "creator002",
-//         "displayName": "TheCreator",
-//         "coverImageUrl": "https://res.cloudinary.com/dezb6qbwe/image/upload/v1763493625/0778edc3-10c3-47c4-a321-c0d52a1ecf61fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL.jpg"
-//     },
-//     "subscriber": {
-//         "phoneNumber": "08109712100",
-//         "usid": "fafam-20251202XlD4UXCdmP3Beg2Wbc1idEHoBId4iZXCkniVTLl2",
-//         "role": "VIEWER",
-//         "email": "damilolaabdulmolik@gmail.com"
-//     },
-//     "fee": 800
-// }
+export interface LiveNotification {
+  creatorId: string;
+  session: string;
+  status: "live" | "ended";
+}
+
+export interface JoinLeaveMessage {
+  session: string;
+  creatorId?: string;
+  userId?: string;
+  role?: "VIEWER" | "HOST";
+}
+
+export interface CommentMessage {
+  sessionID: string;
+  text: string;
+  userId?: string;
+  username?: string;
+  timestamp?: string;
+}
+
+export interface ReactionMessage {
+  sessionID: string;
+  reactionType: string;
+  userId?: string;
+}
