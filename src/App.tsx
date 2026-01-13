@@ -10,26 +10,29 @@ import { Bounce, ToastContainer } from "react-toastify";
 import StoreProvider from "./lib/StoreProvider";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import NotificationToast from "./components/atoms/NotificationsToast";
+import { WebSocketProvider } from "./context/WebSocketContext";
 
 function App() {
   return (
     <StoreProvider>
       <QueryClientContextProvider>
         <NotificationsProvider>
-          <Router>
-            <RoutePage />
-          </Router>
-          <NotificationToast />
-          <ToastContainer
-            position="top-center"
-            pauseOnHover
-            hideProgressBar
-            transition={Bounce}
-            closeButton={false}
-            closeOnClick
-            autoClose={5000}
-          />
-          {/* </AuthProvider> */}
+          <WebSocketProvider>
+            <Router>
+              <RoutePage />
+            </Router>
+            <NotificationToast />
+            <ToastContainer
+              position="top-center"
+              pauseOnHover
+              hideProgressBar
+              transition={Bounce}
+              closeButton={false}
+              closeOnClick
+              autoClose={5000}
+            />
+            {/* </AuthProvider> */}
+          </WebSocketProvider>
         </NotificationsProvider>
       </QueryClientContextProvider>
     </StoreProvider>

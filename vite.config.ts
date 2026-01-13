@@ -17,13 +17,15 @@ export default defineConfig({
   define: {
     global: "globalThis",
   },
-  // server: {
-  //   proxy: {
-  //     "/api/v1/ws": {
-  //       target: "http://fanfam.biyartech.com:7639",
-  //       changeOrigin: true,
-  //       ws: true,
-  //     },
-  //   },
-  // },
+  server: {
+    proxy: {
+      "/api/v1/ws": {
+        target: "ws://fanfam.biyartech.com:7639",
+        ws: true,
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+      },
+    },
+  },
 });

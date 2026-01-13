@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ComponentType } from "react";
+import { Client } from "@stomp/stompjs";
 
 export type UserRoleType = "CREATOR" | "VIEWER";
 export type UserObject = {
@@ -397,8 +398,9 @@ export type ProfilePostProps = {
 
 export interface LiveNotification {
   creatorId: string;
-  session: string;
-  status: "live" | "ended";
+  creatorName?: string;
+  sessionId?: string;
+  status?: "live" | "ended";
 }
 
 export interface JoinLeaveMessage {
@@ -420,4 +422,12 @@ export interface ReactionMessage {
   sessionID: string;
   reactionType: string;
   userId?: string;
+}
+
+export interface WebSocketContextType {
+  isConnected: boolean;
+  client: Client | null;
+  subscribeToCreator: (creatorId: string) => void;
+  unsubscribeFromCreator: (creatorId: string) => void;
+  sendMessage: (destination: string, body: any) => void;
 }

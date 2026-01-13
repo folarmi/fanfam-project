@@ -31,7 +31,6 @@
     "react-select-country-list": "^2.2.3",
     "react-toastify": "^11.0.5",
     "redux-persist": "^6.0.0",
-    "sockjs-client": "^1.6.1",
     "ua-parser-js": "^2.0.5",
     "use-debounce": "^10.0.6"
   },
