@@ -20,13 +20,7 @@ const CreatorLiveCard = () => {
         const initial = (displayName?.trim()?.[0] || "U").toUpperCase();
 
         const handleWatchLive = () => {
-          // If you later require sessionId, handle it here
-          // For now, navigate using creatorId (or your preferred route)
-          navigate(
-            sessionId
-              ? `/livestreaming/${creatorId}/${sessionId}`
-              : `/livestreaming`
-          );
+          navigate(`/livestreaming/${creatorId}/${sessionId}`);
         };
 
         return (
