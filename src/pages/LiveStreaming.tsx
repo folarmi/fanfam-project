@@ -22,18 +22,24 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import type { RootState } from "@/lib/store";
 import { useAppSelector } from "@/lib/hook";
 import { useGetData } from "@/hooks/apiCalls";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { MAX_CHANNEL_LENGTH } from "@/utils/helper";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { formatDuration } from "@/utils/helperTwo";
+import { useLiveStream } from "@/hooks/useLiveStream";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
   const { isConnected, sendMessage } = useWebSocket();
-
+  const { creatorId: urlCreatorId, sessionId: urlSessionId } = useParams();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
+  // Determine if current user is the host
+  const isHost = !urlCreatorId || urlCreatorId === userObject?.usid;
+  const targetCreatorId = urlCreatorId || userObject?.usid;
+
+  const [sessionId, setSessionId] = useState("");
   const [channelName, setChannelName] = useState("");
   const [streamDuration, setStreamDuration] = useState(0);
   const [streamDescription, setStreamDescription] = useState("");
@@ -41,7 +47,6 @@ const LiveStreaming = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
-  const [viewerCount, setViewerCount] = useState(0);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [tipsReceived] = useState(2345);
   const [chatMessage, setChatMessage] = useState("");
@@ -82,6 +87,13 @@ const LiveStreaming = () => {
     },
   ]);
 
+  const { viewerCount } = useLiveStream({
+    sessionId: sessionId,
+    creatorId: userObject?.usid,
+    role: "HOST",
+    enabled: isStreaming && !!sessionId,
+  });
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const agoraClientRef = useRef<any>(null);
   const localAudioTrackRef = useRef<any>(null);
@@ -98,6 +110,17 @@ const LiveStreaming = () => {
     enabled: false,
     // enabled: !!userObject?.uid && !!channelName,
   });
+
+  // If viewer, join existing stream
+  useEffect(() => {
+    if (!isHost && urlSessionId && urlCreatorId) {
+      // Viewer is joining an existing stream
+      setSessionId(urlSessionId);
+      setChannelName(urlSessionId); // Use sessionId as channel name
+      setIsStreaming(true);
+      joinExistingStream();
+    }
+  }, [isHost, urlSessionId, urlCreatorId]);
 
   useEffect(() => {
     // Initialize preview stream
@@ -197,16 +220,19 @@ const LiveStreaming = () => {
       // Listen for remote users joining
       client.on("user-joined", (_user) => {
         // console.log("Viewer joined:", user.uid);
-        setViewerCount((prev) => prev + 1);
+        // setViewerCount((prev) => prev + 1);
       });
 
       client.on("user-left", (_user) => {
         // console.log("Viewer left:", user.uid);
-        setViewerCount((prev) => Math.max(0, prev - 1));
+        // setViewerCount((prev) => Math.max(0, prev - 1));
       });
 
       setIsStreaming(true);
       // console.log("Live stream started! Channel:", channelName);
+
+      const newSessionId = `session_${userObject?.usid}_${Date.now()}`;
+      setSessionId(newSessionId);
 
       // Send "go live" message
       sendMessage("/app/live/go", {
@@ -218,9 +244,69 @@ const LiveStreaming = () => {
     }
   };
 
+  const joinExistingStream = async () => {
+    try {
+      if (!APP_ID) {
+        toast.error("App ID is missing");
+        return;
+      }
+
+      const res = await fetchToken();
+      const token = res?.data?.token;
+
+      if (!token) {
+        toast.error("Failed to obtain streaming token");
+        return;
+      }
+
+      // Initialize Agora Client as viewer
+      const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+      agoraClientRef.current = client;
+
+      // Set client role to audience (viewer)
+      await client.setClientRole("audience");
+
+      // Join channel
+      await client.join(APP_ID, channelName, token, userObject?.usid);
+
+      // Listen for remote users (the host)
+      client.on("user-published", async (user, mediaType) => {
+        await client.subscribe(user, mediaType);
+        console.log("Subscribe success");
+
+        if (mediaType === "video") {
+          const remoteVideoTrack = user.videoTrack;
+          if (videoRef.current) {
+            remoteVideoTrack?.play(videoRef.current);
+          }
+        }
+
+        if (mediaType === "audio") {
+          const remoteAudioTrack = user.audioTrack;
+          remoteAudioTrack?.play();
+        }
+      });
+
+      client.on("user-unpublished", (_user) => {
+        console.log("User unpublished");
+      });
+
+      toast.success("Joined live stream!");
+    } catch (error) {
+      console.error("Error joining stream:", error);
+      toast.error("Failed to join live stream");
+    }
+  };
+
   const handleStopLive = async () => {
     try {
-      // Unpublish and close tracks
+      if (isHost && sessionId) {
+        sendMessage("/app/live/end", {
+          session: sessionId,
+          creatorId: userObject?.usid,
+        });
+      }
+
       if (localAudioTrackRef.current) {
         localAudioTrackRef.current.close();
       }
@@ -228,15 +314,19 @@ const LiveStreaming = () => {
         localVideoTrackRef.current.close();
       }
 
-      // Leave channel
       if (agoraClientRef.current) {
         await agoraClientRef.current.leave();
       }
 
       setIsStreaming(false);
-      setViewerCount(0);
+      setSessionId("");
+      setChatMessages([]);
 
-      // Restart preview
+      if (!isHost) {
+        navigate(-1);
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -245,8 +335,10 @@ const LiveStreaming = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
+
+      toast.success("Stream ended");
     } catch (error) {
-      // console.error("Error stopping stream:", error);
+      console.error("Error stopping stream:", error);
     }
   };
 
@@ -298,7 +390,7 @@ const LiveStreaming = () => {
   };
 
   // Pre-stream setup UI
-  if (!isStreaming) {
+  if (!isStreaming && isHost) {
     return (
       <div className="min-h-screen bg-brown_200 flex">
         {/* Left Side - Video Preview */}

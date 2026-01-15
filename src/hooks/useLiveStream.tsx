@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useWebSocket } from "@/context/WebSocketContext";
+import { useAppSelector } from "@/lib/hook";
+import type { RootState } from "@/lib/store";
 import type { JoinLeaveMessage, UseLiveStreamProps } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
@@ -12,6 +14,8 @@ export const useLiveStream = ({
   role,
   enabled = true,
 }: UseLiveStreamProps) => {
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+
   const { client, isConnected, sendMessage } = useWebSocket();
   const [viewerCount, setViewerCount] = useState(0);
   const [hasJoined, setHasJoined] = useState(false);
@@ -56,6 +60,7 @@ export const useLiveStream = ({
 
       try {
         const data: JoinLeaveMessage = JSON.parse(message.body);
+        console.log("leave data", data);
         setViewerCount((prev) => Math.max(0, prev - 1));
       } catch (error) {
         console.error("Error parsing leave message:", error);
@@ -98,7 +103,7 @@ export const useLiveStream = ({
 
     sendMessage("/app/live/leave", {
       session: sessionId,
-      userId: "current-user-id", // Replace with actual user ID
+      userId: userObject?.usid,
     });
 
     setHasJoined(false);

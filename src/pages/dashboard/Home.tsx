@@ -18,6 +18,7 @@ import ViewPost from "../../components/cards/ViewPost";
 import { transformReactions } from "@/lib/reaction";
 import { CommentOnPost } from "@/components/modals/CommentOnPost";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { CreatorLiveCard } from "@/components/cards/CreatorLiveCard";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -218,6 +219,7 @@ const Home = () => {
             onSearch={handleSearch}
             placeholder="Search..."
           />
+          <CreatorLiveCard />
           {ifUserIsCreatingPoll ? (
             <Poll
               pollOptions={pollOptions}

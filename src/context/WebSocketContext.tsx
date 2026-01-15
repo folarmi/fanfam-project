@@ -143,8 +143,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         )
           .map((sub: any) => sub?.creator?.usid)
           .filter((id: any): id is string => Boolean(id));
-        console.log("idsssss", creatorIds);
-        console.log("idsssss", getViewerSubscriptions?.data?.content);
+
         setFollowedCreators(creatorIds);
       } catch (error) {
         console.error("❌ Error processing viewer subscriptions:", error);
@@ -181,6 +180,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
     try {
       const subscription = client.subscribe(topic, (message) => {
+        // This callback is ONLY called when backend sends a message to this topic
+        console.log("🎉 MESSAGE RECEIVED!", subscription.id);
+        console.log(`📬 Creator ${creatorId} went live:`, message.body);
         try {
           const payload: LiveNotification = JSON.parse(message.body);
           handleCreatorLiveNotification(creatorId, payload);
