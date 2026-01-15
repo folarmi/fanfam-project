@@ -28,7 +28,6 @@ const CreatorList = () => {
 
   // Filter out the currently logged in user
   const creators = useMemo(() => {
-    // const allCreators = getAllCreators?.data || [];
     const allCreators = getAllCreators?.data || [];
     const currentUserId = userObject?.usid;
     return allCreators?.filter(

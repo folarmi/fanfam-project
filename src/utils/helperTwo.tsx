@@ -7,7 +7,15 @@ import type {
 // import { formatDistanceToNowStrict } from "date-fns";
 
 export const formatTimeAgo = (dateString: string) => {
-  const date = new Date(dateString);
+  // If the date string doesn't have timezone info, assume UTC
+  const dateWithTimezone =
+    dateString?.endsWith("Z") ||
+    dateString?.includes("+") ||
+    (dateString?.includes("T") && dateString?.split("T")[1]?.includes("-"))
+      ? dateString
+      : `${dateString}Z`;
+
+  const date = new Date(dateWithTimezone);
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

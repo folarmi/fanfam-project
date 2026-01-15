@@ -17,75 +17,179 @@ const IconAndNumber = ({
   const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
+  // const reactToPostMutation = useCustomMutation({
+  //   endpoint: `contents/reactions`,
+  //   onSuccessCallback: () => {
+  //     // queryClient.invalidateQueries({
+  //     //   queryKey: ["GetContents"],
+  //     //   exact: false,
+  //     // });
+  //   },
+  // });
+
+  // const handleReaction = () => {
+  //   // Optimistic update
+  //   queryClient.setQueryData(["GetContents"], (oldData: any) => {
+  //     if (!oldData?.data?.content) return oldData;
+
+  //     return {
+  //       ...oldData,
+  //       data: {
+  //         ...oldData?.data,
+  //         content: oldData?.data?.content?.map((post: any) => {
+  //           if (post?.publicId !== publicid) return post;
+
+  //           const reactions = post?.reactions || [];
+
+  //           if (isActive) {
+  //             // Remove the reaction if clicking on active one
+  //             return {
+  //               ...post,
+  //               reactions: reactions?.filter(
+  //                 (r: any) =>
+  //                   !(
+  //                     r?.createdBy === userObject?.email &&
+  //                     r?.type === reactionType
+  //                   )
+  //               ),
+  //             };
+  //           } else {
+  //             // Remove any existing reaction from this user, then add new one
+  //             const withoutUserReactions = reactions.filter(
+  //               (r: any) => r.createdBy !== userObject?.email
+  //             );
+
+  //             return {
+  //               ...post,
+  //               reactions: [
+  //                 ...withoutUserReactions,
+  //                 {
+  //                   publicId: `temp-${Date.now()}`,
+  //                   createdBy: userObject?.email,
+  //                   lastModifiedBy: userObject?.email,
+  //                   createdDate: new Date().toISOString(),
+  //                   lastModifiedDate: new Date().toISOString(),
+  //                   type: reactionType,
+  //                 },
+  //               ],
+  //             };
+  //           }
+  //         }),
+  //       },
+  //     };
+  //   });
+
+  //   // Perform the actual mutation
+  //   reactToPostMutation.mutate({
+  //     pubId: publicid,
+  //     reactionType: reactionType,
+  //   });
+  // };
+
   const reactToPostMutation = useCustomMutation({
     endpoint: `contents/reactions`,
-    onSuccessCallback: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: ["GetContents"],
-      //   exact: false,
-      // });
+
+    onMutate: async (variables: { pubId: string; reactionType: string }) => {
+      console.log("🚀 Optimistic update started");
+
+      // Use the SAME query key with activeSearchTerm
+      const queryKey = ["GetContents", activeSearchTerm];
+
+      await queryClient.cancelQueries({ queryKey });
+      const previousData = queryClient.getQueryData(queryKey);
+
+      console.log("📦 Old data:", previousData);
+
+      queryClient.setQueryData(queryKey, (oldData: any) => {
+        if (!oldData?.data?.content) {
+          console.log("❌ No content found");
+          return oldData;
+        }
+
+        const newData = {
+          ...oldData,
+          data: {
+            ...oldData?.data,
+            content: oldData?.data?.content?.map((post: any) => {
+              if (post?.publicId !== variables.pubId) return post;
+
+              console.log("✅ Updating post:", variables.pubId);
+
+              const reactions = post?.reactions || [];
+              const userReaction = reactions.find(
+                (r: any) => r?.createdBy === userObject?.email
+              );
+              const isTogglingOff =
+                userReaction?.type === variables.reactionType;
+
+              if (isTogglingOff) {
+                return {
+                  ...post,
+                  reactions: reactions.filter(
+                    (r: any) =>
+                      !(
+                        r?.createdBy === userObject?.email &&
+                        r?.type === variables.reactionType
+                      )
+                  ),
+                };
+              } else {
+                const withoutUserReactions = reactions.filter(
+                  (r: any) => r.createdBy !== userObject?.email
+                );
+
+                return {
+                  ...post,
+                  reactions: [
+                    ...withoutUserReactions,
+                    {
+                      publicId: `temp-${Date.now()}`,
+                      createdBy: userObject?.email,
+                      lastModifiedBy: userObject?.email,
+                      createdDate: new Date().toISOString(),
+                      lastModifiedDate: new Date().toISOString(),
+                      type: variables.reactionType,
+                    },
+                  ],
+                };
+              }
+            }),
+          },
+        };
+
+        console.log("✨ New data:", newData);
+        return newData;
+      });
+
+      return { previousData, queryKey };
+    },
+
+    onError: (err: any, variables: any, context: any) => {
+      console.log("❌ Error occurred, rolling back");
+      if (context?.previousData && context?.queryKey) {
+        queryClient.setQueryData(context.queryKey, context.previousData);
+      }
+    },
+
+    onSettled: () => {
+      console.log("🔄 Refetching to sync with server");
+      // Invalidate with the same key pattern
+      queryClient.invalidateQueries({
+        queryKey: ["GetContents", activeSearchTerm],
+      });
+    },
+
+    onSuccessCallback: (data) => {
+      console.log("✅ Mutation succeeded");
     },
   });
 
   const handleReaction = () => {
-    // Optimistic update
-    queryClient.setQueryData(["GetContents"], (oldData: any) => {
-      if (!oldData?.data?.content) return oldData;
-
-      return {
-        ...oldData,
-        data: {
-          ...oldData?.data,
-          content: oldData?.data?.content?.map((post: any) => {
-            if (post?.publicId !== publicid) return post;
-
-            const reactions = post?.reactions || [];
-
-            if (isActive) {
-              // Remove the reaction if clicking on active one
-              return {
-                ...post,
-                reactions: reactions?.filter(
-                  (r: any) =>
-                    !(
-                      r?.createdBy === userObject?.email &&
-                      r?.type === reactionType
-                    )
-                ),
-              };
-            } else {
-              // Remove any existing reaction from this user, then add new one
-              const withoutUserReactions = reactions.filter(
-                (r: any) => r.createdBy !== userObject?.email
-              );
-
-              return {
-                ...post,
-                reactions: [
-                  ...withoutUserReactions,
-                  {
-                    publicId: `temp-${Date.now()}`,
-                    createdBy: userObject?.email,
-                    lastModifiedBy: userObject?.email,
-                    createdDate: new Date().toISOString(),
-                    lastModifiedDate: new Date().toISOString(),
-                    type: reactionType,
-                  },
-                ],
-              };
-            }
-          }),
-        },
-      };
-    });
-
-    // Perform the actual mutation
     reactToPostMutation.mutate({
       pubId: publicid,
       reactionType: reactionType,
     });
   };
-
   return (
     <div
       className={`flex items-center mr-4 cursor-pointer ${className}`}

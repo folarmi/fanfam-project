@@ -57,7 +57,7 @@ const Home = () => {
           : `contents?page=0&size=20&sort=createdDate,desc`,
       queryKey: ["GetContents", activeSearchTerm],
     });
-
+  // console.log(getCreatorContent?.data?.content);
   const useRecordContentView = (contentId: string) => {
     return useCustomMutation({
       endpoint: `contents/${contentId}/view`,
@@ -237,6 +237,7 @@ const Home = () => {
                 ifPoll
                 ifRecord
                 setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+                ifGoLive
               />
             )
           )}

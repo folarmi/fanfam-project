@@ -23,6 +23,7 @@ type CommentBoxProp = {
   placeholder?: string;
   commentId?: string;
   onSuccess?: () => void;
+  ifGoLive?: boolean;
 };
 
 const CommentBox = ({
@@ -33,6 +34,7 @@ const CommentBox = ({
   commentId,
   onSuccess,
   placeholder = "Write a Post..",
+  ifGoLive = false,
 }: CommentBoxProp) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -167,19 +169,21 @@ const CommentBox = ({
               Post
             </CustomButton>
           </div>
-          <div
-            onClick={toggleReportUserModal}
-            className="border border-blue_1000 py-2 px-4 flex items-center rounded-3xl ml-3 cursor-pointer"
-          >
-            <img src={video} alt="video" className="mr-1" />
-            <Typography
-              variant="subtitle3"
-              className="text-blue_20"
-              onClick={() => navigate("livestreaming")}
+          {ifGoLive && (
+            <div
+              onClick={toggleReportUserModal}
+              className="border border-blue_1000 py-2 px-4 flex items-center rounded-3xl ml-3 cursor-pointer"
             >
-              Go Live
-            </Typography>
-          </div>
+              <img src={video} alt="video" className="mr-1" />
+              <Typography
+                variant="subtitle3"
+                className="text-blue_20"
+                onClick={() => navigate("livestreaming")}
+              >
+                Go Live
+              </Typography>
+            </div>
+          )}
         </div>
       </div>
     </form>
