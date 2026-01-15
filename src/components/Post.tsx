@@ -63,6 +63,7 @@ const Post = ({
 
   // const tabsToDisplay = isMobile ? profileTabs.slice(0, 2) : profileTabs;
   const contentItems: StoryPost[] = creatorContent || [];
+
   return (
     <>
       {creatorContentIsLoading ? (
@@ -118,7 +119,7 @@ const Post = ({
                   avatar={defaultAvatar}
                   handle={`@${item.creator.split("@")[0]}`}
                   time={formatTimeAgo(item.createdDate)}
-                  paragraphOne={item.message}
+                  paragraphOne={item?.message}
                   paragraphTwo=""
                   timeLineImage={item.mediaFiles || ""}
                   ifParagraph={true}

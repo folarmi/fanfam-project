@@ -68,8 +68,8 @@ const TimeLineHomeModal = ({ publicId, createdBy }: Prop) => {
   };
 
   const menuItems = [
-    { id: 1, name: "Add Bookmark" },
-    { id: 2, name: "Repost" },
+    // { id: 1, name: "Add Bookmark" },
+    // { id: 2, name: "Repost" },
     ...(isOwner
       ? [
           { id: 3, name: "Edit post" },
