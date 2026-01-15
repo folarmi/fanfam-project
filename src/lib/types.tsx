@@ -398,9 +398,6 @@ export type ProfilePostProps = {
 
 export interface LiveNotification {
   creatorId: string;
-  creatorName?: string;
-  sessionId?: string;
-  status?: "live" | "ended";
 }
 
 export interface JoinLeaveMessage {
@@ -426,9 +423,6 @@ export interface ReactionMessage {
 
 export interface LiveCreator {
   creatorId: string;
-  sessionId: string;
-  creatorName?: string;
-  startedAt: number;
 }
 
 export interface WebSocketContextType {

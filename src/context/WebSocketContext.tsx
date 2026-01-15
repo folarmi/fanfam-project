@@ -176,13 +176,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
 
     const topic = `/topic/live/${creatorId}/stream`;
-    console.log(`🔔 Subscribing to: ${topic}`);
+    // console.log(`🔔 Subscribing to: ${topic}`);
 
     try {
       const subscription = client.subscribe(topic, (message) => {
         // This callback is ONLY called when backend sends a message to this topic
-        console.log("🎉 MESSAGE RECEIVED!", subscription.id);
-        console.log(`📬 Creator ${creatorId} went live:`, message.body);
+        // console.log("🎉 MESSAGE RECEIVED!", subscription.id);
+        console.log(`📬 Creator went live:`, message?.body);
         try {
           const payload: LiveNotification = JSON.parse(message.body);
           handleCreatorLiveNotification(creatorId, payload);
@@ -210,48 +210,84 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   };
 
   // Handle live notifications
+  //   const handleCreatorLiveNotification = (
+  //     creatorId: string,
+  //     payload: LiveNotification
+  //   ) => {
+  //     if (!payload?.creatorId) return;
+
+  //     setLiveCreators((prev) => {
+  //       const updated = new Map(prev);
+  //       updated.delete(payload.creatorId);
+  //       return updated;
+  //     });
+
+  //     toast.info(`${payload.creatorId}'s live stream has ended`);
+
+  //     // Add to live creators
+  //     setLiveCreators((prev) => {
+  //       const updated = new Map(prev);
+  //       updated.set(creatorId, {
+  //         creatorId,
+  //         sessionId: payload.sessionId!,
+  //         creatorName: payload.creatorName,
+  //         startedAt: Date.now(),
+  //       });
+  //       return updated;
+  //     });
+  //     console.log("dfgfdsdf", liveCreators);
+
+  //     toast.info(`🔴 ${payload.creatorName || creatorId} is now LIVE!`, {
+  //       autoClose: 7000,
+  //       onClick: () => {
+  //         // TODO: Navigate to live stream
+  //         console.log("Navigate to stream:", payload.sessionId);
+  //         // window.location.href = `/live/${payload.sessionId}`;
+  //       },
+  //     });
+  //   };
+
+  type LiveNotification = {
+    creatorId: string;
+  };
+
   const handleCreatorLiveNotification = (
-    creatorId: string,
+    creatorIdFromTopic: string,
     payload: LiveNotification
   ) => {
-    console.log("🎬 Creator live notification:", creatorId, payload);
+    // Use payload.creatorId if present; otherwise fall back to the topic param
+    const creatorId = payload?.creatorId || creatorIdFromTopic;
+    if (!creatorId) return;
+    console.log(payload);
+    // If already marked live, don't spam toast / reset startedAt
+    const alreadyLive = liveCreators.has(creatorId);
 
-    if (payload.status === "ended" || !payload.sessionId) {
-      // Remove from live creators
-      setLiveCreators((prev) => {
-        const updated = new Map(prev);
-        updated.delete(creatorId);
-        return updated;
-      });
-
-      toast.info(`${payload.creatorName || creatorId}'s live stream has ended`);
-      return;
-    }
-
-    // Add to live creators
     setLiveCreators((prev) => {
       const updated = new Map(prev);
-      updated.set(creatorId, {
-        creatorId,
-        sessionId: payload.sessionId!,
-        creatorName: payload.creatorName,
-        startedAt: Date.now(),
-      });
+
+      if (!updated.has(creatorId)) {
+        updated.set(creatorId, {
+          creatorId,
+        });
+      }
+
       return updated;
     });
 
-    toast.info(`🔴 ${payload.creatorName || creatorId} is now LIVE!`, {
-      autoClose: 7000,
-      onClick: () => {
-        // TODO: Navigate to live stream
-        console.log("Navigate to stream:", payload.sessionId);
-        // window.location.href = `/live/${payload.sessionId}`;
-      },
-    });
+    if (!alreadyLive) {
+      toast.info(`🔴 ${creatorId} is now LIVE!`, {
+        autoClose: 7000,
+        onClick: () => {
+          // You can navigate only if you can derive sessionId elsewhere
+          console.log("Navigate to stream for creator:", creatorId);
+        },
+      });
+    }
   };
 
   // Check if a creator is currently live
   const isCreatorLive = (creatorId: string): boolean => {
+    console.log("is live", creatorId);
     return liveCreators.has(creatorId);
   };
 
@@ -275,7 +311,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         destination,
         body: JSON.stringify(body),
       });
-      console.log(`📤 Sent to ${destination}:`, body);
+      //   console.log(`📤 Sent to ${destination}:`, body);
     } catch (error) {
       console.error("❌ Error sending message:", error);
     }

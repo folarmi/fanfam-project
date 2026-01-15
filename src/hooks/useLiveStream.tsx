@@ -52,20 +52,20 @@ export const useLiveStream = ({
     });
 
     // Subscribe to leave events
-    const leaveTopic = `/topic/live/${sessionId}/leave`;
-    console.log(`🔔 Subscribing to: ${leaveTopic}`);
+    // const leaveTopic = `/topic/live/${sessionId}/leave`;
+    // console.log(`🔔 Subscribing to: ${leaveTopic}`);
 
-    leaveSubRef.current = client?.subscribe(leaveTopic, (message) => {
-      console.log("👋 User left:", message.body);
+    // leaveSubRef.current = client?.subscribe(leaveTopic, (message) => {
+    //   console.log("👋 User left:", message.body);
 
-      try {
-        const data: JoinLeaveMessage = JSON.parse(message.body);
-        console.log("leave data", data);
-        setViewerCount((prev) => Math.max(0, prev - 1));
-      } catch (error) {
-        console.error("Error parsing leave message:", error);
-      }
-    });
+    //   try {
+    //     const data: JoinLeaveMessage = JSON.parse(message.body);
+    //     console.log("leave data", data);
+    //     setViewerCount((prev) => Math.max(0, prev - 1));
+    //   } catch (error) {
+    //     console.error("Error parsing leave message:", error);
+    //   }
+    // });
 
     console.log("✅ Live stream subscriptions set up");
 
