@@ -178,10 +178,11 @@ const LiveStreaming = () => {
         return;
       }
 
+      const newSessionId = `session_${userObject?.usid}_${Date.now()}`;
+      setSessionId(newSessionId);
+
       const res = await fetchToken();
-      console.log(res);
       const token = res?.data?.token;
-      console.log(token);
 
       if (!token) {
         toast.error("Failed to obtain streaming token");
@@ -228,16 +229,13 @@ const LiveStreaming = () => {
         // setViewerCount((prev) => Math.max(0, prev - 1));
       });
 
-      setIsStreaming(true);
-      // console.log("Live stream started! Channel:", channelName);
-
-      const newSessionId = `session_${userObject?.usid}_${Date.now()}`;
-      setSessionId(newSessionId);
-
       // Send "go live" message
       sendMessage("/app/live/go", {
         creatorId: userObject?.usid,
+        session: newSessionId,
       });
+
+      setIsStreaming(true);
     } catch (error) {
       // console.error("Error starting live stream:", error);
       toast.error("Failed to start live stream. Check console for details.");

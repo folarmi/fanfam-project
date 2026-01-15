@@ -154,6 +154,10 @@ const RoutePage = () => {
         </Route>
 
         <Route path="livestreaming" element={<LiveStreaming />} />
+        <Route
+          path="livestreaming/:creatorId/:sessionId"
+          element={<LiveStreaming />}
+        />
       </Route>
 
       {/* <Route element={<ProtectedRoute />}></Route> */}

@@ -5,7 +5,6 @@ import SearchInput from "../../components/SearchInput";
 import Poll from "../../components/molecules/Poll";
 import CommentBox from "../../components/CommentBox";
 import TimeLineHomeModal from "../../components/modals/TimeLineHomeModal";
-import { UserRole } from "../../data";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
 // import StoryModal from "../../components/modals/StoryModal";
@@ -24,6 +23,9 @@ const Home = () => {
   const navigate = useNavigate();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const isCreator = userObject?.role === "CREATOR";
+
   // const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
   // value shown in input
@@ -45,7 +47,8 @@ const Home = () => {
   const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
     useGetData({
       url:
-        userObject?.role === UserRole.creator
+        // userObject?.role === UserRole.creator
+        isCreator
           ? `contents?creator=${
               userObject?.email
             }&page=0&size=20&sort=createdDate,desc${
@@ -219,7 +222,7 @@ const Home = () => {
             onSearch={handleSearch}
             placeholder="Search..."
           />
-          <CreatorLiveCard />
+          {!isCreator && <CreatorLiveCard />}
           {ifUserIsCreatingPoll ? (
             <Poll
               pollOptions={pollOptions}
@@ -229,7 +232,7 @@ const Home = () => {
               setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
             />
           ) : (
-            userObject.role === UserRole.creator && (
+            isCreator && (
               <CommentBox
                 ifPoll
                 ifRecord
@@ -248,7 +251,8 @@ const Home = () => {
           ))}
         </>
 
-        {userObject.role !== UserRole.creator && (
+        {/* {userObject.role !== UserRole.creator && ( */}
+        {!isCreator && (
           <Modal show={showInterestModal} toggleModal={toggleInterestModal}>
             <div className="p-4">
               <InterestModal toggleModal={toggleInterestModal} />

@@ -423,6 +423,7 @@ export interface ReactionMessage {
 
 export interface LiveCreator {
   creatorId: string;
+  sessionId: string;
 }
 
 export interface WebSocketContextType {
