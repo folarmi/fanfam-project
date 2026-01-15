@@ -471,46 +471,46 @@ export const settingsModule = [
     name: "Account",
     path: "/dashboard/settings/account",
   },
-  {
-    id: 2,
-    name: "Collections",
-    path: "/dashboard/settings/collections",
-  },
-  {
-    id: 3,
-    name: "Chat",
-    path: "/dashboard/settings/chat",
-  },
+  // {
+  //   id: 2,
+  //   name: "Collections",
+  //   path: "/dashboard/settings/collections",
+  // },
+  // {
+  //   id: 3,
+  //   name: "Chat",
+  //   path: "/dashboard/settings/chat",
+  // },
   {
     id: 4,
     name: "Notifications",
     path: "/dashboard/settings/notifications",
   },
-  {
-    id: 5,
-    name: "Story",
-    path: "/dashboard/settings/story",
-  },
+  // {
+  //   id: 5,
+  //   name: "Story",
+  //   path: "/dashboard/settings/story",
+  // },
   {
     id: 6,
     name: "Display",
     path: "/dashboard/settings/display",
   },
-  {
-    id: 7,
-    name: "QR Code",
-    path: "/dashboard/settings/qr-code",
-  },
+  // {
+  //   id: 7,
+  //   name: "QR Code",
+  //   path: "/dashboard/settings/qr-code",
+  // },
   {
     id: 8,
     name: "Privacy and safety",
     path: "/dashboard/settings/privacy",
   },
-  {
-    id: 9,
-    name: "Preferences",
-    path: "/dashboard/settings/preferences",
-  },
+  // {
+  //   id: 9,
+  //   name: "Preferences",
+  //   path: "/dashboard/settings/preferences",
+  // },
 ];
 
 export const accountSettingsModules = [
@@ -922,54 +922,54 @@ export const subscriptionMenu = [
     path: "/dashboard/account/subscribed",
     isViewer: true,
   },
-  {
-    id: 1,
-    name: "Cards",
-    path: "/dashboard/account/cards",
-    isViewer: true,
-  },
-  {
-    id: 6,
-    name: "Wallet",
-    path: "/dashboard/account/wallet",
-    isViewer: true,
-  },
+  // {
+  //   id: 1,
+  //   name: "Cards",
+  //   path: "/dashboard/account/cards",
+  //   isViewer: true,
+  // },
+  // {
+  //   id: 6,
+  //   name: "Wallet",
+  //   path: "/dashboard/account/wallet",
+  //   isViewer: true,
+  // },
   {
     id: 2,
     name: "Subscriptions Settings",
     path: "/dashboard/account/settings",
     isViewer: false,
   },
-  {
-    id: 3,
-    name: "Returned Payments",
-    path: "",
-    isViewer: false,
-  },
-  {
-    id: 4,
-    name: "Statistics",
-    path: "/dashboard/account/statistics",
-    isViewer: false,
-  },
-  {
-    id: 5,
-    name: "Statements",
-    path: "",
-    isViewer: false,
-  },
-  {
-    id: 7,
-    name: "Referrals",
-    path: "/dashboard/account/referrals",
-    isViewer: true,
-  },
-  {
-    id: 8,
-    name: "Profile Ads",
-    path: "/dashboard/account/profile-ads",
-    isViewer: false,
-  },
+  // {
+  //   id: 3,
+  //   name: "Returned Payments",
+  //   path: "",
+  //   isViewer: false,
+  // },
+  // {
+  //   id: 4,
+  //   name: "Statistics",
+  //   path: "/dashboard/account/statistics",
+  //   isViewer: false,
+  // },
+  // {
+  //   id: 5,
+  //   name: "Statements",
+  //   path: "",
+  //   isViewer: false,
+  // },
+  // {
+  //   id: 7,
+  //   name: "Referrals",
+  //   path: "/dashboard/account/referrals",
+  //   isViewer: true,
+  // },
+  // {
+  //   id: 8,
+  //   name: "Profile Ads",
+  //   path: "/dashboard/account/profile-ads",
+  //   isViewer: false,
+  // },
 ];
 
 export const earningsSampleData = [

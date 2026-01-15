@@ -9,6 +9,7 @@ import { Loader } from "@/components/molecules/Loader";
 import type { SubscriberProfile } from "@/lib/types";
 import { convertToHumanReadableDate } from "@/utils/helper";
 import { UserRole } from "@/data";
+import EmptyState from "@/components/molecules/EmptyState";
 
 const Subscribed = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -57,7 +58,6 @@ const Subscribed = () => {
 
   // const [isActiveTab, setIsActiveTab] = useState("All Creators");
 
-  console.log(getCreatorSubscriptions);
   return (
     <>
       {getCreatorSubscriptionsIsLoading || getViewerSubscriptionsIsLoading ? (
@@ -72,46 +72,56 @@ const Subscribed = () => {
             isActiveTab={isActiveTab}
           /> */}
 
-          <div className="mt-6 flex flex-wrap gap-4">
-            {subscribersData?.data?.content?.map((item: SubscriberProfile) => {
-              return (
-                <>
-                  {userObject?.role === UserRole.viewer ? (
-                    <SubscribedCard
-                      img={item?.creator?.profilePic}
-                      userName={item?.creator?.username || "N/A"}
-                      tag={item?.creator?.displayName || "N/A"}
-                      expiryStatus={`Expires ${convertToHumanReadableDate(
-                        item?.endDate
-                      )}`}
-                      buttonText={
-                        item?.fee ? `$${item.fee} per month` : "FOR FREE"
-                      }
-                      freeSub
-                      key={item?.publicId}
-                      profileName={item?.creator?.fullName || "Unknown User"}
-                    />
-                  ) : (
-                    <SubscribedCard
-                      // img={item?.subscriber?.profilePic}
-                      img=""
-                      userName={item?.subscriber?.username || "N/A"}
-                      tag={item?.subscriber?.displayName || "N/A"}
-                      expiryStatus={`Expires ${convertToHumanReadableDate(
-                        item?.endDate
-                      )}`}
-                      buttonText={
-                        item?.fee ? `$${item.fee} per month` : "FOR FREE"
-                      }
-                      freeSub
-                      key={item?.publicId}
-                      profileName={item?.subscriber?.fullName || "Unknown User"}
-                    />
-                  )}
-                </>
-              );
-            })}
-          </div>
+          {subscribersData?.data?.content ?? [] ? (
+            <EmptyState text="No subscribers yet" />
+          ) : (
+            <div className="mt-6 flex flex-wrap gap-4">
+              {subscribersData?.data?.content?.map(
+                (item: SubscriberProfile) => {
+                  return (
+                    <>
+                      {userObject?.role === UserRole.viewer ? (
+                        <SubscribedCard
+                          img={item?.creator?.profilePic}
+                          userName={item?.creator?.username || "N/A"}
+                          tag={item?.creator?.displayName || "N/A"}
+                          expiryStatus={`Expires ${convertToHumanReadableDate(
+                            item?.endDate
+                          )}`}
+                          buttonText={
+                            item?.fee ? `$${item.fee} per month` : "FOR FREE"
+                          }
+                          freeSub
+                          key={item?.publicId}
+                          profileName={
+                            item?.creator?.fullName || "Unknown User"
+                          }
+                        />
+                      ) : (
+                        <SubscribedCard
+                          // img={item?.subscriber?.profilePic}
+                          img=""
+                          userName={item?.subscriber?.username || "N/A"}
+                          tag={item?.subscriber?.displayName || "N/A"}
+                          expiryStatus={`Expires ${convertToHumanReadableDate(
+                            item?.endDate
+                          )}`}
+                          buttonText={
+                            item?.fee ? `$${item.fee} per month` : "FOR FREE"
+                          }
+                          freeSub
+                          key={item?.publicId}
+                          profileName={
+                            item?.subscriber?.fullName || "Unknown User"
+                          }
+                        />
+                      )}
+                    </>
+                  );
+                }
+              )}
+            </div>
+          )}
         </div>
       )}
     </>
