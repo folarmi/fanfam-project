@@ -211,8 +211,6 @@ const LiveStreaming = () => {
       // Send "go live" message
       sendMessage("/app/live/go", {
         creatorId: userObject?.usid,
-        // session: sessionId,
-        session: "dfdf",
       });
     } catch (error) {
       // console.error("Error starting live stream:", error);
@@ -634,3 +632,6 @@ const LiveStreaming = () => {
 };
 
 export { LiveStreaming };
+
+// "fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL"
+// "fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL"

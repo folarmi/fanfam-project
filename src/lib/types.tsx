@@ -424,10 +424,34 @@ export interface ReactionMessage {
   userId?: string;
 }
 
+export interface LiveCreator {
+  creatorId: string;
+  sessionId: string;
+  creatorName?: string;
+  startedAt: number;
+}
+
 export interface WebSocketContextType {
   isConnected: boolean;
   client: Client | null;
+  liveCreators: Map<string, LiveCreator>;
   subscribeToCreator: (creatorId: string) => void;
   unsubscribeFromCreator: (creatorId: string) => void;
   sendMessage: (destination: string, body: any) => void;
+  isCreatorLive: (creatorId: string) => boolean;
+  getLiveSession: (creatorId: string) => LiveCreator | undefined;
+}
+
+export interface JoinLeaveMessage {
+  session: string;
+  userId?: string;
+  creatorId?: string;
+  role?: "VIEWER" | "HOST";
+}
+
+export interface UseLiveStreamProps {
+  sessionId: string;
+  creatorId: string;
+  role: "VIEWER" | "HOST";
+  enabled?: boolean;
 }

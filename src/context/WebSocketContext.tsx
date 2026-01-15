@@ -12,7 +12,14 @@ import React, {
 } from "react";
 import { Client } from "@stomp/stompjs";
 import { toast } from "react-toastify";
-import type { LiveNotification, WebSocketContextType } from "@/lib/types";
+import type {
+  LiveCreator,
+  LiveNotification,
+  WebSocketContextType,
+} from "@/lib/types";
+import type { RootState } from "@/lib/store";
+import { useAppSelector } from "@/lib/hook";
+import { useGetData } from "@/hooks/apiCalls";
 
 interface WebSocketProviderProps {
   children: React.ReactNode;
@@ -33,11 +40,32 @@ export const useWebSocket = () => {
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   children,
 }) => {
+  // Get user info from Redux
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const isCreator = userObject?.role === "CREATOR";
+
   const [isConnected, setIsConnected] = useState(false);
   const [followedCreators, setFollowedCreators] = useState<string[]>([]);
+  const [liveCreators, setLiveCreators] = useState<Map<string, LiveCreator>>(
+    new Map()
+  );
 
   const stompClientRef = useRef<Client | null>(null);
   const subscriptionsRef = useRef<Map<string, any>>(new Map());
+
+  // Fetch subscriptions for creators (who follows them)
+  //   const { data: getCreatorSubscriptions } = useGetData({
+  //     url: `subscriptions/creator/${userObject?.usid}/subscribers?page=0&size=20`,
+  //     queryKey: ["GetSubscriptions", userObject?.usid],
+  //     enabled: !!userObject?.usid && isCreator,
+  //   });
+
+  // Fetch subscriptions for viewers (who they follow)
+  const { data: getViewerSubscriptions } = useGetData({
+    url: `subscriptions?page=0&size=20&subscriberEmail=${userObject?.email}`,
+    queryKey: ["GetSubscriptionsForViewer", userObject?.email],
+    enabled: !!userObject?.email && !isCreator,
+  });
 
   const getWebSocketUrl = () => {
     if (import.meta.env.DEV) {
@@ -73,8 +101,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
       onConnect: () => {
         setIsConnected(true);
-        toast.success("Connected to WebSocket");
-
         // Re-subscribe to all followed creators after reconnect
         subscribeToAllFollowedCreators();
       },
@@ -109,35 +135,29 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Fetch followed creators
   useEffect(() => {
-    const fetchFollowedCreators = async () => {
+    // For viewers: Get list of creators they follow
+    if (!isCreator && getViewerSubscriptions) {
       try {
-        const token = localStorage.getItem("authToken");
-
-        // TODO: Replace with your actual API endpoint
-        // const response = await fetch('/api/users/me/following', {
-        //   headers: { Authorization: `Bearer ${token}` }
-        // });
-        // const data = await response.json();
-        // const creatorIds = data.map((c: any) => c.id);
-
-        // Mock data for testing
-        const creatorIds: string[] = [
-          // Add test creator IDs here
-        ];
-
+        const creatorIds: string[] = (
+          getViewerSubscriptions?.data?.content ?? []
+        )
+          .map((sub: any) => sub?.creator?.usid)
+          .filter((id: any): id is string => Boolean(id));
+        console.log("idsssss", creatorIds);
+        console.log("idsssss", getViewerSubscriptions?.data?.content);
         setFollowedCreators(creatorIds);
-        console.log("👥 Followed creators loaded:", creatorIds.length);
       } catch (error) {
-        console.error("❌ Error fetching followed creators:", error);
+        console.error("❌ Error processing viewer subscriptions:", error);
       }
-    };
+    }
 
-    fetchFollowedCreators();
-  }, []);
+    // For creators: They might want to follow other creators too
+    // You can add similar logic here if needed
+  }, [getViewerSubscriptions, isCreator]);
 
   // Subscribe to all followed creators
   const subscribeToAllFollowedCreators = () => {
-    followedCreators.forEach((creatorId) => {
+    followedCreators?.forEach((creatorId) => {
       subscribeToCreator(creatorId);
     });
   };
@@ -145,7 +165,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   // Subscribe to a specific creator
   const subscribeToCreator = (creatorId: string) => {
     const client = stompClientRef.current;
-
+    console.log(creatorId);
     if (!client || !client.connected) {
       console.warn("⚠️ Cannot subscribe: WebSocket not connected");
       return;
@@ -161,8 +181,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
     try {
       const subscription = client.subscribe(topic, (message) => {
-        console.log(`📬 Creator ${creatorId} went live:`, message.body);
-
         try {
           const payload: LiveNotification = JSON.parse(message.body);
           handleCreatorLiveNotification(creatorId, payload);
@@ -172,7 +190,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       });
 
       subscriptionsRef.current.set(creatorId, subscription);
-      console.log(`✅ Subscribed to: ${creatorId}`);
+      //   console.log(`✅ Subscribed to: ${creatorId}`);
     } catch (error) {
       console.error(`❌ Error subscribing to ${creatorId}:`, error);
     }
@@ -194,16 +212,50 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     creatorId: string,
     payload: LiveNotification
   ) => {
-    console.log("🎬 Creator went live:", creatorId, payload);
+    console.log("🎬 Creator live notification:", creatorId, payload);
+
+    if (payload.status === "ended" || !payload.sessionId) {
+      // Remove from live creators
+      setLiveCreators((prev) => {
+        const updated = new Map(prev);
+        updated.delete(creatorId);
+        return updated;
+      });
+
+      toast.info(`${payload.creatorName || creatorId}'s live stream has ended`);
+      return;
+    }
+
+    // Add to live creators
+    setLiveCreators((prev) => {
+      const updated = new Map(prev);
+      updated.set(creatorId, {
+        creatorId,
+        sessionId: payload.sessionId!,
+        creatorName: payload.creatorName,
+        startedAt: Date.now(),
+      });
+      return updated;
+    });
 
     toast.info(`🔴 ${payload.creatorName || creatorId} is now LIVE!`, {
       autoClose: 7000,
       onClick: () => {
         // TODO: Navigate to live stream
-        console.log("Navigate to stream:", payload.sessionId || creatorId);
+        console.log("Navigate to stream:", payload.sessionId);
         // window.location.href = `/live/${payload.sessionId}`;
       },
     });
+  };
+
+  // Check if a creator is currently live
+  const isCreatorLive = (creatorId: string): boolean => {
+    return liveCreators.has(creatorId);
+  };
+
+  // Get live session info for a creator
+  const getLiveSession = (creatorId: string): LiveCreator | undefined => {
+    return liveCreators.get(creatorId);
   };
 
   // Send message helper
@@ -252,9 +304,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const value: WebSocketContextType = {
     isConnected,
     client: stompClientRef.current,
+    liveCreators,
     subscribeToCreator,
     unsubscribeFromCreator,
     sendMessage,
+    isCreatorLive,
+    getLiveSession,
   };
 
   return (
