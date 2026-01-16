@@ -55,7 +55,8 @@ const Home = () => {
               activeSearchTerm ? `&search=${activeSearchTerm}` : ""
             }`
           : `contents?page=0&size=20&sort=createdDate,desc`,
-      queryKey: ["GetContents", activeSearchTerm],
+      // queryKey: ["GetContents", activeSearchTerm],
+      queryKey: ["GetContents"],
     });
   // console.log(getCreatorContent?.data?.content);
   const useRecordContentView = (contentId: string) => {

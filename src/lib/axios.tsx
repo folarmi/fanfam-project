@@ -1,119 +1,252 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import axios, { type AxiosInstance } from "axios";
-// import https from "https";
-// const https = require("https");
-// const fs = require("fs");
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// /* eslint-disable @typescript-eslint/no-unused-vars */
+// import axios, { type AxiosInstance } from "axios";
+// // import https from "https";
+// // const https = require("https");
+// // const fs = require("fs");
 
-// const cert = new (require("fs").Agent)({});
+// // const cert = new (require("fs").Agent)({});
 
-// console.log(cert);
+// // console.log(cert);
+
+// const api: AxiosInstance = axios.create({
+//   baseURL: import.meta.env.VITE_PUBLIC_BASE_URL,
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+//   // httpsAgent: new https.Agent({
+//   //   rejectUnauthorized: false,
+//   // }),
+// });
+
+// // const EAONCREDENTIALVALUE = import.meta.env.VITE_PUBLIC_EAONCREDENTIALVALUE;
+// // const EAONCREDENTIALKEY = import.meta.env.VITE_PUBLIC_EAONCREDENTIALKEY;
+
+// let isRefreshing = false;
+// let refreshSubscribers: Array<(token: string) => void> = [];
+
+// api.interceptors.request.use(
+//   async (config) => {
+//     try {
+//       const token = localStorage.getItem("token");
+
+//       if (token) {
+//         const newConfig = { ...config };
+
+//         newConfig.headers.Authorization = `Bearer ${token}`;
+//         newConfig.headers.EAONCREDENTIALKEY =
+//           "K1T2U3V4W5X6Y7Z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0G1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5V6W7X8Y9Z0g3h4i5j6k7l8m9n0o1p2q3r4s5t6u7v8w9x0y1z2A3B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S4Y5Z6a7b8c9d0e1f2";
+//         newConfig.headers.EAONCREDENTIALVALUE =
+//           "V1T2bR3yL4FpU5qZvS6xC7dG8hIoJ9kApLbQcM1uN2vXwO3xY4zU5hV6mB7nC8oD9pE0qF1rG2sH3tI4uJ5vK6wL7xM8yN9zA0bB1cC2dD3eE4fF5gG6hH7iI8jJ9kK0lL1mM2nN3oO4pP5qQ6rR7sS8tT9uU0vV1wW2xX3yY4zZ50A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X";
+//         return newConfig;
+//       }
+//       return config;
+//     } catch (error) {
+//       return config;
+//     }
+//   },
+//   (error) => Promise.reject(error)
+// );
+
+// api.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+//     // Skip token refresh and redirect logic for login endpoint
+//     const isLoginRequest =
+//       originalRequest.url?.includes("auth/login") ||
+//       originalRequest.url?.includes("auth/refresh");
+//     // Check for token expiration (401 Unauthorized)
+//     if (
+//       error.response?.status === 401 &&
+//       !originalRequest._retry &&
+//       !isLoginRequest
+//     ) {
+//       originalRequest._retry = true; // Mark the request as retried
+
+//       if (!isRefreshing) {
+//         isRefreshing = true;
+
+//         try {
+//           const refreshToken = localStorage.getItem("refreshToken");
+
+//           if (!refreshToken) {
+//             throw new Error("No refresh token available");
+//           }
+
+//           // Make a request to refresh the token
+//           const { data } = await axios.post(
+//             `${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`,
+//             { token: refreshToken }
+//           );
+
+//           const newToken = data.accessToken;
+
+//           // Store new tokens
+//           localStorage.setItem("token", newToken);
+//           localStorage.setItem("refreshToken", data.refreshToken);
+
+//           // Notify all subscribers
+//           refreshSubscribers.forEach((callback) => callback(newToken));
+//           refreshSubscribers = []; // Clear the queue
+
+//           return api(originalRequest); // Retry the original request
+//         } catch (refreshError) {
+//           console.error("Token refresh failed:", refreshError);
+//           localStorage.removeItem("token");
+//           localStorage.removeItem("refreshToken");
+//           // Only redirect to login if NOT a login request
+//           if (!isLoginRequest) {
+//             // window.location.href = "/";
+//           }
+//           return Promise.reject(refreshError);
+//         } finally {
+//           isRefreshing = false;
+//         }
+//       }
+
+//       // Queue the request until the token is refreshed
+//       return new Promise((resolve) => {
+//         refreshSubscribers.push((newToken) => {
+//           originalRequest.headers.Authorization = `Bearer ${newToken}`;
+//           resolve(api(originalRequest)); // Retry the original request
+//         });
+//       });
+//     }
+
+//     return Promise.reject(error); // For other errors, reject the promise
+//   }
+// );
+
+// export default api;
+
+import axios, { type AxiosError, type AxiosInstance } from "axios";
+
+const BASE_URL = import.meta.env.VITE_PUBLIC_BASE_URL;
 
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_PUBLIC_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  // httpsAgent: new https.Agent({
-  //   rejectUnauthorized: false,
-  // }),
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
 });
-
-// const EAONCREDENTIALVALUE = import.meta.env.VITE_PUBLIC_EAONCREDENTIALVALUE;
-// const EAONCREDENTIALKEY = import.meta.env.VITE_PUBLIC_EAONCREDENTIALKEY;
 
 let isRefreshing = false;
 let refreshSubscribers: Array<(token: string) => void> = [];
 
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onTokenRefreshed(token: string) {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+function setAuthHeader(config: any, token: string) {
+  // Axios v1 headers can be AxiosHeaders or plain object depending on runtime
+  config.headers = config.headers ?? {};
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+}
+
 api.interceptors.request.use(
-  async (config) => {
-    try {
-      const token = localStorage.getItem("token");
+  (config) => {
+    const token = localStorage.getItem("token");
 
-      if (token) {
-        const newConfig = { ...config };
+    // always ensure headers exist
+    config.headers = config.headers ?? {};
 
-        newConfig.headers.Authorization = `Bearer ${token}`;
-        newConfig.headers.EAONCREDENTIALKEY =
-          "K1T2U3V4W5X6Y7Z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0G1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5V6W7X8Y9Z0g3h4i5j6k7l8m9n0o1p2q3r4s5t6u7v8w9x0y1z2A3B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S4Y5Z6a7b8c9d0e1f2";
-        newConfig.headers.EAONCREDENTIALVALUE =
-          "V1T2bR3yL4FpU5qZvS6xC7dG8hIoJ9kApLbQcM1uN2vXwO3xY4zU5hV6mB7nC8oD9pE0qF1rG2sH3tI4uJ5vK6wL7xM8yN9zA0bB1cC2dD3eE4fF5gG6hH7iI8jJ9kK0lL1mM2nN3oO4pP5qQ6rR7sS8tT9uU0vV1wW2xX3yY4zZ50A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X";
-        return newConfig;
-      }
-      return config;
-    } catch (error) {
-      return config;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // your extra headers
+    config.headers.EAONCREDENTIALKEY =
+      "K1T2U3V4W5X6Y7Z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0G1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5V6W7X8Y9Z0g3h4i5j6k7l8m9n0o1p2q3r4s5t6u7v8w9x0y1z2A3B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S4Y5Z6a7b8c9d0e1f2";
+    config.headers.EAONCREDENTIALVALUE =
+      "V1T2bR3yL4FpU5qZvS6xC7dG8hIoJ9kApLbQcM1uN2vXwO3xY4zU5hV6mB7nC8oD9pE0qF1rG2sH3tI4uJ5vK6wL7xM8yN9zA0bB1cC2dD3eE4fF5gG6hH7iI8jJ9kK0lL1mM2nN3oO4pP5qQ6rR7sS8tT9uU0vV1wW2xX3yY4zZ50A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X";
+
+    return config;
   },
   (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    // Skip token refresh and redirect logic for login endpoint
-    const isLoginRequest =
-      originalRequest.url?.includes("auth/login") ||
-      originalRequest.url?.includes("auth/refresh");
-    // Check for token expiration (401 Unauthorized)
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !isLoginRequest
-    ) {
-      originalRequest._retry = true; // Mark the request as retried
+  async (error: AxiosError<any>) => {
+    const originalRequest: any = error.config;
 
-      if (!isRefreshing) {
-        isRefreshing = true;
+    const status = error.response?.status;
+    const message = error.response?.data?.message || error.message;
 
-        try {
-          const refreshToken = localStorage.getItem("refreshToken");
+    // don’t refresh for login/refresh calls
+    const isAuthEndpoint =
+      originalRequest?.url?.includes("auth/login") ||
+      originalRequest?.url?.includes("auth/refresh");
 
-          if (!refreshToken) {
-            throw new Error("No refresh token available");
+    // Your backend returns 400 when Authorization header is missing,
+    // so treat that as an auth failure too.
+    const isAuthFailure =
+      status === 401 ||
+      (status === 400 &&
+        typeof message === "string" &&
+        message.toLowerCase().includes("missing authorization"));
+
+    if (!originalRequest || isAuthEndpoint || !isAuthFailure) {
+      return Promise.reject(error);
+    }
+
+    if (originalRequest._retry) {
+      return Promise.reject(error);
+    }
+    originalRequest._retry = true;
+
+    // If refresh already happening, queue this request
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        subscribeTokenRefresh((newToken) => {
+          try {
+            setAuthHeader(originalRequest, newToken);
+            resolve(api(originalRequest));
+          } catch (e) {
+            reject(e);
           }
-
-          // Make a request to refresh the token
-          const { data } = await axios.post(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`,
-            { token: refreshToken }
-          );
-
-          const newToken = data.accessToken;
-
-          // Store new tokens
-          localStorage.setItem("token", newToken);
-          localStorage.setItem("refreshToken", data.refreshToken);
-
-          // Notify all subscribers
-          refreshSubscribers.forEach((callback) => callback(newToken));
-          refreshSubscribers = []; // Clear the queue
-
-          return api(originalRequest); // Retry the original request
-        } catch (refreshError) {
-          console.error("Token refresh failed:", refreshError);
-          localStorage.removeItem("token");
-          localStorage.removeItem("refreshToken");
-          // Only redirect to login if NOT a login request
-          if (!isLoginRequest) {
-            // window.location.href = "/";
-          }
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
-        }
-      }
-
-      // Queue the request until the token is refreshed
-      return new Promise((resolve) => {
-        refreshSubscribers.push((newToken) => {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          resolve(api(originalRequest)); // Retry the original request
         });
       });
     }
 
-    return Promise.reject(error); // For other errors, reject the promise
+    isRefreshing = true;
+
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) throw new Error("No refresh token available");
+
+      // ✅ IMPORTANT: use Vite env + api baseURL (not process.env / Next.js)
+      const { data } = await api.post("/auth/refresh", { token: refreshToken });
+
+      const newToken = data?.accessToken;
+      const newRefresh = data?.refreshToken;
+
+      if (!newToken) throw new Error("Refresh did not return accessToken");
+
+      localStorage.setItem("token", newToken);
+      if (newRefresh) localStorage.setItem("refreshToken", newRefresh);
+
+      // ✅ ensure future requests use new token
+      api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+
+      // ✅ update the request we’re retrying right now
+      setAuthHeader(originalRequest, newToken);
+
+      onTokenRefreshed(newToken);
+
+      return api(originalRequest);
+    } catch (refreshError) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
 
