@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomButton from "./forms/CustomButton";
 import { useForm } from "react-hook-form";
 import { CustomTextArea } from "./forms/CustomTextArea";
@@ -39,7 +39,14 @@ const CommentBox = ({
 }: CommentBoxProp) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { handleSubmit, control, reset, trigger } = useForm();
+  const {
+    handleSubmit,
+    control,
+    reset,
+    clearErrors,
+    trigger,
+    formState: { isSubmitted },
+  } = useForm();
 
   const [isActive, setIsActive] = useState(false);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -77,15 +84,11 @@ const CommentBox = ({
   // Just store files, don't upload yet
   const handleFileUpload = (files: File[]) => {
     setQueuedFiles((prev) => [...prev, ...files]);
-    // Re-trigger validation to clear any errors
-    trigger("message");
   };
 
   // Remove file from queue
   const handleRemoveFile = (index: number) => {
     setQueuedFiles((prev) => prev.filter((_, i) => i !== index));
-    // Re-trigger validation after removing file
-    setTimeout(() => trigger("message"), 0);
   };
 
   const handleRecordingComplete = (audioBlob: Blob) => {
@@ -95,8 +98,6 @@ const CommentBox = ({
     });
 
     setQueuedFiles((prev) => [...prev, audioFile]);
-    // Re-trigger validation to clear any errors
-    trigger("message");
     toast.success("Voice note added successfully");
   };
 
@@ -157,6 +158,16 @@ const CommentBox = ({
     },
     onError: () => {},
   });
+
+  useEffect(() => {
+    if (!isSubmitted) return;
+    if (queuedFiles.length > 0) {
+      clearErrors("message");
+    } else {
+      // if they removed all files, re-check requirement
+      trigger("message");
+    }
+  }, [queuedFiles.length, clearErrors, trigger]);
 
   return (
     <form
