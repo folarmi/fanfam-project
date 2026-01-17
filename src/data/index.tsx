@@ -69,7 +69,88 @@ import { convertToHumanReadableDate, getRemainingDays } from "@/utils/helper";
 import { Link } from "react-router-dom";
 // import CustomButton from "@/components/forms/CustomButton";
 import BlueBorderedButton from "@/components/forms/BlueBorderedButton";
+import landingIconOne from "@/assets/icons/landingIconOne.svg";
+import landingIconTwo from "@/assets/icons/landingIconTwo.svg";
 
+export const landingPageMenu = [
+  {
+    id: 1,
+    name: "The Problem",
+  },
+  {
+    id: 2,
+    name: "Early Access",
+  },
+];
+
+export const ownYourAudience = [
+  {
+    id: 1,
+    title: "You Don't Own Your Audience",
+    body: "Your followers belong to the platform, not you. One algorithm change and your reach vanishes overnight.",
+    icon: landingIconOne,
+    bgColor: "#12141D",
+    color: "#FFFFFF",
+  },
+  {
+    id: 2,
+    title: "Shallow Engagement",
+    body: "Likes and views don't pay the bills. Algorithms reward virality, not meaningful fan relationships.",
+    icon: landingIconTwo,
+    bgColor: "#92CDFE",
+    color: "#000000",
+  },
+  {
+    id: 1,
+    title: "Platform Dependency",
+    body: "You're building on rented land. Changes to terms, monetization, or policies can destroy years of work.",
+    icon: landingIconOne,
+    bgColor: "#12141D",
+    color: "#FFFFFF",
+  },
+];
+
+export const meetFanFamData = [
+  {
+    id: 1,
+    name: "Community First",
+  },
+  {
+    id: 2,
+    name: "Creator Owned",
+  },
+  {
+    id: 3,
+    name: "Fan Powered",
+  },
+  {
+    id: 4,
+    name: "Algorithm Free",
+  },
+];
+
+export const builtForCreators = [
+  {
+    id: 1,
+    title: "True Audience Ownership",
+    body: "Your fans, your data, your rules. Export anytime, no lock-in. Build on your own terms.",
+  },
+  {
+    id: 2,
+    title: "Deep Fan Engagement",
+    body: "Go beyond likes. Create meaningful interactions that turn casual followers into superfans.",
+  },
+  {
+    id: 3,
+    title: "Community-First Experiences",
+    body: "Build spaces where fans connect with each other, not just with you. Foster belonging",
+  },
+  {
+    id: 4,
+    title: "Sustainable Monetization",
+    body: "Multiple revenue streams designed for the long-term. Subscriptions, tips, exclusives, and more.",
+  },
+];
 export const sideBarItems = [
   {
     id: 1,

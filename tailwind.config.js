@@ -23,8 +23,12 @@ export default {
           "inset 0 2px 0 0 rgba(255, 255, 255, 0.16)",
         ].join(", "),
       },
+      fontFamily: {
+        clash: ['"Clash Display"', "ui-sans-serif", "system-ui"],
+      },
       colors: {
         primary: "#2599F6",
+        primaryTwo: "#0567B5",
         grey_10: "#ECEEFB",
         grey_20: "#FAFAFA",
         grey_30: "#707072",
@@ -69,6 +73,12 @@ export default {
         bloomTextHeading: "#1C2024",
         brown_100: "#3a1f37",
         brown_200: "#27061b",
+        white_100: "#D6E7F5",
+        white_200: "#FEFEFE",
+        white_300: "#FEFFFF",
+        white_400: "#0007149F",
+        white_500: "#00083046",
+        white_600: "#E4E4E4",
       },
       boxShadow: {
         custom: "0px 2px 1px 0px #00000040",
