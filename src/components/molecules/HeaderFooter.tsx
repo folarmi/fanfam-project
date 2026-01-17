@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 import headerFooter from "@assets/headerFooter.svg";
 import HeaderText from "../atoms/HeaderText";
 import StackedInput from "../forms/StackedInput";
@@ -58,11 +59,27 @@ const HeaderFooter = () => {
 
           <HeaderButton
             label="Get Early Access"
-            className="bg-red-900"
+            bg="dark"
             icon={<ArrowRight className="w-4 h-4" />}
           />
+
+          <p className="text-white_600 font-medium text-xs text-center max-w-[408px]">
+            By joining, you agree to receive updates about FanFam. We respect
+            your privacy and won't spam you.
+          </p>
         </form>
       </div>
+
+      <footer className="bg-white py-5 px-20 flex justify-between items-center">
+        <p className="font-black text-base text-primaryTwo">FANFAM</p>
+        <p className="font-normal text-sm text-grey_60">
+          © 2026 FanFam. All rights reserved.
+        </p>
+        <div className="flex items-center gap-x-6">
+          <p className="font-normal text-sm text-grey_60">Privacy</p>
+          <p className="font-normal text-sm text-grey_60">Terms</p>
+        </div>
+      </footer>
     </div>
   );
 };

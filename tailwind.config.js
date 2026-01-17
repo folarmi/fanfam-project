@@ -47,6 +47,7 @@ export default {
         grey_90: "#F3F4FC",
         grey_80: "#D9D9D9",
         grey_70: "#c4c4c4",
+        grey_60: "#646464",
         gray_100: "#101510",
         blue_100: "#F7FAFC",
         blue_200: "#E4F1FC",
@@ -79,6 +80,7 @@ export default {
         white_400: "#0007149F",
         white_500: "#00083046",
         white_600: "#E4E4E4",
+        blue_100: "#92CDFE",
       },
       boxShadow: {
         custom: "0px 2px 1px 0px #00000040",
