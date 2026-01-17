@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   useController,
   type Control,
   type FieldValues,
+  type Path,
   type RegisterOptions,
 } from "react-hook-form";
 
@@ -37,7 +37,7 @@ const borderClass: Record<BorderStyle, string> = {
 
 export interface StackedInputProps<
   TFieldValues extends FieldValues,
-  TName extends string = string,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
 > extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "name"> {
   name: TName;
   control: Control<TFieldValues>;
@@ -59,7 +59,7 @@ export interface StackedInputProps<
 
 export default function StackedInput<
   TFieldValues extends FieldValues,
-  TName extends string = string,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
 >({
   name,
   control,

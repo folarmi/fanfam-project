@@ -151,6 +151,7 @@ export const builtForCreators = [
     body: "Multiple revenue streams designed for the long-term. Subscriptions, tips, exclusives, and more.",
   },
 ];
+
 export const sideBarItems = [
   {
     id: 1,
@@ -814,7 +815,7 @@ export const subscriptionSettings = [
 ];
 
 export const getPromotionalCampaignData = (
-  campaign: PromotionalCampaignType
+  campaign: PromotionalCampaignType,
 ) => [
   {
     id: 1,

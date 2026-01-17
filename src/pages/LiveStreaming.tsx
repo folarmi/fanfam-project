@@ -37,7 +37,7 @@ const LiveStreaming = () => {
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   // Determine if current user is the host
   const isHost = !urlCreatorId || urlCreatorId === userObject?.usid;
-  const targetCreatorId = urlCreatorId || userObject?.usid;
+  // const targetCreatorId = urlCreatorId || userObject?.usid;
 
   const [sessionId, setSessionId] = useState("");
   const [channelName, setChannelName] = useState("");
