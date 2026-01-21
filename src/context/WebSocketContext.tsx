@@ -26,7 +26,7 @@ interface WebSocketProviderProps {
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useWebSocket = () => {
@@ -47,7 +47,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const [isConnected, setIsConnected] = useState(false);
   const [followedCreators, setFollowedCreators] = useState<string[]>([]);
   const [liveCreators, setLiveCreators] = useState<Map<string, LiveCreator>>(
-    new Map()
+    new Map(),
   );
 
   const stompClientRef = useRef<Client | null>(null);
@@ -149,9 +149,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         console.error("❌ Error processing viewer subscriptions:", error);
       }
     }
-
-    // For creators: They might want to follow other creators too
-    // You can add similar logic here if needed
   }, [getViewerSubscriptions, isCreator]);
 
   // Subscribe to all followed creators
@@ -213,7 +210,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   const handleCreatorLiveNotification = (
     creatorIdFromTopic: string,
-    payload: LiveNotification
+    payload: LiveNotification,
   ) => {
     // Use payload.creatorId if present; otherwise fall back to the topic param
     const creatorId = payload?.creatorId || creatorIdFromTopic;
