@@ -334,8 +334,8 @@ import type {
   LiveNotification,
   WebSocketContextType,
 } from "@/lib/types";
-import type { RootState } from "@/lib/store";
-import { useAppSelector } from "@/lib/hook";
+// import type { RootState } from "@/lib/store";
+// import { useAppSelector } from "@/lib/hook";
 
 interface WebSocketProviderProps {
   children: React.ReactNode;
@@ -357,8 +357,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   children,
 }) => {
   // Get user info from Redux
-  const { userObject } = useAppSelector((state: RootState) => state.auth);
-  const isCreator = userObject?.role === "CREATOR";
+  // const { userObject } = useAppSelector((state: RootState) => state.auth);
+  // const isCreator = userObject?.role === "CREATOR";
 
   const [isConnected, setIsConnected] = useState(false);
   const [liveCreators, setLiveCreators] = useState<Map<string, LiveCreator>>(
