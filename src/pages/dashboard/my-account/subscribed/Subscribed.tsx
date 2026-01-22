@@ -32,7 +32,6 @@ const Subscribed = () => {
     queryKey: ["GetSubscriptionsForViewer"],
     enabled: !isCreator,
   });
-
   const subscribersData = isCreator
     ? getCreatorSubscriptions
     : getViewerSubscriptions;
@@ -72,7 +71,7 @@ const Subscribed = () => {
             isActiveTab={isActiveTab}
           /> */}
 
-          {subscribersData?.data?.content ?? [] ? (
+          {subscribersData?.data?.content?.length === 0 ? (
             <EmptyState text="No subscribers yet" />
           ) : (
             <div className="mt-6 flex flex-wrap gap-4">
@@ -86,7 +85,7 @@ const Subscribed = () => {
                           userName={item?.creator?.username || "N/A"}
                           tag={item?.creator?.displayName || "N/A"}
                           expiryStatus={`Expires ${convertToHumanReadableDate(
-                            item?.endDate
+                            item?.endDate,
                           )}`}
                           buttonText={
                             item?.fee ? `$${item.fee} per month` : "FOR FREE"
@@ -104,7 +103,7 @@ const Subscribed = () => {
                           userName={item?.subscriber?.username || "N/A"}
                           tag={item?.subscriber?.displayName || "N/A"}
                           expiryStatus={`Expires ${convertToHumanReadableDate(
-                            item?.endDate
+                            item?.endDate,
                           )}`}
                           buttonText={
                             item?.fee ? `$${item.fee} per month` : "FOR FREE"
@@ -118,7 +117,7 @@ const Subscribed = () => {
                       )}
                     </>
                   );
-                }
+                },
               )}
             </div>
           )}

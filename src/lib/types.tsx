@@ -431,6 +431,7 @@ export interface WebSocketContextType {
   client: Client | null;
   liveCreators: Map<string, LiveCreator>;
   subscribeToCreator: (creatorId: string) => void;
+  markCreatorOffline: (creatorId: string) => void;
   unsubscribeFromCreator: (creatorId: string) => void;
   sendMessage: (destination: string, body: any) => void;
   isCreatorLive: (creatorId: string) => boolean;

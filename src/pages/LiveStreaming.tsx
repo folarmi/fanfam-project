@@ -232,7 +232,8 @@ const LiveStreaming = () => {
       // Send "go live" message
       sendMessage("/app/live/go", {
         creatorId: userObject?.usid,
-        session: newSessionId,
+        // session: newSessionId,
+        session: channelName,
       });
 
       setIsStreaming(true);

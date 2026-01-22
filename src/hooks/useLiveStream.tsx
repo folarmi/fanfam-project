@@ -25,15 +25,16 @@ export const useLiveStream = ({
 
   // Subscribe to join/leave events
   useEffect(() => {
-    if (!isConnected || !enabled || !sessionId) return;
+    // if (!isConnected || !enabled) return;
 
     console.log(
-      `🎥 Setting up live stream subscriptions for session: ${sessionId}`
+      `🎥 Setting up live stream subscriptions for session: ${sessionId}`,
     );
 
     // Subscribe to join events
-    const joinTopic = `/topic/live/${sessionId}/join`;
-    console.log(`🔔 Subscribing to: ${joinTopic}`);
+    // const joinTopic = `/topic/live/${sessionId}/join`;
+    const joinTopic = `/queue/live-notify`;
+    console.log(`🔔 Subscribing to from: ${joinTopic}`);
 
     joinSubRef.current = client?.subscribe(joinTopic, (message) => {
       console.log("👋 User joined:", message.body);
@@ -75,7 +76,7 @@ export const useLiveStream = ({
       joinSubRef.current?.unsubscribe();
       leaveSubRef.current?.unsubscribe();
     };
-  }, [isConnected, sessionId, enabled, client, role]);
+  }, [isConnected, enabled, client, role]);
 
   // Join the live stream
   const joinLiveStream = () => {
@@ -84,7 +85,7 @@ export const useLiveStream = ({
       return;
     }
 
-    console.log(`📤 Joining live stream: ${sessionId}`);
+    // console.log(`📤 Joining live stream: ${sessionId}`);
 
     sendMessage("/app/live/join", {
       session: sessionId,
