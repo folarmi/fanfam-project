@@ -81,11 +81,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   // Initialize WebSocket Connection
   useEffect(() => {
     const token = localStorage.getItem("token");
-
-    if (!token) {
-      toast.warn("⚠️ No auth token - WebSocket not initialized");
-      return;
-    }
+    if (token === undefined) return;
+    // if (!token) {
+    //   toast.warn("⚠️ No auth token - WebSocket not initialized");
+    //   return;
+    // }
 
     const client = new Client({
       brokerURL: WS_URL,

@@ -33,30 +33,3 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
 };
 
 export default withAuth;
-
-// hoc/withAuth.tsx
-// hoc/withAuth.tsx
-// hoc/withAuth.tsx
-// import { useEffect, type ComponentType } from "react";
-// import { useNavigate } from "react-router-dom";
-
-// const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
-//   const Wrapper = (props: P) => {
-//     const navigate = useNavigate();
-
-//     useEffect(() => {
-//       const authToken = localStorage.getItem("token");
-
-//       if (!authToken) {
-//         navigate("/", { replace: true });
-//       }
-//     }, [navigate]);
-
-//     // Always render the component - let the effect handle redirect
-//     return <WrappedComponent {...props} />;
-//   };
-
-//   return Wrapper;
-// };
-
-// export default withAuth;
