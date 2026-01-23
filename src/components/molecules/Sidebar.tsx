@@ -18,7 +18,7 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data: profileData } = useFetchProfile(userObject);
-
+  console.log(userObject);
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
     successMessage: (data: any) => data?.data?.message,
