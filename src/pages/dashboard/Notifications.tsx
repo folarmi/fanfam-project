@@ -10,6 +10,7 @@ import { Loader } from "@/components/molecules/Loader";
 import type { NotificationType } from "@/lib/types";
 import { convertToHumanReadableDate } from "@/utils/helper";
 import { useNotifications } from "@/context/NotificationsContext";
+import EmptyState from "@/components/molecules/EmptyState";
 
 const Notifications = () => {
   const [showRearrangeModal, setShowRearrangeModal] = useState(false);
@@ -64,6 +65,9 @@ const Notifications = () => {
             </div> */}
 
             <div className="">
+              {notificationsData?.length === 0 && (
+                <EmptyState text="No notifications yet" />
+              )}
               {notificationsData?.map(
                 ({ message, createdAt, from }: NotificationType) => {
                   return (
@@ -101,7 +105,7 @@ const Notifications = () => {
                       </div>
                     </div>
                   );
-                }
+                },
               )}
             </div>
           </section>
