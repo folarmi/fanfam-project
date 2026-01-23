@@ -36,7 +36,7 @@ const Subscribed = () => {
   const subscribersData = isCreator
     ? getCreatorSubscriptions
     : getViewerSubscriptions;
-  console.log(getCreatorSubscriptions?.data?.content);
+
   // const [tabs] = useState([
   //   {
   //     id: 1,
@@ -72,14 +72,14 @@ const Subscribed = () => {
             isActiveTab={isActiveTab}
           /> */}
 
-          {(subscribersData?.data?.content ?? []) ? (
+          {subscribersData?.data?.content?.length === 0 ? (
             <EmptyState text="No subscribers yet" />
           ) : (
             <div className="mt-6 flex flex-wrap gap-4">
               {subscribersData?.data?.content?.map(
                 (item: SubscriberProfile) => {
                   return (
-                    <>
+                    <div key={item?.publicId}>
                       {userObject?.role === UserRole.viewer ? (
                         <SubscribedCard
                           img={item?.creator?.profilePic}
@@ -116,7 +116,7 @@ const Subscribed = () => {
                           }
                         />
                       )}
-                    </>
+                    </div>
                   );
                 },
               )}
