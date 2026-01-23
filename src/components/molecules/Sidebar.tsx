@@ -11,6 +11,7 @@ import { logout } from "@/lib/features/auth/authSlice";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import DefaultAvatar from "./DefaultAvatar";
 import { LogOutIcon } from "lucide-react";
+import { Loader } from "./Loader";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -68,6 +69,8 @@ const Sidebar = () => {
           </div>
         </div>
       }
+
+      {!userObject && <Loader />}
 
       <div className="w-[25%]">
         {sideBarItems
