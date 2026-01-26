@@ -1,14 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Suspense, useEffect, useState } from "react"; // Import Suspense
+import { Suspense, useEffect, useState } from "react";
 import Typography from "../components/forms/Typography";
 import AuthLayout from "../layouts/AuthLayout";
 import CustomInput from "../components/forms/CustomInput";
 import { useForm } from "react-hook-form";
 import CustomButton from "../components/forms/CustomButton";
-// import { useRouter, useSearchParams } from "next/navigation";
-// import { useMutation } from "@tanstack/react-query";
-// import api from "../lib/axios";
-// import { toast } from "react-toastify";
 import {
   fetchDeviceIP,
   getBrowserInfo,
@@ -16,14 +11,15 @@ import {
   getPlatformFromUAParser,
   getReadableLocation,
 } from "../utils/helper";
-import { useCustomMutation } from "../hooks/apiCalls";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { getFCMToken } from "@/oauth/firebaseConfig";
+import { useSignIn } from "@/hooks/useSignIn";
+import type { LocationErrorCode } from "@/lib/types";
+import { LocationPermissionCard } from "@/components/cards/LocationPermissionCard";
+
+type LocStatus = "idle" | "requesting" | "granted" | "denied" | "error";
 
 const VerifyEmail = () => {
-  //   const navigate = useNavigate();
-
-  // Wrap useSearchParams with Suspense
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <VerifyEmailForm />
@@ -33,10 +29,16 @@ const VerifyEmail = () => {
 
 const VerifyEmailForm = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [ip, setIp] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
-  const [, setError] = useState<string | null>(null);
+  const [, setNotVerifiedError] = useState(false);
+
+  const [ip, setIp] = useState("");
+  const [location, setLocation] = useState("");
+  const [locStatus, setLocStatus] = useState<LocStatus>("idle");
+  const [locError, setLocError] = useState<string | null>(null);
+  const [locCode, setLocCode] = useState<LocationErrorCode | undefined>(
+    undefined,
+  );
+
   const browser = getBrowserInfo();
   const platform = getPlatformFromUAParser();
 
@@ -45,20 +47,7 @@ const VerifyEmailForm = () => {
       const deviceIP = await fetchDeviceIP();
       setIp(deviceIP);
     };
-
     fetchIP();
-  }, []);
-
-  useEffect(() => {
-    getReadableLocation()
-      .then((result) => {
-        if (result.success && result.location) {
-          setLocation(result.location);
-        } else {
-          setError(result.error || "Failed to get location");
-        }
-      })
-      .catch((err) => setError(err.message || "An unexpected error occurred"));
   }, []);
 
   const { control, handleSubmit } = useForm({
@@ -68,46 +57,79 @@ const VerifyEmailForm = () => {
     },
   });
 
-  const verifyUserMutation = useCustomMutation({
+  const verifyUserMutation = useSignIn({
+    setNotVerifiedError,
     endpoint: `auth/verify-token?mafanf=${searchParams.get(
-      "mafanf"
+      "mafanf",
     )}&fanfam=${searchParams.get("fanfam")}`,
-    successMessage: (data: any) => data?.message,
-    onSuccessCallback: (data) => {
-      localStorage.setItem("token", data?.data?.accessToken);
-      localStorage.setItem("refreshToken", data?.data?.refreshToken);
-      navigate("/dashboard");
-    },
   });
 
+  const requestLocation = async () => {
+    setLocError(null);
+    setLocCode(undefined);
+    setLocStatus("requesting");
+
+    const res = await getReadableLocation();
+
+    if (res.success && res.location) {
+      setLocation(res.location);
+      setLocStatus("granted");
+      return true;
+    }
+
+    setLocStatus(res.code === "PERMISSION_DENIED" ? "denied" : "error");
+    setLocError(res.error || "Location is required to verify your email.");
+    setLocCode(res.code);
+    return false;
+  };
+
   const submitForm = async () => {
+    // Location is REQUIRED: ensure granted before verify
+    const hasLocation =
+      locStatus === "granted" && Boolean(location)
+        ? true
+        : await requestLocation();
+
+    if (!hasLocation) return;
+
     const formData = {
       deviceOS: getDeviceOS(),
       deviceIP: ip,
-      location: location,
-      platform: platform,
-      browser: browser,
+      location,
+      platform,
+      browser,
       firebaseClientToken: await getFCMToken(),
-      // firebaseClientToken:
-      //   "BIzRklo4oMu3MoSqf6_Y6FAJfhEgWxhoOiWB8oXunj2FedcHAi3Xxd40Bj9NAxwy7Sw7ID13Pc1xI22bhnW11HI",
     };
+
     verifyUserMutation.mutate(formData);
   };
+
+  const needsLocation = locStatus !== "granted";
 
   return (
     <AuthLayout>
       <form onSubmit={handleSubmit(submitForm)} className="mt-5">
-        <Typography variant="h5" className="pb-4">
+        <Typography variant="h5" className="pb-2">
           Verify Email
         </Typography>
 
-        <CustomInput name="email" control={control} readOnly={true} />
+        <LocationPermissionCard
+          status={locStatus}
+          location={location}
+          error={locError}
+          code={locCode}
+          onRetry={requestLocation}
+        />
+
+        <CustomInput name="email" control={control} readOnly />
+
         <CustomButton
-          loading={verifyUserMutation.isPending}
+          type="submit"
+          loading={verifyUserMutation.isPending || locStatus === "requesting"}
           variant="primary"
           className="shadow-custom mb-6 px-6 w-full"
         >
-          Verify Email
+          {needsLocation ? "Allow location to verify" : "Verify Email"}
         </CustomButton>
       </form>
     </AuthLayout>

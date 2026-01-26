@@ -4,16 +4,22 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 
 type EmailType = "Reset" | "Signup" | null;
 
+export interface UserObject {
+  email: string;
+  role: string;
+  usid: string;
+}
+
 export interface AuthState {
   userEmail: string | null;
   emailType: EmailType;
-  userObject: object;
+  userObject: UserObject | null;
 }
 
 const initialState: AuthState = {
   userEmail: null,
   emailType: null,
-  userObject: {},
+  userObject: null,
 };
 
 export const authSlice = createSlice({
@@ -32,7 +38,7 @@ export const authSlice = createSlice({
     logout: (state) => {
       state.userEmail = null;
       state.emailType = null;
-      state.userObject = {};
+      state.userObject = null;
     },
   },
 });

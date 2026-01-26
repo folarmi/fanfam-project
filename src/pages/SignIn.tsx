@@ -153,7 +153,7 @@ const SignIn = () => {
             control={control}
             name="termsAndCondition"
           />
-          <Link to="forgot-password">
+          <Link to="/forgot-password">
             <Typography
               variant="subtitle2"
               className="text-blue_500 whitespace-nowrap"

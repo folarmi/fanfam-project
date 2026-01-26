@@ -451,3 +451,28 @@ export interface UseLiveStreamProps {
   role: "VIEWER" | "HOST";
   enabled?: boolean;
 }
+
+export type LocStatus = "idle" | "requesting" | "granted" | "denied" | "error";
+
+export type LocationErrorCode =
+  | "PERMISSION_DENIED"
+  | "POSITION_UNAVAILABLE"
+  | "TIMEOUT"
+  | "UNSUPPORTED"
+  | "GEOCODE_FAILED"
+  | "UNKNOWN";
+
+export interface LocationResult {
+  success: boolean;
+  location?: string;
+  coords?: { latitude: number; longitude: number };
+  error?: string;
+  code?: LocationErrorCode;
+}
+export interface LocationPermissionCardProps {
+  status: LocStatus;
+  location?: string;
+  error?: string | null;
+  code?: LocationErrorCode;
+  onRetry: () => void;
+}

@@ -78,7 +78,7 @@ const Subscribed = () => {
               {subscribersData?.data?.content?.map(
                 (item: SubscriberProfile) => {
                   return (
-                    <>
+                    <div key={item?.publicId}>
                       {userObject?.role === UserRole.viewer ? (
                         <SubscribedCard
                           img={item?.creator?.profilePic}
@@ -115,7 +115,7 @@ const Subscribed = () => {
                           }
                         />
                       )}
-                    </>
+                    </div>
                   );
                 },
               )}

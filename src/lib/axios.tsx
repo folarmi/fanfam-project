@@ -167,7 +167,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
@@ -218,7 +218,7 @@ api.interceptors.response.use(
 
     try {
       const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) throw new Error("No refresh token available");
+      // if (!refreshToken) throw new Error("No refresh token available");
 
       // ✅ IMPORTANT: use Vite env + api baseURL (not process.env / Next.js)
       const { data } = await api.post("/auth/refresh", { token: refreshToken });
@@ -247,7 +247,7 @@ api.interceptors.response.use(
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );
 
 export default api;

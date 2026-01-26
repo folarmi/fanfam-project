@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Clash Display";
+  src: url("/fonts/ClashDisplay-Variable.woff") format("woff2");
+  font-weight: 200 700; /* variable range */
+  font-style: normal;
+  font-display: swap;
+}
