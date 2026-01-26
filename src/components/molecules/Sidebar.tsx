@@ -16,7 +16,6 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const userString = localStorage.getItem("userObject");
   const userObject = userString ? JSON.parse(userString) : null;
-  // const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data: profileData } = useFetchProfile(userObject);
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
@@ -30,7 +29,7 @@ const Sidebar = () => {
       localStorage.clear();
     },
   });
-
+  console.log(userObject);
   return (
     <div className="hidden md:flex flex-col h-screen pr-12 pl-[109px] border-r border-grey_10">
       {/* User Avatar */}
