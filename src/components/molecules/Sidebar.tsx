@@ -29,7 +29,7 @@ const Sidebar = () => {
       localStorage.clear();
     },
   });
-  console.log(userObject);
+  console.log("user object here", userObject);
   return (
     <div className="hidden md:flex flex-col h-screen pr-12 pl-[109px] border-r border-grey_10">
       {/* User Avatar */}
