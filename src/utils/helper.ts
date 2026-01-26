@@ -8,7 +8,7 @@ import {
   reachProfileSummary,
   reachPromotionsSummary,
 } from "../data";
-import type { GeolocationCoords, LocationResult } from "@/lib/types";
+import type { LocationResult } from "@/lib/types";
 import moment from "moment";
 
 export const phoneRegex =
@@ -87,6 +87,7 @@ export const fetchDeviceIP = async (): Promise<string> => {
     return "Unable to fetch IP";
   }
 };
+
 export const getPlatform = (): string => {
   if (
     "userAgentData" in navigator &&
@@ -112,55 +113,130 @@ export const getPlatformFromUAParser = (): string => {
   return parser.getOS().name || "Unknown Platform";
 };
 
-export const getGeolocation = (): Promise<GeolocationCoords> => {
+// export const getGeolocation = (): Promise<GeolocationCoords> => {
+//   return new Promise((resolve, reject) => {
+//     if (!("geolocation" in navigator)) {
+//       reject(new Error("Geolocation is not supported by your browser."));
+//       return;
+//     }
+
+//     navigator.geolocation.getCurrentPosition(
+//       (position) => {
+//         const { latitude, longitude } = position.coords;
+//         resolve({ latitude, longitude });
+//       },
+//       (error) => {
+//         // More specific error messages
+//         const errorMessages: Record<number, string> = {
+//           1: "Location permission denied. Please enable location access.",
+//           2: "Location unavailable. Please check your device settings.",
+//           3: "Location request timed out. Please try again.",
+//         };
+
+//         reject(
+//           new Error(
+//             errorMessages[error.code] || "Failed to retrieve location.",
+//           ),
+//         );
+//       },
+//       {
+//         timeout: 10000, // 10 seconds
+//         maximumAge: 60000, // Cache for 1 minute
+//         enableHighAccuracy: false, // Faster, less battery drain
+//       },
+//     );
+//   });
+// };
+
+// export const getReadableLocation = async (): Promise<LocationResult> => {
+//   try {
+//     const coords = await getGeolocation();
+
+//     // BigDataCloud free API (no key required, better rate limits)
+//     const response = await fetch(
+//       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`
+//     );
+
+//     if (!response.ok) {
+//       throw new Error(`Geocoding service error: ${response.status}`);
+//     }
+
+//     const data = await response.json();
+
+//     // Build readable location
+//     const locationParts = [
+//       data.locality || data.city,
+//       data.principalSubdivision,
+//       data.countryName,
+//     ].filter(Boolean);
+
+//     const location =
+//       locationParts.length > 0
+//         ? locationParts.join(", ")
+//         : data.localityInfo?.administrative?.[0]?.name ||
+//           "Location unavailable";
+
+//     return {
+//       success: true,
+//       location,
+//       coords,
+//     };
+//   } catch (error: any) {
+//     return {
+//       success: false,
+//       error: error.message || "An unexpected error occurred.",
+//     };
+//   }
+// };
+
+export const getGeolocation = (): Promise<{
+  latitude: number;
+  longitude: number;
+}> => {
   return new Promise((resolve, reject) => {
-    if (!("geolocation" in navigator)) {
-      reject(new Error("Geolocation is not supported by your browser."));
+    if (!navigator.geolocation) {
+      reject({ code: 0, message: "Geolocation not supported" });
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        resolve({ latitude, longitude });
-      },
-      (error) => {
-        // More specific error messages
-        const errorMessages: Record<number, string> = {
-          1: "Location permission denied. Please enable location access.",
-          2: "Location unavailable. Please check your device settings.",
-          3: "Location request timed out. Please try again.",
-        };
-
-        reject(
-          new Error(errorMessages[error.code] || "Failed to retrieve location.")
-        );
-      },
-      {
-        timeout: 10000, // 10 seconds
-        maximumAge: 60000, // Cache for 1 minute
-        enableHighAccuracy: false, // Faster, less battery drain
-      }
+      (pos) =>
+        resolve({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        }),
+      (err) => reject(err),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
   });
 };
 
 export const getReadableLocation = async (): Promise<LocationResult> => {
   try {
+    if (!navigator.geolocation) {
+      return {
+        success: false,
+        code: "UNSUPPORTED",
+        error: "Your browser does not support location access.",
+      };
+    }
+
     const coords = await getGeolocation();
 
-    // BigDataCloud free API (no key required, better rate limits)
     const response = await fetch(
-      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`,
     );
 
     if (!response.ok) {
-      throw new Error(`Geocoding service error: ${response.status}`);
+      return {
+        success: false,
+        code: "GEOCODE_FAILED",
+        error: `Location service error (${response.status}). Please try again.`,
+      };
     }
 
     const data = await response.json();
 
-    // Build readable location
     const locationParts = [
       data.locality || data.city,
       data.principalSubdivision,
@@ -173,15 +249,38 @@ export const getReadableLocation = async (): Promise<LocationResult> => {
         : data.localityInfo?.administrative?.[0]?.name ||
           "Location unavailable";
 
-    return {
-      success: true,
-      location,
-      coords,
-    };
+    return { success: true, location, coords };
   } catch (error: any) {
+    const code = error?.code;
+
+    if (code === 1) {
+      return {
+        success: false,
+        code: "PERMISSION_DENIED",
+        error:
+          "Location permission was denied. Please allow it to verify your email.",
+      };
+    }
+    if (code === 2) {
+      return {
+        success: false,
+        code: "POSITION_UNAVAILABLE",
+        error:
+          "We couldn’t detect your location. Turn on location services and try again.",
+      };
+    }
+    if (code === 3) {
+      return {
+        success: false,
+        code: "TIMEOUT",
+        error: "Location request timed out. Please retry.",
+      };
+    }
+
     return {
       success: false,
-      error: error.message || "An unexpected error occurred.",
+      code: "UNKNOWN",
+      error: error?.message || "An unexpected error occurred.",
     };
   }
 };
