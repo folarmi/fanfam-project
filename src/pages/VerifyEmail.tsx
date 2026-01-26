@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Suspense, useEffect, useState } from "react"; // Import Suspense
 import Typography from "../components/forms/Typography";
 import AuthLayout from "../layouts/AuthLayout";
@@ -16,9 +15,9 @@ import {
   getPlatformFromUAParser,
   getReadableLocation,
 } from "../utils/helper";
-import { useCustomMutation } from "../hooks/apiCalls";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { getFCMToken } from "@/oauth/firebaseConfig";
+import { useSignIn } from "@/hooks/useSignIn";
 
 const VerifyEmail = () => {
   //   const navigate = useNavigate();
@@ -33,7 +32,8 @@ const VerifyEmail = () => {
 
 const VerifyEmailForm = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [, setNotVerifiedError] = useState(false);
+
   const [ip, setIp] = useState<string>("");
   const [location, setLocation] = useState<string>("");
   const [, setError] = useState<string | null>(null);
@@ -68,16 +68,23 @@ const VerifyEmailForm = () => {
     },
   });
 
-  const verifyUserMutation = useCustomMutation({
+  // const verifyUserMutation = useCustomMutation({
+  // endpoint: `auth/verify-token?mafanf=${searchParams.get(
+  //   "mafanf",
+  // )}&fanfam=${searchParams.get("fanfam")}`,
+  //   successMessage: (data: any) => data?.message,
+  //   onSuccessCallback: (data) => {
+  //     localStorage.setItem("token", data?.data?.accessToken);
+  //     localStorage.setItem("refreshToken", data?.data?.refreshToken);
+  //     navigate("/dashboard");
+  //   },
+  // });
+
+  const verifyUserMutation = useSignIn({
+    setNotVerifiedError,
     endpoint: `auth/verify-token?mafanf=${searchParams.get(
-      "mafanf"
+      "mafanf",
     )}&fanfam=${searchParams.get("fanfam")}`,
-    successMessage: (data: any) => data?.message,
-    onSuccessCallback: (data) => {
-      localStorage.setItem("token", data?.data?.accessToken);
-      localStorage.setItem("refreshToken", data?.data?.refreshToken);
-      navigate("/dashboard");
-    },
   });
 
   const submitForm = async () => {
@@ -88,8 +95,6 @@ const VerifyEmailForm = () => {
       platform: platform,
       browser: browser,
       firebaseClientToken: await getFCMToken(),
-      // firebaseClientToken:
-      //   "BIzRklo4oMu3MoSqf6_Y6FAJfhEgWxhoOiWB8oXunj2FedcHAi3Xxd40Bj9NAxwy7Sw7ID13Pc1xI22bhnW11HI",
     };
     verifyUserMutation.mutate(formData);
   };

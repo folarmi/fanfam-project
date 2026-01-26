@@ -81,6 +81,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   // Initialize WebSocket Connection
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (token === undefined) return;
     // if (!token) {
     //   toast.warn("⚠️ No auth token - WebSocket not initialized");
@@ -95,7 +96,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       debug: (str) => {
         console.log("STOMP Debug:", str);
       },
-      reconnectDelay: 5000,
+      // reconnectDelay: 5000,
+      reconnectDelay: 500000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
 

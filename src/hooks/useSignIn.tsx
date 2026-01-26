@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// hooks/useSignIn.ts (or hooks/useAuthMutation.ts)
-// adjust path
 
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useCustomMutation } from "./apiCalls";
 import { updateUserObject } from "@/lib/features/auth/authSlice";
+import { showErrorToast } from "@/utils/toastUtils";
 
 interface UseSignInProps {
   setNotVerifiedError: (value: boolean) => void;
+  setErrorMessage?: (value: string | null) => void;
   endpoint: string;
 }
 
@@ -27,7 +27,7 @@ export const useSignIn = ({
       const userObject = {
         email: data?.data?.email,
         role: data?.data?.role,
-        usid: data?.data?.usid,
+        usid: data?.data?.usid || data?.data?.userId,
       };
 
       localStorage.setItem("token", data?.data?.accessToken);
@@ -40,12 +40,28 @@ export const useSignIn = ({
 
       navigate("/dashboard");
     },
+    // onError: (error: any) => {
+    //   console.log(error?.response?.data?.data?.message);
+    //   //   console.log(error?.response?.data?.data?.message);
+    //   setNotVerifiedError(
+    //     error?.response?.data?.data?.message ===
+    //       "Account has not been verified",
+    //   );
+    // },
     onError: (error: any) => {
-      //   console.log(error?.response?.data?.data?.message);
-      setNotVerifiedError(
-        error?.response?.data?.data?.message ===
-          "Account has not been verified",
-      );
+      const msg =
+        error?.response?.data?.data?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong. Please try again.";
+
+      if (msg === "Account has not been verified") {
+        setNotVerifiedError(true);
+        return;
+      }
+
+      setNotVerifiedError(false);
+      showErrorToast(msg);
     },
   });
 

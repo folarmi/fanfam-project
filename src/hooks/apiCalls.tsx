@@ -29,15 +29,21 @@ interface MutationResponse {
   };
 }
 
-interface UseDataOptions
-  extends Omit<UseQueryOptions<any, any>, "queryKey" | "queryFn"> {
+interface UseDataOptions extends Omit<
+  UseQueryOptions<any, any>,
+  "queryKey" | "queryFn"
+> {
   url: string;
   queryKey: string[];
   enabled?: any;
 }
 
-interface CustomMutationOptions<TData, TError, TVariables, TContext>
-  extends UseMutationOptions<TData, TError, TVariables, TContext> {
+interface CustomMutationOptions<
+  TData,
+  TError,
+  TVariables,
+  TContext,
+> extends UseMutationOptions<TData, TError, TVariables, TContext> {
   endpoint: string;
   method?: "get" | "post" | "put" | "patch" | "delete";
   successMessage?: (data: TData) => string;
@@ -69,9 +75,9 @@ export const useCustomMutation = <
   TData = MutationResponse,
   TError = AxiosError,
   TVariables = unknown,
-  TContext = unknown
+  TContext = unknown,
 >(
-  options: CustomMutationOptions<TData, TError, TVariables, TContext>
+  options: CustomMutationOptions<TData, TError, TVariables, TContext>,
 ): UseMutationResult<TData, TError, TVariables, TContext> => {
   const {
     endpoint,
@@ -87,44 +93,6 @@ export const useCustomMutation = <
   } = options;
 
   return useMutation<TData, TError, TVariables, TContext>({
-    // mutationFn: async (variables: TVariables) => {
-    //   let finalEndpoint = endpoint;
-    //   let requestData = variables;
-
-    //   // If useQueryParams is true, append variables as query parameters
-    //   if (useQueryParams && variables) {
-    //     const params = new URLSearchParams(
-    //       variables as Record<string, string>
-    //     ).toString();
-    //     finalEndpoint = `${endpoint}?${params}`;
-    //     requestData = undefined as any; // No body for query params
-    //   }
-
-    //   // Handle different HTTP methods
-    //   let response;
-    //   if (method === "get" || method === "delete") {
-    //     // GET and DELETE typically don't have a body
-    //     response = await api[method]<TData>(finalEndpoint, {
-    //       headers: {
-    //         "Content-Type": contentType,
-    //       },
-    //     });
-    //   } else {
-    //     // POST, PUT, PATCH have a body
-    //     response = await api[method]<TData>(
-    //       finalEndpoint,
-    //       useQueryParams ? undefined : requestData,
-    //       {
-    //         headers: {
-    //           "Content-Type": contentType,
-    //         },
-    //       }
-    //     );
-    //   }
-
-    //   return response.data;
-    // },
-
     mutationFn: async (variables: TVariables) => {
       let finalEndpoint = endpoint;
       let requestData: any = variables;
@@ -138,7 +106,7 @@ export const useCustomMutation = <
 
         if (queryParamsData) {
           const params = new URLSearchParams(
-            queryParamsData as Record<string, string>
+            queryParamsData as Record<string, string>,
           ).toString();
           finalEndpoint = `${endpoint}?${params}`;
         }
@@ -205,7 +173,7 @@ export const useCustomMutation = <
             error as unknown as TError,
             undefined as unknown as TVariables,
             undefined as unknown as TContext,
-            undefined as any
+            undefined as any,
           );
         }
 
@@ -415,13 +383,13 @@ export const useGetPatientProfile = (enabled: boolean = true) => {
 
 export const useGetDoctorAvailableSessions = (
   doctorId: string | undefined,
-  enabled: boolean = true
+  enabled: boolean = true,
 ) => {
   return useQuery<any>({
     queryKey: ["GetDoctorAvailableSessions"],
     queryFn: async () => {
       const response = await api.get(
-        `appointment/api/doctors/${doctorId}/available-sessions`
+        `appointment/api/doctors/${doctorId}/available-sessions`,
       );
       return response?.data;
     },

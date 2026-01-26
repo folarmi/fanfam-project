@@ -7,8 +7,6 @@ import CommentBox from "../../components/CommentBox";
 import TimeLineHomeModal from "../../components/modals/TimeLineHomeModal";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
-// import StoryModal from "../../components/modals/StoryModal";
-// import { StoryUploader } from "@/components/molecules/StoryUploader";
 import { useCustomMutation, useGetData } from "@/hooks/apiCalls";
 import { Loader } from "@/components/molecules/Loader";
 import type { StoryPost } from "@/lib/types";
@@ -68,7 +66,7 @@ const Home = () => {
 
   // const [isEditingStory, setIsEditingStory] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
-    null
+    null,
   );
   const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
@@ -140,7 +138,7 @@ const Home = () => {
             observer.disconnect();
           }
         },
-        { threshold: 0.5 }
+        { threshold: 0.5 },
       );
 
       observer.observe(postRef.current);
@@ -163,7 +161,7 @@ const Home = () => {
           showModal={showMoreModal === data?.publicId}
           toggleModal={() =>
             setShowMoreModal(
-              showMoreModal === data?.publicId ? null : data?.publicId
+              showMoreModal === data?.publicId ? null : data?.publicId,
             )
           }
           onCommentClick={() => toggleShowCommentModal(data?.publicId)}
