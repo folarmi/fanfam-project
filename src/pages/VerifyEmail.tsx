@@ -68,18 +68,6 @@ const VerifyEmailForm = () => {
     },
   });
 
-  // const verifyUserMutation = useCustomMutation({
-  // endpoint: `auth/verify-token?mafanf=${searchParams.get(
-  //   "mafanf",
-  // )}&fanfam=${searchParams.get("fanfam")}`,
-  //   successMessage: (data: any) => data?.message,
-  //   onSuccessCallback: (data) => {
-  //     localStorage.setItem("token", data?.data?.accessToken);
-  //     localStorage.setItem("refreshToken", data?.data?.refreshToken);
-  //     navigate("/dashboard");
-  //   },
-  // });
-
   const verifyUserMutation = useSignIn({
     setNotVerifiedError,
     endpoint: `auth/verify-token?mafanf=${searchParams.get(
