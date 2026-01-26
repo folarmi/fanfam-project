@@ -32,6 +32,7 @@ export const useSignIn = ({
 
       localStorage.setItem("token", data?.data?.accessToken);
       localStorage.setItem("refreshToken", data?.data?.refreshToken);
+      localStorage.setItem("userObject", JSON.stringify(userObject));
       dispatch(updateUserObject(userObject));
 
       // Dispatch custom event
@@ -42,7 +43,8 @@ export const useSignIn = ({
     onError: (error: any) => {
       //   console.log(error?.response?.data?.data?.message);
       setNotVerifiedError(
-        error?.response?.data?.data?.message === "Account has not been verified"
+        error?.response?.data?.data?.message ===
+          "Account has not been verified",
       );
     },
   });

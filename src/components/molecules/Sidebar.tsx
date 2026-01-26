@@ -3,23 +3,21 @@ import Typography from "../forms/Typography";
 import CustomButton from "../forms/CustomButton";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCustomMutation } from "../../hooks/apiCalls";
-import type { RootState } from "../../lib/store";
-import { useAppSelector } from "../../lib/hook";
 import { sideBarItems } from "../../data";
 import { useDispatch } from "react-redux";
 import { logout } from "@/lib/features/auth/authSlice";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import DefaultAvatar from "./DefaultAvatar";
 import { LogOutIcon } from "lucide-react";
-import { Loader } from "./Loader";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const userString = localStorage.getItem("userObject");
+  const userObject = userString ? JSON.parse(userString) : null;
+  // const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data: profileData } = useFetchProfile(userObject);
-  console.log(userObject);
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
     successMessage: (data: any) => data?.data?.message,
@@ -70,12 +68,10 @@ const Sidebar = () => {
         </div>
       }
 
-      {!userObject && <Loader />}
-
       <div className="w-[25%]">
         {sideBarItems
-          .filter((item) => item.roles.includes(userObject.role))
-          .map(({ id, name, image, link }) => {
+          ?.filter((item) => item?.roles.includes(userObject?.role))
+          ?.map(({ id, name, image, link }) => {
             return (
               <Link
                 className={`w-[236px] flex items-center mb-2 py-2 pl-4 rounded-lg ${
