@@ -16,60 +16,119 @@ export const useLiveStream = ({
 }: UseLiveStreamProps) => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
-  const { isConnected, sendMessage } = useWebSocket();
-  const [viewerCount] = useState(0);
+  // ✅ CHANGE 1: pull `client` so we can subscribe
+  const { client, isConnected, sendMessage } = useWebSocket();
+
+  const [viewerCount, setViewerCount] = useState(0);
   const [hasJoined, setHasJoined] = useState(false);
-  const [isStreamEnded] = useState(false);
+  const [isStreamEnded, setIsStreamEnded] = useState(false);
 
   const joinSubRef = useRef<any>(null);
   const leaveSubRef = useRef<any>(null);
   const endSubRef = useRef<any>(null);
+  const commentSubRef = useRef<any>(null);
+  const reactionSubRef = useRef<any>(null);
 
   useEffect(() => {
     if (!enabled) return;
     if (!isConnected) return;
+    if (!client || !client.connected) return;
     if (!sessionId) return;
-    if (hasJoined) return;
 
-    // we only need joinSubRef to be ready
-    if (!joinSubRef.current) return;
+    if (
+      joinSubRef.current &&
+      leaveSubRef.current &&
+      endSubRef.current &&
+      commentSubRef.current &&
+      reactionSubRef.current
+    ) {
+      return;
+    }
 
-    const timer = setTimeout(() => {
-      joinLiveStream();
-    }, 300);
+    try {
+      const joinTopic = `/topic/live/${sessionId}/join`;
+      const leaveTopic = `/topic/live/${sessionId}/leave`;
+      const endTopic = `/topic/live/${sessionId}/end`;
+      const commentTopic = `/topic/live/${sessionId}/comment`;
+      const reactionTopic = `/topic/live/${sessionId}/reaction`;
 
-    return () => clearTimeout(timer);
-  }, [enabled, isConnected, sessionId, hasJoined, role]);
+      // console.log("🔔 Subscribing to live topics:", {
+      //   joinTopic,
+      //   leaveTopic,
+      //   endTopic,
+      //   commentTopic,
+      //   reactionTopic,
+      // });
 
-  // Join the live stream
-  // const joinLiveStream = () => {
-  //   if (!isConnected) {
-  //     toast.error("Not connected to server");
-  //     return;
-  //   }
+      console.log("SUB TOPIC CHECK", `/topic/live/${sessionId}/join`);
+      // JOIN
+      if (!joinSubRef.current) {
+        joinSubRef.current = client.subscribe(joinTopic, (message) => {
+          console.log("👋 JOIN EVENT:", message.body);
+          setViewerCount((prev) => prev + 1);
+        });
+      }
 
-  //   if (!sessionId) {
-  //     toast.error("Invalid session");
-  //     return;
-  //   }
+      // LEAVE
+      if (!leaveSubRef.current) {
+        leaveSubRef.current = client.subscribe(leaveTopic, (message) => {
+          console.log("👋 LEAVE EVENT:", message.body);
+          setViewerCount((prev) => Math.max(0, prev - 1));
+        });
+      }
 
-  //   console.log(`📤 Joining live stream: ${sessionId}`, {
-  //     session: sessionId,
-  //     creatorId: creatorId,
-  //     role: role,
-  //   });
+      // END
+      if (!endSubRef.current) {
+        endSubRef.current = client.subscribe(endTopic, (message) => {
+          console.log("🛑 END EVENT:", message.body);
+          setIsStreamEnded(true);
+        });
+      }
 
-  //   sendMessage("/app/live/join", {
-  //     session: sessionId,
-  //     creatorId: creatorId,
-  //     role: role,
-  //   });
+      // COMMENT
+      if (!commentSubRef.current) {
+        commentSubRef.current = client.subscribe(commentTopic, (message) => {
+          console.log("💬 COMMENT EVENT:", message.body);
+          // We’ll wire this into UI later (next step).
+        });
+      }
 
-  //   setHasJoined(true);
-  //   console.log("✅ Join message sent");
-  // };
+      // REACTION
+      if (!reactionSubRef.current) {
+        reactionSubRef.current = client.subscribe(reactionTopic, (message) => {
+          console.log("❤️ REACTION EVENT:", message.body);
+          // We’ll wire this into UI later (next step).
+        });
+      }
 
+      // console.log("✅ Live topic subscriptions ready for:", sessionId);
+    } catch (err) {
+      console.error("❌ Error subscribing to live topics:", err);
+    }
+
+    // Cleanup when session changes / unmount
+    return () => {
+      joinSubRef.current?.unsubscribe?.();
+      leaveSubRef.current?.unsubscribe?.();
+      endSubRef.current?.unsubscribe?.();
+      commentSubRef.current?.unsubscribe?.();
+      reactionSubRef.current?.unsubscribe?.();
+
+      joinSubRef.current = null;
+      leaveSubRef.current = null;
+      endSubRef.current = null;
+      commentSubRef.current = null;
+      reactionSubRef.current = null;
+
+      // Optional: reset end state when leaving a session
+      setIsStreamEnded(false);
+    };
+  }, [enabled, isConnected, client, sessionId]);
+
+  // Join the live stream (same as yours, just slightly safer)
   const joinLiveStream = () => {
+    if (!enabled) return;
+
     if (!isConnected) {
       toast.error("Not connected to server");
       return;
@@ -80,65 +139,76 @@ export const useLiveStream = ({
       return;
     }
 
-    if (hasJoined) return; // prevent duplicates
+    if (hasJoined) return;
+
+    // ✅ CHANGE 4: ensure subscriptions exist before join (subscribe-before-send rule)
+    if (!joinSubRef.current || !leaveSubRef.current || !endSubRef.current) {
+      console.warn("⚠️ Not joining yet: subscriptions not ready");
+      return;
+    }
 
     sendMessage("/app/live/join", {
       session: sessionId,
       creatorId,
-      role, // "VIEWER" or "HOST"
+      role,
     });
-    console.log(sessionId, creatorId, role);
+
     setHasJoined(true);
+    // console.log("✅ Sent /app/live/join", { sessionId, creatorId, role });
   };
 
-  // Leave the live stream
+  // ✅ CHANGE 5: clean auto-join (single source of truth)
+  useEffect(() => {
+    if (!enabled) return;
+    if (!isConnected) return;
+    if (!sessionId) return;
+    if (hasJoined) return;
+
+    // wait until subscriptions are ready
+    if (!joinSubRef.current || !leaveSubRef.current || !endSubRef.current)
+      return;
+
+    const t = setTimeout(() => joinLiveStream(), 250);
+    return () => clearTimeout(t);
+  }, [enabled, isConnected, sessionId, hasJoined, role]);
+
+  useEffect(() => {
+    return () => {
+      if (!hasJoined) return;
+      if (!isConnected) return;
+      if (!sessionId) return;
+
+      console.log("🧹 Auto LEAVE on unmount");
+
+      sendMessage("/app/live/leave", {
+        session: sessionId,
+        userId: userObject?.usid,
+      });
+    };
+  }, [hasJoined, isConnected, sessionId, userObject?.usid]);
+
+  // Leave the live stream (unchanged for now)
   const leaveLiveStream = () => {
     if (!isConnected) {
       console.log("⚠️ Not connected, skipping leave message");
       return;
     }
 
-    console.log(`📤 Leaving live stream: ${sessionId}`);
+    if (!sessionId) return;
+
+    console.log("📤 Sending LEAVE", {
+      session: sessionId,
+      userId: userObject?.usid,
+    });
 
     sendMessage("/app/live/leave", {
       session: sessionId,
       userId: userObject?.usid,
-      role: role,
+      role,
     });
 
     setHasJoined(false);
   };
-
-  // Auto-join when subscriptions are ready (for both HOST and VIEWER)
-  useEffect(() => {
-    if (
-      enabled &&
-      isConnected &&
-      !hasJoined &&
-      sessionId &&
-      joinSubRef.current &&
-      leaveSubRef.current &&
-      endSubRef.current
-    ) {
-      // Small delay to ensure subscriptions are fully ready
-      const timer = setTimeout(() => {
-        console.log(`⏰ Auto-joining stream as ${role}...`);
-        joinLiveStream();
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [enabled, isConnected, sessionId, hasJoined, role]);
-
-  // Auto-leave when component unmounts
-  useEffect(() => {
-    return () => {
-      if (hasJoined && isConnected) {
-        console.log("🧹 Component unmounting, leaving stream");
-        leaveLiveStream();
-      }
-    };
-  }, [hasJoined, isConnected]);
 
   return {
     viewerCount,

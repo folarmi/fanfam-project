@@ -287,7 +287,6 @@ const LiveStreaming = () => {
   };
 
   const joinExistingStream = async (channel: string) => {
-    console.log("name", channel);
     try {
       if (!APP_ID) {
         toast.error("App ID is missing");
@@ -298,8 +297,6 @@ const LiveStreaming = () => {
         toast.error("Channel name is missing");
         return;
       }
-
-      console.log(`🎬 Joining stream channel: ${channel}`);
 
       const res = await fetchToken();
       const token = res?.data?.token;
@@ -316,6 +313,12 @@ const LiveStreaming = () => {
       await client.join(APP_ID, channel, token, userObject?.usid);
 
       client.on("user-published", async (user, mediaType) => {
+        console.log("✅ VIEWER RECEIVED HOST STREAM", {
+          hostUid: user.uid,
+          mediaType,
+          channel: channel,
+        });
+
         await client.subscribe(user, mediaType);
 
         if (mediaType === "video") {
