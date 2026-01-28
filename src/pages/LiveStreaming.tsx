@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -28,18 +29,25 @@ import { MAX_CHANNEL_LENGTH } from "@/utils/helper";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { formatDuration } from "@/utils/helperTwo";
 import { useLiveStream } from "@/hooks/useLiveStream";
+import { useFetchProfile } from "@/hooks/apiHooks";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
-  const { isConnected, sendMessage } = useWebSocket();
-  const { creatorId: urlCreatorId, sessionId: urlSessionId } = useParams();
+  const { client: stompClient, isConnected, sendMessage } = useWebSocket();
+  const { creatorId: urlCreatorIdEncoded, sessionId } = useParams();
+
+  // Decode the creatorId since it was encoded (contains @ symbol)
+  const urlCreatorId = urlCreatorIdEncoded
+    ? decodeURIComponent(urlCreatorIdEncoded)
+    : undefined;
+
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
+  const { data: profileData } = useFetchProfile(userObject);
   // Determine if current user is the host
   const isHost = !urlCreatorId || urlCreatorId === userObject?.usid;
-  // const targetCreatorId = urlCreatorId || userObject?.usid;
+  // const isHost = !urlCreatorId || urlCreatorId === userObject?.email;
 
-  const [sessionId, setSessionId] = useState("");
   const [channelName, setChannelName] = useState("");
   const [streamDuration, setStreamDuration] = useState(0);
   const [streamDescription, setStreamDescription] = useState("");
@@ -50,47 +58,58 @@ const LiveStreaming = () => {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [tipsReceived] = useState(2345);
   const [chatMessage, setChatMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: 1,
-      user: "Mike_R",
-      badge: "SUB",
-      message: "This is awesome! 🔥",
-      time: "06:04 PM",
-    },
-    {
-      id: 2,
-      user: "Emma_W",
-      badge: "SUB",
-      message: "Love the energy today!",
-      time: "06:04 PM",
-    },
-    {
-      id: 3,
-      user: "Mike_R",
-      message: "🔥 Fire",
-      time: "06:04 PM",
-      isGift: true,
-    },
-    {
-      id: 4,
-      user: "Chris_L",
-      message: "Can someone explain what's happening?",
-      time: "06:05 PM",
-    },
-    {
-      id: 5,
-      user: "Jessica_T",
-      badge: "SUB",
-      message: "So glad I subscribed! Worth every penny",
-      time: "06:06 PM",
-    },
+  const [chatMessages, setChatMessages] = useState<
+    Array<{
+      id: number;
+      user: string;
+      badge?: string;
+      message: string;
+      time: string;
+      isGift?: boolean;
+    }>
+  >([
+    // {
+    //   id: 1,
+    //   user: "Mike_R",
+    //   badge: "SUB",
+    //   message: "This is awesome! 🔥",
+    //   time: "06:04 PM",
+    // },
+    // {
+    //   id: 2,
+    //   user: "Emma_W",
+    //   badge: "SUB",
+    //   message: "Love the energy today!",
+    //   time: "06:04 PM",
+    // },
+    // {
+    //   id: 3,
+    //   user: "Mike_R",
+    //   message: "🔥 Fire",
+    //   time: "06:04 PM",
+    //   isGift: true,
+    // },
+    // {
+    //   id: 4,
+    //   user: "Chris_L",
+    //   message: "Can someone explain what's happening?",
+    //   time: "06:05 PM",
+    // },
+    // {
+    //   id: 5,
+    //   user: "Jessica_T",
+    //   badge: "SUB",
+    //   message: "So glad I subscribed! Worth every penny",
+    //   time: "06:06 PM",
+    // },
   ]);
+  const [isJoining, setIsJoining] = useState(false);
+  const [hasJoinedAgora, setHasJoinedAgora] = useState(false);
 
-  const { viewerCount } = useLiveStream({
-    sessionId: sessionId,
-    creatorId: userObject?.usid,
-    role: "HOST",
+  const { viewerCount, isStreamEnded } = useLiveStream({
+    sessionId: sessionId || "",
+    creatorId: isHost ? userObject?.usid : urlCreatorId,
+    role: isHost ? "HOST" : "VIEWER",
     enabled: isStreaming && !!sessionId,
   });
 
@@ -99,28 +118,45 @@ const LiveStreaming = () => {
   const localAudioTrackRef = useRef<any>(null);
   const localVideoTrackRef = useRef<any>(null);
   const streamTimerRef = useRef<any>(null);
+  const joinSubRef = useRef<any>(null);
+  const hasAttemptedJoinRef = useRef(false);
 
-  const {
-    // data: agoraTokenData,
-    isLoading: isLoadingToken,
-    refetch: fetchToken,
-  } = useGetData({
-    url: `/agora/rtc-token?channel=${channelName}&uid=${userObject?.usid}`,
-    queryKey: ["GetAgoraRTCToken", channelName, userObject?.usid],
+  // const {
+  //   // data: agoraTokenData,
+  //   isLoading: isLoadingToken,
+  //   refetch: fetchToken,
+  // } = useGetData({
+  //   url: `/agora/rtc-token?channel=${channelName}&uid=${userObject?.usid}`,
+  //   queryKey: ["GetAgoraRTCToken", channelName, userObject?.usid],
+  //   enabled: false,
+  //   // enabled: !!userObject?.uid && !!channelName,
+  // });
+
+  const { isLoading: isLoadingToken, refetch: fetchToken } = useGetData({
+    url: `/agora/rtc-token?channel=${channelName || sessionId}&uid=${userObject?.usid}`,
+    queryKey: ["GetAgoraRTCToken", channelName || sessionId, userObject?.usid],
     enabled: false,
-    // enabled: !!userObject?.uid && !!channelName,
   });
+
+  useEffect(() => {
+    hasAttemptedJoinRef.current = false;
+    setIsJoining(false);
+    setHasJoinedAgora(false);
+  }, [sessionId]);
 
   // If viewer, join existing stream
   useEffect(() => {
-    if (!isHost && urlSessionId && urlCreatorId) {
-      // Viewer is joining an existing stream
-      setSessionId(urlSessionId);
-      setChannelName(urlSessionId); // Use sessionId as channel name
-      setIsStreaming(true);
-      joinExistingStream();
-    }
-  }, [isHost, urlSessionId, urlCreatorId]);
+    if (isHost) return;
+    if (!sessionId || !urlCreatorId) return;
+
+    if (hasAttemptedJoinRef.current) return;
+    hasAttemptedJoinRef.current = true;
+
+    setChannelName(sessionId);
+    setIsStreaming(true);
+
+    joinExistingStream(sessionId);
+  }, [isHost, sessionId, urlCreatorId]);
 
   useEffect(() => {
     // Initialize preview stream
@@ -148,6 +184,9 @@ const LiveStreaming = () => {
       if (streamTimerRef.current) {
         clearInterval(streamTimerRef.current);
       }
+
+      joinSubRef.current?.unsubscribe?.();
+      joinSubRef.current = null;
     };
   }, []);
 
@@ -170,6 +209,16 @@ const LiveStreaming = () => {
     };
   }, [isStreaming]);
 
+  // Add this useEffect to handle stream end for viewers
+  useEffect(() => {
+    if (!isHost && isStreamEnded) {
+      toast.info("The stream has ended");
+      setTimeout(() => {
+        handleStopLive();
+      }, 2000);
+    }
+  }, [isStreamEnded, isHost]);
+
   const handleStartLive = async () => {
     try {
       // Validate App ID
@@ -178,8 +227,19 @@ const LiveStreaming = () => {
         return;
       }
 
-      const newSessionId = `session_${userObject?.usid}_${Date.now()}`;
-      setSessionId(newSessionId);
+      if (!channelName?.trim()) {
+        toast.error("Channel name is required");
+        return;
+      }
+
+      if (isConnected && stompClient?.connected && !joinSubRef.current) {
+        joinSubRef.current = stompClient.subscribe(
+          `/topic/live/${channelName}/join`,
+          (message) => {
+            console.log("👋 JOIN EVENT:", message.body);
+          },
+        );
+      }
 
       const res = await fetchToken();
       const token = res?.data?.token;
@@ -231,8 +291,7 @@ const LiveStreaming = () => {
 
       // Send "go live" message
       sendMessage("/app/live/go", {
-        creatorId: userObject?.usid,
-        // session: newSessionId,
+        creatorId: profileData?.data?.username,
         session: channelName,
       });
 
@@ -243,10 +302,18 @@ const LiveStreaming = () => {
     }
   };
 
-  const joinExistingStream = async () => {
+  const joinExistingStream = async (channel: string) => {
+    if (isJoining || hasJoinedAgora) return;
+
+    setIsJoining(true);
     try {
       if (!APP_ID) {
         toast.error("App ID is missing");
+        return;
+      }
+
+      if (!channel) {
+        toast.error("Channel name is missing");
         return;
       }
 
@@ -258,42 +325,42 @@ const LiveStreaming = () => {
         return;
       }
 
-      // Initialize Agora Client as viewer
+      if (agoraClientRef.current) {
+        try {
+          await agoraClientRef.current.leave();
+        } catch {}
+        agoraClientRef.current = null;
+      }
+
       const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
       agoraClientRef.current = client;
 
-      // Set client role to audience (viewer)
       await client.setClientRole("audience");
+      await client.join(APP_ID, channel, token, userObject?.usid);
 
-      // Join channel
-      await client.join(APP_ID, channelName, token, userObject?.usid);
-
-      // Listen for remote users (the host)
       client.on("user-published", async (user, mediaType) => {
         await client.subscribe(user, mediaType);
-        console.log("Subscribe success");
 
         if (mediaType === "video") {
-          const remoteVideoTrack = user.videoTrack;
-          if (videoRef.current) {
-            remoteVideoTrack?.play(videoRef.current);
-          }
+          user.videoTrack?.play(videoRef.current!);
         }
 
         if (mediaType === "audio") {
-          const remoteAudioTrack = user.audioTrack;
-          remoteAudioTrack?.play();
+          user.audioTrack?.play();
         }
       });
-
-      client.on("user-unpublished", (_user) => {
-        console.log("User unpublished");
-      });
-
+      setHasJoinedAgora(true);
       toast.success("Joined live stream!");
     } catch (error) {
       console.error("Error joining stream:", error);
-      toast.error("Failed to join live stream");
+
+      // ✅ CHANGE: only show error if we truly didn't join
+      if (!hasJoinedAgora) {
+        toast.error("Failed to join live stream");
+      }
+    } finally {
+      // ✅ CHANGE: always reset joining flag
+      setIsJoining(false);
     }
   };
 
@@ -318,7 +385,6 @@ const LiveStreaming = () => {
       }
 
       setIsStreaming(false);
-      setSessionId("");
       setChatMessages([]);
 
       if (!isHost) {
@@ -334,6 +400,9 @@ const LiveStreaming = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
+
+      joinSubRef.current?.unsubscribe();
+      joinSubRef.current = null;
 
       toast.success("Stream ended");
     } catch (error) {
@@ -723,6 +792,3 @@ const LiveStreaming = () => {
 };
 
 export { LiveStreaming };
-
-// "fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL"
-// "fafam-20251115JY86aKbd0UhmbbPdbZY4b04ITbpehJBcLASL5RQL"

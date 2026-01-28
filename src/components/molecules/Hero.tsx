@@ -23,7 +23,7 @@ const Hero = () => {
           />
         </div>
       </div>
-      <div className="w-full bg-red-900">
+      <div className="w-full">
         <img src={heroImage} className="w-full" />
       </div>
     </>
