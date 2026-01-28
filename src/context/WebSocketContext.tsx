@@ -176,8 +176,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
         // Add or update live hosts from the API
         liveHostsData.forEach((host: any) => {
-          console.log(host);
-
           const creatorId = host?.creatorID;
           const sessionId = host?.session;
 

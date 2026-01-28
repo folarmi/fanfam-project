@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -103,8 +102,6 @@ const LiveStreaming = () => {
     //   time: "06:06 PM",
     // },
   ]);
-  const [isJoining, setIsJoining] = useState(false);
-  const [hasJoinedAgora, setHasJoinedAgora] = useState(false);
 
   const { viewerCount, isStreamEnded } = useLiveStream({
     sessionId: sessionId || "",
@@ -119,7 +116,6 @@ const LiveStreaming = () => {
   const localVideoTrackRef = useRef<any>(null);
   const streamTimerRef = useRef<any>(null);
   const joinSubRef = useRef<any>(null);
-  const hasAttemptedJoinRef = useRef(false);
 
   // const {
   //   // data: agoraTokenData,
@@ -138,24 +134,15 @@ const LiveStreaming = () => {
     enabled: false,
   });
 
-  useEffect(() => {
-    hasAttemptedJoinRef.current = false;
-    setIsJoining(false);
-    setHasJoinedAgora(false);
-  }, [sessionId]);
-
   // If viewer, join existing stream
   useEffect(() => {
-    if (isHost) return;
-    if (!sessionId || !urlCreatorId) return;
+    if (!isHost && sessionId && urlCreatorId) {
+      setChannelName(sessionId);
+      setIsStreaming(true);
 
-    if (hasAttemptedJoinRef.current) return;
-    hasAttemptedJoinRef.current = true;
-
-    setChannelName(sessionId);
-    setIsStreaming(true);
-
-    joinExistingStream(sessionId);
+      // pass it directly so we don’t depend on async state updates
+      joinExistingStream(sessionId);
+    }
   }, [isHost, sessionId, urlCreatorId]);
 
   useEffect(() => {
@@ -184,9 +171,6 @@ const LiveStreaming = () => {
       if (streamTimerRef.current) {
         clearInterval(streamTimerRef.current);
       }
-
-      joinSubRef.current?.unsubscribe?.();
-      joinSubRef.current = null;
     };
   }, []);
 
@@ -303,9 +287,7 @@ const LiveStreaming = () => {
   };
 
   const joinExistingStream = async (channel: string) => {
-    if (isJoining || hasJoinedAgora) return;
-
-    setIsJoining(true);
+    console.log("name", channel);
     try {
       if (!APP_ID) {
         toast.error("App ID is missing");
@@ -317,19 +299,14 @@ const LiveStreaming = () => {
         return;
       }
 
+      console.log(`🎬 Joining stream channel: ${channel}`);
+
       const res = await fetchToken();
       const token = res?.data?.token;
 
       if (!token) {
         toast.error("Failed to obtain streaming token");
         return;
-      }
-
-      if (agoraClientRef.current) {
-        try {
-          await agoraClientRef.current.leave();
-        } catch {}
-        agoraClientRef.current = null;
       }
 
       const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
@@ -349,18 +326,11 @@ const LiveStreaming = () => {
           user.audioTrack?.play();
         }
       });
-      setHasJoinedAgora(true);
+
       toast.success("Joined live stream!");
     } catch (error) {
       console.error("Error joining stream:", error);
-
-      // ✅ CHANGE: only show error if we truly didn't join
-      if (!hasJoinedAgora) {
-        toast.error("Failed to join live stream");
-      }
-    } finally {
-      // ✅ CHANGE: always reset joining flag
-      setIsJoining(false);
+      toast.error("Failed to join live stream");
     }
   };
 

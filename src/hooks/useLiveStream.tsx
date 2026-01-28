@@ -172,7 +172,7 @@ export const useLiveStream = ({
       creatorId,
       role, // "VIEWER" or "HOST"
     });
-
+    console.log(sessionId, creatorId, role);
     setHasJoined(true);
   };
 
