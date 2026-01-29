@@ -313,11 +313,11 @@ const LiveStreaming = () => {
       await client.join(APP_ID, channel, token, userObject?.usid);
 
       client.on("user-published", async (user, mediaType) => {
-        console.log("✅ VIEWER RECEIVED HOST STREAM", {
-          hostUid: user.uid,
-          mediaType,
-          channel: channel,
-        });
+        // console.log("✅ VIEWER RECEIVED HOST STREAM", {
+        //   hostUid: user.uid,
+        //   mediaType,
+        //   channel: channel,
+        // });
 
         await client.subscribe(user, mediaType);
 

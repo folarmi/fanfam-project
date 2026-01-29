@@ -5,6 +5,7 @@ import { useWebSocket } from "@/context/WebSocketContext";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import type { UseLiveStreamProps } from "@/lib/types";
+import { parseLiveEvent } from "@/utils/helper";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -28,6 +29,38 @@ export const useLiveStream = ({
   const endSubRef = useRef<any>(null);
   const commentSubRef = useRef<any>(null);
   const reactionSubRef = useRef<any>(null);
+
+  const safeLeaveThenCleanup = () => {
+    if (!sessionId) return;
+
+    // Only send leave if user had joined and stream isn't ended
+    if (hasJoined && isConnected && !isStreamEnded) {
+      console.log("📤 Sending LEAVE before cleanup", {
+        session: sessionId,
+        userId: userObject?.usid,
+      });
+
+      sendMessage("/app/live/leave", {
+        session: sessionId,
+        userId: userObject?.usid,
+      });
+    }
+
+    // Delay unsubscribe slightly so the publish isn't racing teardown
+    setTimeout(() => {
+      joinSubRef.current?.unsubscribe?.();
+      leaveSubRef.current?.unsubscribe?.();
+      endSubRef.current?.unsubscribe?.();
+      commentSubRef.current?.unsubscribe?.();
+      reactionSubRef.current?.unsubscribe?.();
+
+      joinSubRef.current = null;
+      leaveSubRef.current = null;
+      endSubRef.current = null;
+      commentSubRef.current = null;
+      reactionSubRef.current = null;
+    }, 200);
+  };
 
   useEffect(() => {
     if (!enabled) return;
@@ -60,11 +93,19 @@ export const useLiveStream = ({
       //   reactionTopic,
       // });
 
-      console.log("SUB TOPIC CHECK", `/topic/live/${sessionId}/join`);
       // JOIN
       if (!joinSubRef.current) {
         joinSubRef.current = client.subscribe(joinTopic, (message) => {
-          console.log("👋 JOIN EVENT:", message.body);
+          const payload = parseLiveEvent(message.body);
+          if (!payload) return;
+
+          console.log("👋 JOIN EVENT:", payload);
+
+          if (payload.event !== "USER_JOIN_LIVE") return;
+
+          // Optional: don't count yourself
+          if (payload.user && payload.user === userObject?.email) return;
+
           setViewerCount((prev) => prev + 1);
         });
       }
@@ -72,7 +113,16 @@ export const useLiveStream = ({
       // LEAVE
       if (!leaveSubRef.current) {
         leaveSubRef.current = client.subscribe(leaveTopic, (message) => {
-          console.log("👋 LEAVE EVENT:", message.body);
+          const payload = parseLiveEvent(message.body);
+          if (!payload) return;
+
+          console.log("👋 LEAVE EVENT:", payload);
+
+          if (payload.event !== "USER_LEFT_LIVE") return;
+
+          // Optional: don't decrement for yourself twice (if you send leave + receive broadcast)
+          if (payload.user && payload.user === userObject?.email) return;
+
           setViewerCount((prev) => Math.max(0, prev - 1));
         });
       }
@@ -80,7 +130,13 @@ export const useLiveStream = ({
       // END
       if (!endSubRef.current) {
         endSubRef.current = client.subscribe(endTopic, (message) => {
-          console.log("🛑 END EVENT:", message.body);
+          const payload = parseLiveEvent(message.body);
+          if (!payload) return;
+
+          console.log("🛑 END EVENT:", payload);
+
+          if (payload.event !== "CREATOR_ENDED_LIVE") return;
+
           setIsStreamEnded(true);
         });
       }
@@ -88,16 +144,28 @@ export const useLiveStream = ({
       // COMMENT
       if (!commentSubRef.current) {
         commentSubRef.current = client.subscribe(commentTopic, (message) => {
-          console.log("💬 COMMENT EVENT:", message.body);
-          // We’ll wire this into UI later (next step).
+          const payload = parseLiveEvent(message.body);
+          if (!payload) return;
+
+          console.log("💬 COMMENT EVENT:", payload);
+
+          if (payload.event !== "LIVE_COMMENT") return;
+
+          // next step: push to chat UI
         });
       }
 
       // REACTION
       if (!reactionSubRef.current) {
         reactionSubRef.current = client.subscribe(reactionTopic, (message) => {
-          console.log("❤️ REACTION EVENT:", message.body);
-          // We’ll wire this into UI later (next step).
+          const payload = parseLiveEvent(message.body);
+          if (!payload) return;
+
+          console.log("❤️ REACTION EVENT:", payload);
+
+          if (payload.event !== "LIVE_REACTION") return;
+
+          // next step: show floating hearts / counters
         });
       }
 
@@ -154,7 +222,7 @@ export const useLiveStream = ({
     });
 
     setHasJoined(true);
-    // console.log("✅ Sent /app/live/join", { sessionId, creatorId, role });
+    setViewerCount((prev) => (prev === 0 ? 1 : prev));
   };
 
   // ✅ CHANGE 5: clean auto-join (single source of truth)
@@ -184,6 +252,8 @@ export const useLiveStream = ({
         session: sessionId,
         userId: userObject?.usid,
       });
+
+      console.log("On leavinggggg", sessionId, userObject?.usid);
     };
   }, [hasJoined, isConnected, sessionId, userObject?.usid]);
 
@@ -218,3 +288,5 @@ export const useLiveStream = ({
     leaveLiveStream,
   };
 };
+
+// [Log] 👋 JOIN EVENT: – {event: "USER_JOIN_LIVE", user: "subCreator@mailinator.com"} (useLiveStream.tsx, line 48)

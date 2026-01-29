@@ -8,7 +8,7 @@ import {
   reachProfileSummary,
   reachPromotionsSummary,
 } from "../data";
-import type { LocationResult } from "@/lib/types";
+import type { LiveEventPayload, LocationResult } from "@/lib/types";
 import moment from "moment";
 
 export const phoneRegex =
@@ -310,4 +310,13 @@ export const getWebSocketUrl = () => {
   return (
     import.meta.env.VITE_WS_URL || "ws://fanfam.biyartech.com:7639/api/v1/ws"
   );
+};
+
+export const parseLiveEvent = (body: string): LiveEventPayload | null => {
+  try {
+    return JSON.parse(body);
+  } catch (e) {
+    console.error("❌ Failed to parse live event:", body, e);
+    return null;
+  }
 };

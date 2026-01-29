@@ -477,3 +477,20 @@ export interface LocationPermissionCardProps {
   code?: LocationErrorCode;
   onRetry: () => void;
 }
+
+export type LiveEventType =
+  | "USER_JOIN_LIVE"
+  | "USER_LEFT_LIVE"
+  | "CREATOR_LIVE_STARTED"
+  | "LIVE_COMMENT"
+  | "LIVE_REACTION"
+  | "CREATOR_ENDED_LIVE";
+
+export type LiveEventPayload = {
+  event: LiveEventType;
+  user?: string; // you already received this
+  session?: string;
+  text?: string; // likely for LIVE_COMMENT
+  reactionType?: string; // likely for LIVE_REACTION
+  [key: string]: any;
+};
