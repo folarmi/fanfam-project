@@ -39,6 +39,10 @@ export const useLiveStream = ({
         session: sessionId,
         userId: userObject?.usid,
       });
+      console.log("📤 VIEWER LEAVE SEND", {
+        session: sessionId,
+        userId: userObject?.usid,
+      });
 
       sendMessage("/app/live/leave", {
         session: sessionId,
@@ -104,7 +108,10 @@ export const useLiveStream = ({
           if (payload.event !== "USER_JOIN_LIVE") return;
 
           // Optional: don't count yourself
-          if (payload.user && payload.user === userObject?.email) return;
+          const me = userObject?.email || userObject?.usid;
+          if (payload.user && payload.user === me) return;
+
+          // if (payload.user && payload.user === userObject?.email) return;
 
           setViewerCount((prev) => prev + 1);
         });
@@ -138,6 +145,7 @@ export const useLiveStream = ({
           if (payload.event !== "CREATOR_ENDED_LIVE") return;
 
           setIsStreamEnded(true);
+          setHasJoined(false);
         });
       }
 
@@ -176,18 +184,7 @@ export const useLiveStream = ({
 
     // Cleanup when session changes / unmount
     return () => {
-      joinSubRef.current?.unsubscribe?.();
-      leaveSubRef.current?.unsubscribe?.();
-      endSubRef.current?.unsubscribe?.();
-      commentSubRef.current?.unsubscribe?.();
-      reactionSubRef.current?.unsubscribe?.();
-
-      joinSubRef.current = null;
-      leaveSubRef.current = null;
-      endSubRef.current = null;
-      commentSubRef.current = null;
-      reactionSubRef.current = null;
-
+      safeLeaveThenCleanup();
       // Optional: reset end state when leaving a session
       setIsStreamEnded(false);
     };
@@ -240,22 +237,22 @@ export const useLiveStream = ({
     return () => clearTimeout(t);
   }, [enabled, isConnected, sessionId, hasJoined, role]);
 
-  useEffect(() => {
-    return () => {
-      if (!hasJoined) return;
-      if (!isConnected) return;
-      if (!sessionId) return;
+  // useEffect(() => {
+  //   return () => {
+  //     if (!hasJoined) return;
+  //     if (!isConnected) return;
+  //     if (!sessionId) return;
 
-      console.log("🧹 Auto LEAVE on unmount");
+  //     console.log("🧹 Auto LEAVE on unmount");
 
-      sendMessage("/app/live/leave", {
-        session: sessionId,
-        userId: userObject?.usid,
-      });
+  //     sendMessage("/app/live/leave", {
+  //       session: sessionId,
+  //       userId: userObject?.usid,
+  //     });
 
-      console.log("On leavinggggg", sessionId, userObject?.usid);
-    };
-  }, [hasJoined, isConnected, sessionId, userObject?.usid]);
+  //     console.log("On leavinggggg", sessionId, userObject?.usid);
+  //   };
+  // }, [hasJoined, isConnected, sessionId, userObject?.usid]);
 
   // Leave the live stream (unchanged for now)
   const leaveLiveStream = () => {
@@ -265,18 +262,7 @@ export const useLiveStream = ({
     }
 
     if (!sessionId) return;
-
-    console.log("📤 Sending LEAVE", {
-      session: sessionId,
-      userId: userObject?.usid,
-    });
-
-    sendMessage("/app/live/leave", {
-      session: sessionId,
-      userId: userObject?.usid,
-      role,
-    });
-
+    safeLeaveThenCleanup();
     setHasJoined(false);
   };
 
@@ -288,5 +274,3 @@ export const useLiveStream = ({
     leaveLiveStream,
   };
 };
-
-// [Log] 👋 JOIN EVENT: – {event: "USER_JOIN_LIVE", user: "subCreator@mailinator.com"} (useLiveStream.tsx, line 48)

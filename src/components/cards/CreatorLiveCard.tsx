@@ -57,7 +57,8 @@ const CreatorLiveCard = () => {
             <button
               type="button"
               onClick={handleWatchLive}
-              disabled={!sessionId || !isConnected}
+              // disabled={!sessionId || !isConnected}
+              disabled={!isConnected}
               className="relative w-[72px] h-[72px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={`Watch ${displayName} live`}
             >

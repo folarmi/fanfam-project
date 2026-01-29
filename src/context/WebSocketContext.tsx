@@ -1,11 +1,3 @@
-// {
-//     "creatorID": "theCreator@mailinator.com",
-//     "session": "channell",
-//     "firstname": "",
-//     "lastname": "",
-//     "liveAt": ""
-// }
-
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react-hooks/exhaustive-deps */

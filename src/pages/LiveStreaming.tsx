@@ -103,7 +103,7 @@ const LiveStreaming = () => {
     // },
   ]);
 
-  const { viewerCount, isStreamEnded } = useLiveStream({
+  const { viewerCount, isStreamEnded, leaveLiveStream } = useLiveStream({
     sessionId: sessionId || "",
     creatorId: isHost ? userObject?.usid : urlCreatorId,
     role: isHost ? "HOST" : "VIEWER",
@@ -116,17 +116,6 @@ const LiveStreaming = () => {
   const localVideoTrackRef = useRef<any>(null);
   const streamTimerRef = useRef<any>(null);
   const joinSubRef = useRef<any>(null);
-
-  // const {
-  //   // data: agoraTokenData,
-  //   isLoading: isLoadingToken,
-  //   refetch: fetchToken,
-  // } = useGetData({
-  //   url: `/agora/rtc-token?channel=${channelName}&uid=${userObject?.usid}`,
-  //   queryKey: ["GetAgoraRTCToken", channelName, userObject?.usid],
-  //   enabled: false,
-  //   // enabled: !!userObject?.uid && !!channelName,
-  // });
 
   const { isLoading: isLoadingToken, refetch: fetchToken } = useGetData({
     url: `/agora/rtc-token?channel=${channelName || sessionId}&uid=${userObject?.usid}`,
@@ -339,12 +328,13 @@ const LiveStreaming = () => {
 
   const handleStopLive = async () => {
     try {
-      if (isHost && sessionId) {
+      if (isHost && channelName) {
         sendMessage("/app/live/end", {
-          session: sessionId,
+          session: channelName,
           creatorId: userObject?.usid,
         });
       }
+      console.log("🛑 HOST END SEND", { isHost, session: channelName });
 
       if (localAudioTrackRef.current) {
         localAudioTrackRef.current.close();
@@ -748,11 +738,18 @@ const LiveStreaming = () => {
             </button>
 
             <button
-              onClick={handleStopLive}
+              onClick={() => {
+                if (isHost) {
+                  handleStopLive(); // host ends stream (/app/live/end)
+                } else {
+                  leaveLiveStream(); // viewer leaves (/app/live/leave)
+                  handleStopLive(); // viewer exits Agora + navigates away
+                }
+              }}
               className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-all"
             >
               <Phone className="w-5 h-5" />
-              End Stream
+              {isHost ? "End Stream" : "Leave Stream"}
             </button>
           </div>
 
