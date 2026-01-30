@@ -35,15 +35,6 @@ export const useLiveStream = ({
 
     // Only send leave if user had joined and stream isn't ended
     if (hasJoined && isConnected && !isStreamEnded) {
-      console.log("📤 Sending LEAVE before cleanup", {
-        session: sessionId,
-        userId: userObject?.usid,
-      });
-      console.log("📤 VIEWER LEAVE SEND", {
-        session: sessionId,
-        userId: userObject?.usid,
-      });
-
       sendMessage("/app/live/leave", {
         session: sessionId,
         userId: userObject?.usid,
@@ -81,6 +72,12 @@ export const useLiveStream = ({
     ) {
       return;
     }
+    console.log(
+      "✅ SUB LEAVE TOPIC:",
+      `/topic/live/${sessionId}/leave`,
+      "role:",
+      role,
+    );
 
     try {
       const joinTopic = `/topic/live/${sessionId}/join`;
@@ -120,6 +117,8 @@ export const useLiveStream = ({
       // LEAVE
       if (!leaveSubRef.current) {
         leaveSubRef.current = client.subscribe(leaveTopic, (message) => {
+          console.log("👋 LEAVE EVENT RAW:", message.body);
+
           const payload = parseLiveEvent(message.body);
           if (!payload) return;
 
@@ -236,23 +235,6 @@ export const useLiveStream = ({
     const t = setTimeout(() => joinLiveStream(), 250);
     return () => clearTimeout(t);
   }, [enabled, isConnected, sessionId, hasJoined, role]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (!hasJoined) return;
-  //     if (!isConnected) return;
-  //     if (!sessionId) return;
-
-  //     console.log("🧹 Auto LEAVE on unmount");
-
-  //     sendMessage("/app/live/leave", {
-  //       session: sessionId,
-  //       userId: userObject?.usid,
-  //     });
-
-  //     console.log("On leavinggggg", sessionId, userObject?.usid);
-  //   };
-  // }, [hasJoined, isConnected, sessionId, userObject?.usid]);
 
   // Leave the live stream (unchanged for now)
   const leaveLiveStream = () => {

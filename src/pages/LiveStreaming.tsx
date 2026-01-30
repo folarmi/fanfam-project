@@ -33,7 +33,9 @@ import { useFetchProfile } from "@/hooks/apiHooks";
 const LiveStreaming = () => {
   const navigate = useNavigate();
   const { client: stompClient, isConnected, sendMessage } = useWebSocket();
-  const { creatorId: urlCreatorIdEncoded, sessionId } = useParams();
+  // const { creatorId: urlCreatorIdEncoded, sessionId } = useParams();
+  const { creatorId: urlCreatorIdEncoded, sessionId: urlSessionId } =
+    useParams();
 
   // Decode the creatorId since it was encoded (contains @ symbol)
   const urlCreatorId = urlCreatorIdEncoded
@@ -45,7 +47,6 @@ const LiveStreaming = () => {
   const { data: profileData } = useFetchProfile(userObject);
   // Determine if current user is the host
   const isHost = !urlCreatorId || urlCreatorId === userObject?.usid;
-  // const isHost = !urlCreatorId || urlCreatorId === userObject?.email;
 
   const [channelName, setChannelName] = useState("");
   const [streamDuration, setStreamDuration] = useState(0);
@@ -66,48 +67,14 @@ const LiveStreaming = () => {
       time: string;
       isGift?: boolean;
     }>
-  >([
-    // {
-    //   id: 1,
-    //   user: "Mike_R",
-    //   badge: "SUB",
-    //   message: "This is awesome! 🔥",
-    //   time: "06:04 PM",
-    // },
-    // {
-    //   id: 2,
-    //   user: "Emma_W",
-    //   badge: "SUB",
-    //   message: "Love the energy today!",
-    //   time: "06:04 PM",
-    // },
-    // {
-    //   id: 3,
-    //   user: "Mike_R",
-    //   message: "🔥 Fire",
-    //   time: "06:04 PM",
-    //   isGift: true,
-    // },
-    // {
-    //   id: 4,
-    //   user: "Chris_L",
-    //   message: "Can someone explain what's happening?",
-    //   time: "06:05 PM",
-    // },
-    // {
-    //   id: 5,
-    //   user: "Jessica_T",
-    //   badge: "SUB",
-    //   message: "So glad I subscribed! Worth every penny",
-    //   time: "06:06 PM",
-    // },
-  ]);
+  >([]);
+  const activeSession = isHost ? channelName : urlSessionId || "";
 
   const { viewerCount, isStreamEnded, leaveLiveStream } = useLiveStream({
-    sessionId: sessionId || "",
+    sessionId: activeSession || "",
     creatorId: isHost ? userObject?.usid : urlCreatorId,
     role: isHost ? "HOST" : "VIEWER",
-    enabled: isStreaming && !!sessionId,
+    enabled: isStreaming && !!activeSession,
   });
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -118,21 +85,25 @@ const LiveStreaming = () => {
   const joinSubRef = useRef<any>(null);
 
   const { isLoading: isLoadingToken, refetch: fetchToken } = useGetData({
-    url: `/agora/rtc-token?channel=${channelName || sessionId}&uid=${userObject?.usid}`,
-    queryKey: ["GetAgoraRTCToken", channelName || sessionId, userObject?.usid],
+    url: `/agora/rtc-token?channel=${channelName || activeSession}&uid=${userObject?.usid}`,
+    queryKey: [
+      "GetAgoraRTCToken",
+      channelName || activeSession,
+      userObject?.usid,
+    ],
     enabled: false,
   });
 
   // If viewer, join existing stream
   useEffect(() => {
-    if (!isHost && sessionId && urlCreatorId) {
-      setChannelName(sessionId);
+    if (!isHost && activeSession && urlCreatorId) {
+      setChannelName(activeSession);
       setIsStreaming(true);
 
       // pass it directly so we don’t depend on async state updates
-      joinExistingStream(sessionId);
+      joinExistingStream(activeSession);
     }
-  }, [isHost, sessionId, urlCreatorId]);
+  }, [isHost, activeSession, urlCreatorId]);
 
   useEffect(() => {
     // Initialize preview stream
@@ -334,7 +305,6 @@ const LiveStreaming = () => {
           creatorId: userObject?.usid,
         });
       }
-      console.log("🛑 HOST END SEND", { isHost, session: channelName });
 
       if (localAudioTrackRef.current) {
         localAudioTrackRef.current.close();
@@ -738,12 +708,12 @@ const LiveStreaming = () => {
             </button>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (isHost) {
-                  handleStopLive(); // host ends stream (/app/live/end)
+                  await handleStopLive();
                 } else {
-                  leaveLiveStream(); // viewer leaves (/app/live/leave)
-                  handleStopLive(); // viewer exits Agora + navigates away
+                  leaveLiveStream(); // send leave + keep subs alive briefly
+                  setTimeout(() => handleStopLive(), 600); // leave agora + navigate after 600ms
                 }
               }}
               className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-all"
