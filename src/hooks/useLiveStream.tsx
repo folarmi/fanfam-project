@@ -17,7 +17,6 @@ export const useLiveStream = ({
 }: UseLiveStreamProps) => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
-  // ✅ CHANGE 1: pull `client` so we can subscribe
   const { client, isConnected, sendMessage } = useWebSocket();
 
   const [viewerCount, setViewerCount] = useState(0);
@@ -72,12 +71,6 @@ export const useLiveStream = ({
     ) {
       return;
     }
-    console.log(
-      "✅ SUB LEAVE TOPIC:",
-      `/topic/live/${sessionId}/leave`,
-      "role:",
-      role,
-    );
 
     try {
       const joinTopic = `/topic/live/${sessionId}/join`;
@@ -85,14 +78,6 @@ export const useLiveStream = ({
       const endTopic = `/topic/live/${sessionId}/end`;
       const commentTopic = `/topic/live/${sessionId}/comment`;
       const reactionTopic = `/topic/live/${sessionId}/reaction`;
-
-      // console.log("🔔 Subscribing to live topics:", {
-      //   joinTopic,
-      //   leaveTopic,
-      //   endTopic,
-      //   commentTopic,
-      //   reactionTopic,
-      // });
 
       // JOIN
       if (!joinSubRef.current) {
@@ -136,10 +121,11 @@ export const useLiveStream = ({
       // END
       if (!endSubRef.current) {
         endSubRef.current = client.subscribe(endTopic, (message) => {
+          console.log("🛑 END EVENT RAW:", message.body);
           const payload = parseLiveEvent(message.body);
           if (!payload) return;
 
-          console.log("🛑 END EVENT:", payload);
+          console.log("🛑 END EVENT PARSED:", payload);
 
           if (payload.event !== "CREATOR_ENDED_LIVE") return;
 

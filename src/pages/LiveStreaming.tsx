@@ -83,6 +83,29 @@ const LiveStreaming = () => {
   const localVideoTrackRef = useRef<any>(null);
   const streamTimerRef = useRef<any>(null);
   const joinSubRef = useRef<any>(null);
+  const heartbeatRef = useRef<number | null>(null);
+
+  const startHeartbeat = () => {
+    if (!isHost) return;
+    if (heartbeatRef.current) return; // already running
+
+    // // send immediately once
+    // console.log("💓 HEARTBEAT START");
+    sendMessage("/app/live/streaming", { isStreaming: true });
+
+    heartbeatRef.current = window.setInterval(() => {
+      // console.log("💓 HEARTBEAT TICK");
+      sendMessage("/app/live/streaming", { isStreaming: true });
+    }, 25000);
+  };
+
+  const stopHeartbeat = () => {
+    if (heartbeatRef.current) {
+      window.clearInterval(heartbeatRef.current);
+      heartbeatRef.current = null;
+      // console.log("💓 HEARTBEAT STOP");
+    }
+  };
 
   const { isLoading: isLoadingToken, refetch: fetchToken } = useGetData({
     url: `/agora/rtc-token?channel=${channelName || activeSession}&uid=${userObject?.usid}`,
@@ -121,6 +144,7 @@ const LiveStreaming = () => {
       });
 
     return () => {
+      stopHeartbeat();
       stopAllTracks();
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
@@ -163,6 +187,15 @@ const LiveStreaming = () => {
     }
   }, [isStreamEnded, isHost]);
 
+  useEffect(() => {
+    if (!isHost) return;
+    if (!isStreaming) return;
+    if (!isConnected) return;
+
+    // if we’re live and reconnected, ensure heartbeat is running
+    startHeartbeat();
+  }, [isConnected, isStreaming, isHost]);
+
   const handleStartLive = async () => {
     try {
       // Validate App ID
@@ -174,15 +207,6 @@ const LiveStreaming = () => {
       if (!channelName?.trim()) {
         toast.error("Channel name is required");
         return;
-      }
-
-      if (isConnected && stompClient?.connected && !joinSubRef.current) {
-        joinSubRef.current = stompClient.subscribe(
-          `/topic/live/${channelName}/join`,
-          (message) => {
-            console.log("👋 JOIN EVENT:", message.body);
-          },
-        );
       }
 
       const res = await fetchToken();
@@ -240,6 +264,7 @@ const LiveStreaming = () => {
       });
 
       setIsStreaming(true);
+      startHeartbeat();
     } catch (error) {
       // console.error("Error starting live stream:", error);
       toast.error("Failed to start live stream. Check console for details.");
@@ -298,10 +323,16 @@ const LiveStreaming = () => {
   };
 
   const handleStopLive = async () => {
+    console.log("🛑 HOST END SEND PAYLOAD", {
+      destination: "/app/live/end",
+      sessionID: channelName,
+      creatorId: userObject?.usid,
+    });
     try {
+      stopHeartbeat();
       if (isHost && channelName) {
         sendMessage("/app/live/end", {
-          session: channelName,
+          sessionID: channelName,
           creatorId: userObject?.usid,
         });
       }

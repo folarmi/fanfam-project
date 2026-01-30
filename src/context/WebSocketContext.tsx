@@ -80,7 +80,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       heartbeatOutgoing: 4000,
 
       onConnect: () => {
-        console.log("✅ WebSocket connected");
         setIsConnected(true);
         // Subscribe to live notifications
         subscribeToLiveNotifications();
@@ -124,7 +123,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   // Subscribe to live notifications
   const subscribeToLiveNotifications = () => {
     const client = stompClientRef.current;
-
     if (!client || !client.connected) {
       console.warn("⚠️ Cannot subscribe: WebSocket not connected");
       return;
@@ -136,10 +134,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
 
     const topic = "/user/queue/live-notify";
-    console.log(`🔔 Subscribing to: ${topic}`);
 
     try {
       const subscription = client.subscribe(topic, (message) => {
+        console.log("message from backend", message);
         console.log("🎉 Live notification received!");
 
         try {
@@ -151,7 +149,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       });
 
       liveNotifySubscriptionRef.current = subscription;
-      console.log(`✅ Subscribed to live notifications`);
     } catch (error) {
       console.error(`❌ Error subscribing to live notifications:`, error);
     }
@@ -192,6 +189,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Handle live notifications from WebSocket
   const handleLiveNotification = (payload: LiveNotification) => {
+    console.log(payload);
     const creatorId = payload?.creatorId;
     if (!creatorId) {
       console.warn("⚠️ Live notification missing creatorId");
