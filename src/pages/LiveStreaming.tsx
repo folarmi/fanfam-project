@@ -328,14 +328,14 @@ const LiveStreaming = () => {
   const handleStopLive = async () => {
     console.log("🛑 HOST END SEND PAYLOAD", {
       destination: "/app/live/end",
-      sessionID: channelName,
+      session: channelName,
       creatorId: userObject?.usid,
     });
     try {
       stopHeartbeat();
       if (isHost && channelName) {
         sendMessage("/app/live/end", {
-          sessionID: channelName,
+          session: channelName,
           creatorId: userObject?.usid,
         });
       }
