@@ -64,8 +64,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   // Initialize WebSocket Connection
   useEffect(() => {
     const token = localStorage.getItem("token");
-
-    if (token === undefined) return;
+    if (!token) return;
 
     const client = new Client({
       brokerURL: WS_URL,
@@ -90,6 +89,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       onStompError: (frame) => {
         console.error("❌ STOMP Error:", frame);
         setIsConnected(false);
+        liveNotifySubscriptionRef.current = null;
       },
 
       onWebSocketClose: () => {
@@ -101,6 +101,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       onWebSocketError: (_error) => {
         console.error("❌ WebSocket error");
         setIsConnected(false);
+        liveNotifySubscriptionRef.current = null;
       },
     });
 
@@ -121,36 +122,78 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   }, []);
 
   // Subscribe to live notifications
+
+  // const subscribeToLiveNotifications = () => {
+  //   const client = stompClientRef.current;
+
+  //   if (!client || !client.connected) {
+  //     console.warn("⚠️ Cannot subscribe: WebSocket not connected");
+  //     return;
+  //   }
+
+  //   if (liveNotifySubscriptionRef.current) {
+  //     console.log("ℹ️ Already subscribed to live notifications");
+  //     return;
+  //   }
+
+  //   const topic = "/user/queue/live-notify";
+  //   console.log("🔔 Subscribing to:", topic);
+
+  //   try {
+  //     const subscription = client.subscribe(topic, (message) => {
+  //       console.log("message from backend", message);
+  //       console.log("🎉 Live notification received!");
+
+  //       try {
+  //         const payload: LiveNotification = JSON.parse(message.body);
+  //         handleLiveNotification(payload);
+  //       } catch (error) {
+  //         console.error("❌ Error parsing live notification:", error);
+  //       }
+  //     });
+
+  //     liveNotifySubscriptionRef.current = subscription;
+  //   } catch (error) {
+  //     console.error(`❌ Error subscribing to live notifications:`, error);
+  //   }
+  // };
+
   const subscribeToLiveNotifications = () => {
     const client = stompClientRef.current;
+
     if (!client || !client.connected) {
       console.warn("⚠️ Cannot subscribe: WebSocket not connected");
       return;
     }
 
+    // if we already have a subscription object, avoid duplicating
     if (liveNotifySubscriptionRef.current) {
-      console.log("ℹ️ Already subscribed to live notifications");
+      console.log("ℹ️ Already subscribed to /user/queue/live-notify");
       return;
     }
 
     const topic = "/user/queue/live-notify";
+    console.log("🔔 Subscribing to:", topic);
 
     try {
-      const subscription = client.subscribe(topic, (message) => {
-        console.log("message from backend", message);
-        console.log("🎉 Live notification received!");
+      liveNotifySubscriptionRef.current = client.subscribe(topic, (message) => {
+        console.log(`🎉 Live notification received on ${topic}`);
 
         try {
           const payload: LiveNotification = JSON.parse(message.body);
           handleLiveNotification(payload);
         } catch (error) {
-          console.error("❌ Error parsing live notification:", error);
+          console.error(
+            "❌ Error parsing live notification:",
+            error,
+            message.body,
+          );
         }
       });
 
-      liveNotifySubscriptionRef.current = subscription;
+      console.log("✅ Subscribed to live notifications");
     } catch (error) {
-      console.error(`❌ Error subscribing to live notifications:`, error);
+      console.error("❌ Error subscribing to live notifications:", error);
     }
   };
 

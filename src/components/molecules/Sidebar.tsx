@@ -22,7 +22,7 @@ const Sidebar = () => {
     successMessage: (data: any) => data?.data?.message,
     errorMessage: (error: any) => error,
     onSuccessCallback: () => {
-      navigate("/");
+      navigate("/login");
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       dispatch(logout());

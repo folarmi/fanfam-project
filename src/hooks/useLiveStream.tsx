@@ -179,6 +179,8 @@ export const useLiveStream = ({
   const joinLiveStream = () => {
     if (!enabled) return;
 
+    if (role === "HOST") return;
+
     if (!isConnected) {
       toast.error("Not connected to server");
       return;
@@ -213,6 +215,8 @@ export const useLiveStream = ({
     if (!isConnected) return;
     if (!sessionId) return;
     if (hasJoined) return;
+
+    if (role === "HOST") return;
 
     // wait until subscriptions are ready
     if (!joinSubRef.current || !leaveSubRef.current || !endSubRef.current)
