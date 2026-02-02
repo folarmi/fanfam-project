@@ -91,7 +91,6 @@ const LiveStreaming = () => {
 
     // // send immediately once
     console.log("💓 HEARTBEAT START");
-    sendMessage("/app/live/streaming", { isStreaming: true });
 
     heartbeatRef.current = window.setInterval(() => {
       console.log("💓 HEARTBEAT TICK");
@@ -257,14 +256,18 @@ const LiveStreaming = () => {
         // setViewerCount((prev) => Math.max(0, prev - 1));
       });
 
+      setIsStreaming(true);
+      await new Promise((resolve) => setTimeout(resolve, 100));
       // Send "go live" message
+      console.log("📡 Sending GO LIVE message");
+
       sendMessage("/app/live/go", {
         creatorId: profileData?.data?.username,
         session: channelName,
       });
 
-      setIsStreaming(true);
-      startHeartbeat();
+      // This might be the cause of the double go live ish
+      // startHeartbeat();
     } catch (error) {
       // console.error("Error starting live stream:", error);
       toast.error("Failed to start live stream. Check console for details.");

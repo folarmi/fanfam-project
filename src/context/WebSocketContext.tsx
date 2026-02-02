@@ -50,6 +50,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   const stompClientRef = useRef<Client | null>(null);
   const liveNotifySubscriptionRef = useRef<any>(null);
+  const hasSubscribedThisConnection = useRef(false);
 
   // Fetch currently live hosts
   const { data: getLiveHosts, refetch: refetchLiveHosts } = useGetData({
@@ -79,28 +80,46 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       heartbeatOutgoing: 4000,
 
       onConnect: () => {
+        console.log("✅ WebSocket connected");
         setIsConnected(true);
-        // Subscribe to live notifications
-        subscribeToLiveNotifications();
-        // Sync live hosts data on connect
-        refetchLiveHosts();
+
+        // ✅ CHANGED: Reset subscription tracking on new connection
+        hasSubscribedThisConnection.current = false;
+
+        // ✅ IMPROVED: Add small delay to ensure connection is fully ready
+        setTimeout(() => {
+          subscribeToLiveNotifications();
+          refetchLiveHosts();
+        }, 100);
       },
+
+      // onStompError: (frame) => {
+      //   console.error("❌ STOMP Error:", frame);
+      //   setIsConnected(false);
+      //   liveNotifySubscriptionRef.current = null;
+      // },
 
       onStompError: (frame) => {
         console.error("❌ STOMP Error:", frame);
         setIsConnected(false);
+        // ✅ CHANGED: Reset tracking flags
+        hasSubscribedThisConnection.current = false;
         liveNotifySubscriptionRef.current = null;
       },
 
       onWebSocketClose: () => {
         console.log("🔌 WebSocket closed");
         setIsConnected(false);
+        // ✅ CHANGED: Reset tracking flags
+        hasSubscribedThisConnection.current = false;
         liveNotifySubscriptionRef.current = null;
       },
 
       onWebSocketError: (_error) => {
         console.error("❌ WebSocket error");
         setIsConnected(false);
+        // ✅ CHANGED: Reset tracking flags
+        hasSubscribedThisConnection.current = false;
         liveNotifySubscriptionRef.current = null;
       },
     });
@@ -123,41 +142,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Subscribe to live notifications
 
-  // const subscribeToLiveNotifications = () => {
-  //   const client = stompClientRef.current;
-
-  //   if (!client || !client.connected) {
-  //     console.warn("⚠️ Cannot subscribe: WebSocket not connected");
-  //     return;
-  //   }
-
-  //   if (liveNotifySubscriptionRef.current) {
-  //     console.log("ℹ️ Already subscribed to live notifications");
-  //     return;
-  //   }
-
-  //   const topic = "/user/queue/live-notify";
-  //   console.log("🔔 Subscribing to:", topic);
-
-  //   try {
-  //     const subscription = client.subscribe(topic, (message) => {
-  //       console.log("message from backend", message);
-  //       console.log("🎉 Live notification received!");
-
-  //       try {
-  //         const payload: LiveNotification = JSON.parse(message.body);
-  //         handleLiveNotification(payload);
-  //       } catch (error) {
-  //         console.error("❌ Error parsing live notification:", error);
-  //       }
-  //     });
-
-  //     liveNotifySubscriptionRef.current = subscription;
-  //   } catch (error) {
-  //     console.error(`❌ Error subscribing to live notifications:`, error);
-  //   }
-  // };
-
+  // ✅ IMPROVED: Subscribe to live notifications with retry logic
   const subscribeToLiveNotifications = () => {
     const client = stompClientRef.current;
 
@@ -166,10 +151,26 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       return;
     }
 
-    // if we already have a subscription object, avoid duplicating
-    if (liveNotifySubscriptionRef.current) {
-      console.log("ℹ️ Already subscribed to /user/queue/live-notify");
+    // ✅ CHANGED: Check if we already have an active subscription on THIS connection
+    if (
+      liveNotifySubscriptionRef.current &&
+      hasSubscribedThisConnection.current
+    ) {
+      console.log(
+        "ℹ️ Already subscribed to /user/queue/live-notify on this connection",
+      );
       return;
+    }
+
+    // ✅ ADDED: Unsubscribe from any stale subscription before creating new one
+    if (liveNotifySubscriptionRef.current) {
+      console.log("🔄 Cleaning up stale subscription before re-subscribing");
+      try {
+        liveNotifySubscriptionRef.current.unsubscribe();
+      } catch (e) {
+        console.warn("Failed to unsubscribe from stale subscription:", e);
+      }
+      liveNotifySubscriptionRef.current = null;
     }
 
     const topic = "/user/queue/live-notify";
@@ -178,9 +179,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     try {
       liveNotifySubscriptionRef.current = client.subscribe(topic, (message) => {
         console.log(`🎉 Live notification received on ${topic}`);
+        console.log("📨 Raw message:", message.body);
 
         try {
           const payload: LiveNotification = JSON.parse(message.body);
+          console.log("📦 Parsed payload:", payload);
           handleLiveNotification(payload);
         } catch (error) {
           console.error(
@@ -191,9 +194,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         }
       });
 
-      console.log("✅ Subscribed to live notifications");
+      // ✅ ADDED: Mark that we've subscribed on this connection
+      hasSubscribedThisConnection.current = true;
+      console.log("✅ Successfully subscribed to live notifications");
     } catch (error) {
       console.error("❌ Error subscribing to live notifications:", error);
+      hasSubscribedThisConnection.current = false;
     }
   };
 
