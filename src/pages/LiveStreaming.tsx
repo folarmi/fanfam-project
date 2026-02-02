@@ -17,7 +17,7 @@ import {
   DollarSign,
   Phone,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import type { RootState } from "@/lib/store";
 import { useAppSelector } from "@/lib/hook";
@@ -29,6 +29,7 @@ import { useWebSocket } from "@/context/WebSocketContext";
 import { formatDuration } from "@/utils/helperTwo";
 import { useLiveStream } from "@/hooks/useLiveStream";
 import { useFetchProfile } from "@/hooks/apiHooks";
+import type { ChatMessage } from "@/lib/types";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
@@ -57,25 +58,44 @@ const LiveStreaming = () => {
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [tipsReceived] = useState(2345);
-  const [chatMessage, setChatMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState<
-    Array<{
-      id: number;
-      user: string;
-      badge?: string;
-      message: string;
-      time: string;
-      isGift?: boolean;
-    }>
-  >([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const activeSession = isHost ? channelName : urlSessionId || "";
+  const [chatMessage, setChatMessage] = useState("");
 
-  const { viewerCount, isStreamEnded, leaveLiveStream } = useLiveStream({
-    sessionId: activeSession || "",
-    creatorId: isHost ? userObject?.usid : urlCreatorId,
-    role: isHost ? "HOST" : "VIEWER",
-    enabled: isStreaming && !!activeSession,
-  });
+  const handleCommentReceived = useCallback((comment: any) => {
+    console.log("📨 Received live comment:", comment);
+
+    const newMessage = {
+      id:
+        typeof comment.id === "string"
+          ? parseInt(comment.id)
+          : (comment.id as number),
+      user: comment.user || comment.userId || "Anonymous",
+      username: comment.username,
+      message: comment.message,
+      time: comment.timestamp
+        ? new Date(comment.timestamp).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : new Date().toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+      isComment: true,
+    };
+
+    setChatMessages((prev) => [...prev, newMessage]);
+  }, []);
+
+  const { viewerCount, isStreamEnded, sendComment, leaveLiveStream } =
+    useLiveStream({
+      sessionId: activeSession || "",
+      creatorId: isHost ? userObject?.usid : urlCreatorId,
+      role: isHost ? "HOST" : "VIEWER",
+      enabled: isStreaming && !!activeSession,
+      onCommentReceived: handleCommentReceived,
+    });
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const agoraClientRef = useRef<any>(null);
@@ -84,6 +104,7 @@ const LiveStreaming = () => {
   const streamTimerRef = useRef<any>(null);
   const joinSubRef = useRef<any>(null);
   const heartbeatRef = useRef<number | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
   const startHeartbeat = () => {
     if (!isHost) return;
@@ -194,6 +215,14 @@ const LiveStreaming = () => {
     // if we’re live and reconnected, ensure heartbeat is running
     startHeartbeat();
   }, [isConnected, isStreaming, isHost]);
+
+  // ADD auto-scroll effect
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   const handleStartLive = async () => {
     try {
@@ -392,13 +421,50 @@ const LiveStreaming = () => {
   };
 
   const handleSendMessage = () => {
-    if (chatMessage.trim()) {
-      setChatMessages([
-        ...chatMessages,
+    const message = chatMessage.trim();
+
+    if (!message) {
+      console.log("⚠️ Empty message, not sending");
+      return;
+    }
+
+    console.log("📤 Attempting to send message:", message);
+
+    // If streaming, send via WebSocket
+    if (isStreaming && sendComment) {
+      const success = sendComment(message);
+
+      if (success) {
+        // Optimistically add own message to chat
+        const newMessage = {
+          id: Date.now(),
+          user: "You",
+          message: message,
+          time: new Date().toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          isComment: true,
+        };
+
+        setChatMessages((prev) => [...prev, newMessage]);
+        setChatMessage("");
+
+        console.log("✅ Message sent and added to local chat");
+      } else {
+        console.error("❌ Failed to send message");
+        toast.error("Failed to send message");
+      }
+    } else {
+      // Fallback: Local only (for pre-stream setup)
+      console.log("ℹ️ Not streaming, adding message locally only");
+
+      setChatMessages((prev) => [
+        ...prev,
         {
           id: Date.now(),
           user: "You",
-          message: chatMessage,
+          message: message,
           time: new Date().toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
@@ -638,7 +704,7 @@ const LiveStreaming = () => {
           </div>
 
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {/* <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {chatMessages.map((msg) => (
               <div
                 key={msg.id}
@@ -661,10 +727,45 @@ const LiveStreaming = () => {
                 )}
               </div>
             ))}
+          </div> */}
+          <div
+            ref={chatContainerRef} // ✅ ADD ref
+            className="flex-1 overflow-y-auto p-4 space-y-3"
+          >
+            {chatMessages.length === 0 ? (
+              <div className="text-center text-gray-400 text-sm mt-4">
+                No messages yet. Be the first to comment!
+              </div>
+            ) : (
+              chatMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={msg.isGift ? "bg-orange-100 p-3 rounded-lg" : ""}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-sm">{msg.user}</span>
+                    {msg.badge && (
+                      <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded">
+                        {msg.badge}
+                      </span>
+                    )}
+                    {msg.isGift && (
+                      <span className="text-xs">sent 🔥 Fire</span>
+                    )}
+                    <span className="text-xs text-gray-500 ml-auto">
+                      {msg.time}
+                    </span>
+                  </div>
+                  {!msg.isGift && (
+                    <p className="text-sm text-gray-800">{msg.message}</p>
+                  )}
+                </div>
+              ))
+            )}
           </div>
 
           {/* Chat Input */}
-          <div className="p-4 border-t">
+          {/* <div className="p-4 border-t">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -680,6 +781,42 @@ const LiveStreaming = () => {
               >
                 <Send className="w-5 h-5" />
               </button>
+            </div>
+          </div> */}
+
+          <div className="p-4 border-t">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+                placeholder={
+                  isStreaming
+                    ? "Send a message..."
+                    : "Start streaming to enable chat"
+                }
+                disabled={!isStreaming}
+                maxLength={500}
+                className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!isStreaming || !chatMessage.trim()}
+                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-2 rounded-full transition"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Character count */}
+            <div className="text-xs text-gray-400 text-right mt-1">
+              {chatMessage.length}/500
             </div>
           </div>
         </div>

@@ -446,11 +446,36 @@ export interface JoinLeaveMessage {
   role?: "VIEWER" | "HOST";
 }
 
+export interface LiveComment {
+  id: string | number;
+  sessionID: string;
+  message: string;
+  user?: string;
+  userId?: string;
+  username?: string;
+  timestamp?: string | number;
+  createdAt?: string;
+}
+
 export interface UseLiveStreamProps {
   sessionId: string;
   creatorId: string;
   role: "VIEWER" | "HOST";
   enabled?: boolean;
+  onCommentReceived?: (comment: LiveComment) => void;
+}
+
+export interface ChatMessage {
+  id: number;
+  user: string;
+  username?: string;
+  userId?: string;
+  badge?: string;
+  message: string;
+  time: string;
+  isGift?: boolean;
+  isComment?: boolean; // ✅ NEW: To distinguish WebSocket comments from local messages
+  isPinned?: boolean; // ✅ OPTIONAL: For future pinned messages feature
 }
 
 export type LocStatus = "idle" | "requesting" | "granted" | "denied" | "error";

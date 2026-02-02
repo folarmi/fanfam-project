@@ -4,17 +4,22 @@
 import { useWebSocket } from "@/context/WebSocketContext";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
-import type { UseLiveStreamProps } from "@/lib/types";
+import type { LiveComment, UseLiveStreamProps } from "@/lib/types";
 import { parseLiveEvent } from "@/utils/helper";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+
+interface UseLiveStreamPropsExtended extends UseLiveStreamProps {
+  onCommentReceived?: (comment: LiveComment) => void;
+}
 
 export const useLiveStream = ({
   sessionId,
   creatorId,
   role,
   enabled = true,
-}: UseLiveStreamProps) => {
+  onCommentReceived,
+}: UseLiveStreamPropsExtended) => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
   const { client, isConnected, sendMessage } = useWebSocket();
@@ -135,17 +140,69 @@ export const useLiveStream = ({
       }
 
       // COMMENT
+      // if (!commentSubRef.current) {
+      //   commentSubRef.current = client.subscribe(commentTopic, (message) => {
+      //     const payload = parseLiveEvent(message.body);
+      //     if (!payload) return;
+
+      //     console.log("💬 COMMENT EVENT:", payload);
+
+      //     if (payload.event !== "LIVE_COMMENT") return;
+
+      //     // next step: push to chat UI
+      //   });
+      // }
+
+      // ✅ IMPROVED: COMMENT subscription
       if (!commentSubRef.current) {
         commentSubRef.current = client.subscribe(commentTopic, (message) => {
+          console.log("💬 COMMENT EVENT RAW:", message.body);
+
           const payload = parseLiveEvent(message.body);
           if (!payload) return;
 
-          console.log("💬 COMMENT EVENT:", payload);
+          console.log("💬 COMMENT EVENT PARSED:", payload);
 
-          if (payload.event !== "LIVE_COMMENT") return;
+          // ✅ FLEXIBLE: Check for different event field formats
+          if (payload.event !== "LIVE_COMMENT") {
+            // console.log("⚠️ Skipping non-comment event:", eventType);
+            return;
+          }
 
-          // next step: push to chat UI
+          // ✅ Extract comment data with flexible field names
+          const comment: LiveComment = {
+            id:
+              payload.id ||
+              payload.commentId ||
+              payload.messageId ||
+              Date.now(),
+            sessionID: payload.sessionID || payload.session || sessionId,
+            message: payload.message || payload.text || payload.content || "",
+            user: payload.user || payload.username || payload.userName,
+            userId: payload.userId || payload.usid || payload.uid,
+            username:
+              payload.username || payload.userName || payload.displayName,
+            timestamp:
+              payload.timestamp ||
+              payload.createdAt ||
+              payload.time ||
+              Date.now(),
+          };
+
+          console.log("✅ Comment received:", comment);
+
+          // Validate comment has required fields
+          if (!comment.message) {
+            console.warn("⚠️ Received comment with no message, ignoring");
+            return;
+          }
+
+          // Call the callback if provided
+          if (onCommentReceived) {
+            onCommentReceived(comment);
+          }
         });
+        console.log("✅ Subscribed to:", commentTopic);
       }
 
       // REACTION
@@ -226,6 +283,46 @@ export const useLiveStream = ({
     return () => clearTimeout(t);
   }, [enabled, isConnected, sessionId, hasJoined, role]);
 
+  const sendComment = useCallback(
+    (message: string) => {
+      if (!sessionId) {
+        console.error("❌ Cannot send comment: No session ID");
+        return false;
+      }
+
+      if (!message.trim()) {
+        console.error("❌ Cannot send comment: Message is empty");
+        return false;
+      }
+
+      if (!isConnected) {
+        console.error("❌ Cannot send comment: Not connected");
+        toast.error("Not connected to server");
+        return false;
+      }
+
+      console.log("💬 Sending comment:", {
+        sessionId,
+        message: message.trim(),
+      });
+
+      try {
+        sendMessage("/app/live/comment", {
+          sessionID: sessionId,
+          message: message.trim(),
+        });
+
+        console.log("✅ Comment sent successfully");
+        return true;
+      } catch (error) {
+        console.error("❌ Error sending comment:", error);
+        toast.error("Failed to send comment");
+        return false;
+      }
+    },
+    [sessionId, isConnected, sendMessage],
+  );
+
   // Leave the live stream (unchanged for now)
   const leaveLiveStream = () => {
     if (!isConnected) {
@@ -244,11 +341,9 @@ export const useLiveStream = ({
     isStreamEnded,
     joinLiveStream,
     leaveLiveStream,
+    sendComment,
   };
 };
-
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // import { useWebSocket } from "@/context/WebSocketContext";
 // import { useAppSelector } from "@/lib/hook";
