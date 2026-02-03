@@ -424,19 +424,18 @@ export interface ReactionMessage {
 export interface LiveCreator {
   creatorId: string;
   sessionId: string;
+  streamStartTime?: number;
 }
 
 export interface WebSocketContextType {
   isConnected: boolean;
   client: Client | null;
   liveCreators: Map<string, LiveCreator>;
-  // subscribeToCreator: (creatorId: string) => void;
-  // markCreatorOffline: (creatorId: string) => void;
-  // unsubscribeFromCreator: (creatorId: string) => void;
   sendMessage: (destination: string, body: any) => void;
   isCreatorLive: (creatorId: string) => boolean;
   getLiveSession: (creatorId: string) => LiveCreator | undefined;
   refetchLiveHosts: () => void;
+  removeCreatorFromLive: (creatorId: string) => void;
 }
 
 export interface JoinLeaveMessage {

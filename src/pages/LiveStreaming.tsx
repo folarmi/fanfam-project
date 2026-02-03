@@ -32,8 +32,13 @@ import type { ChatMessage } from "@/lib/types";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
-  const { client: stompClient, isConnected, sendMessage } = useWebSocket();
-  // const { creatorId: urlCreatorIdEncoded, sessionId } = useParams();
+  const {
+    client: stompClient,
+    isConnected,
+    sendMessage,
+    removeCreatorFromLive,
+    refetchLiveHosts,
+  } = useWebSocket();
   const { creatorId: urlCreatorIdEncoded, sessionId: urlSessionId } =
     useParams();
 
@@ -345,6 +350,16 @@ const LiveStreaming = () => {
           creatorId: userObject?.usid,
         });
       }
+
+      // ✅ NEW: Remove self from live list immediately
+      if (userObject?.usid) {
+        removeCreatorFromLive(userObject?.usid);
+      }
+
+      // ✅ NEW: Force refetch for other users
+      setTimeout(() => {
+        refetchLiveHosts();
+      }, 500);
 
       if (localAudioTrackRef.current) {
         localAudioTrackRef.current.close();

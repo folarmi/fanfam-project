@@ -66,15 +66,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const WS_URL = getWebSocketUrl();
 
   const removeCreatorFromLive = useCallback((creatorId: string) => {
-    console.log("📴 Removing creator from live:", creatorId);
-
     setLiveCreators((prev) => {
       const updated = new Map(prev);
       const existed = updated.has(creatorId);
 
       if (existed) {
         updated.delete(creatorId);
-        console.log(`✅ Creator ${creatorId} removed from live list`);
       } else {
         console.log(`ℹ️ Creator ${creatorId} was not in live list`);
       }
@@ -91,7 +88,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       try {
         endSub.unsubscribe();
         creatorEndSubsRef.current.delete(creatorId);
-        console.log(`🧹 Unsubscribed from end events for ${creatorId}`);
       } catch (e) {
         console.warn(
           `Failed to unsubscribe from end event for ${creatorId}:`,
@@ -234,35 +230,90 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   };
 
   // Sync live hosts data from API with local state
+  // useEffect(() => {
+  //   if (getLiveHosts?.data) {
+  //     const liveHostsData = Array.isArray(getLiveHosts?.data)
+  //       ? getLiveHosts?.data
+  //       : getLiveHosts?.data?.content || [];
+  //     setLiveCreators((prev) => {
+  //       const updated = new Map(prev);
+
+  //       // Add or update live hosts from the API
+  //       liveHostsData.forEach((host: any) => {
+  //         const creatorId = host?.creatorID;
+  //         const sessionId = host?.session;
+
+  //         if (creatorId) {
+  //           // Only update if not already in the map or if session changed
+  //           const existing = updated.get(creatorId);
+  //           if (!existing || existing.sessionId !== sessionId) {
+  //             updated.set(creatorId, {
+  //               creatorId,
+  //               sessionId,
+  //             });
+  //           }
+  //         }
+  //       });
+
+  //       return updated;
+  //     });
+
+  //     console.log(`📊 Synced ${liveHostsData.length} live hosts from API`);
+  //   }
+  // }, [getLiveHosts]);
   useEffect(() => {
     if (getLiveHosts?.data) {
       const liveHostsData = Array.isArray(getLiveHosts?.data)
         ? getLiveHosts?.data
         : getLiveHosts?.data?.content || [];
+
+      console.log(`📊 Syncing ${liveHostsData.length} live hosts from API`);
+
       setLiveCreators((prev) => {
         const updated = new Map(prev);
 
-        // Add or update live hosts from the API
+        // ✅ Track which creators are in the current API response
+        const activeCreatorIds = new Set<string>();
+
+        // Add or update live hosts
         liveHostsData.forEach((host: any) => {
           const creatorId = host?.creatorID;
           const sessionId = host?.session;
+          const streamStartTime = host?.streamStartTime || host?.startTime;
 
           if (creatorId) {
-            // Only update if not already in the map or if session changed
+            activeCreatorIds.add(creatorId); // Mark as active
+
             const existing = updated.get(creatorId);
             if (!existing || existing.sessionId !== sessionId) {
               updated.set(creatorId, {
                 creatorId,
                 sessionId,
+                streamStartTime: streamStartTime
+                  ? Number(streamStartTime)
+                  : undefined,
               });
             }
           }
         });
 
+        // ✅ CRITICAL: Remove creators NOT in API response
+        let removedCount = 0;
+        Array.from(updated.keys()).forEach((creatorId) => {
+          if (!activeCreatorIds.has(creatorId)) {
+            console.log(`📴 Removing creator ${creatorId} - no longer in API`);
+            updated.delete(creatorId);
+            notifiedCreatorsRef.current.delete(creatorId);
+            removedCount++;
+          }
+        });
+
+        if (removedCount > 0) {
+          console.log(`🧹 Removed ${removedCount} creators who went offline`);
+        }
+
         return updated;
       });
-
-      console.log(`📊 Synced ${liveHostsData.length} live hosts from API`);
     }
   }, [getLiveHosts]);
 
@@ -345,6 +396,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     isCreatorLive,
     getLiveSession,
     refetchLiveHosts,
+    removeCreatorFromLive,
   };
 
   return (
