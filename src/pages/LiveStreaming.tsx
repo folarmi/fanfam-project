@@ -14,7 +14,6 @@ import {
   Settings,
   MessageCircle,
   Send,
-  DollarSign,
   Phone,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -57,7 +56,6 @@ const LiveStreaming = () => {
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [tipsReceived] = useState(2345);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const activeSession = isHost ? channelName : urlSessionId || "";
   const [chatMessage, setChatMessage] = useState("");
@@ -275,15 +273,9 @@ const LiveStreaming = () => {
       await client.publish([audioTrack, videoTrack]);
 
       // Listen for remote users joining
-      client.on("user-joined", (_user) => {
-        // console.log("Viewer joined:", user.uid);
-        // setViewerCount((prev) => prev + 1);
-      });
+      client.on("user-joined", (_user) => {});
 
-      client.on("user-left", (_user) => {
-        // console.log("Viewer left:", user.uid);
-        // setViewerCount((prev) => Math.max(0, prev - 1));
-      });
+      client.on("user-left", (_user) => {});
 
       setIsStreaming(true);
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -294,11 +286,7 @@ const LiveStreaming = () => {
         creatorId: profileData?.data?.username,
         session: channelName,
       });
-
-      // This might be the cause of the double go live ish
-      // startHeartbeat();
     } catch (error) {
-      // console.error("Error starting live stream:", error);
       toast.error("Failed to start live stream. Check console for details.");
     }
   };
@@ -330,12 +318,6 @@ const LiveStreaming = () => {
       await client.join(APP_ID, channel, token, userObject?.usid);
 
       client.on("user-published", async (user, mediaType) => {
-        // console.log("✅ VIEWER RECEIVED HOST STREAM", {
-        //   hostUid: user.uid,
-        //   mediaType,
-        //   channel: channel,
-        // });
-
         await client.subscribe(user, mediaType);
 
         if (mediaType === "video") {
@@ -355,11 +337,6 @@ const LiveStreaming = () => {
   };
 
   const handleStopLive = async () => {
-    console.log("🛑 HOST END SEND PAYLOAD", {
-      destination: "/app/live/end",
-      session: channelName,
-      creatorId: userObject?.usid,
-    });
     try {
       stopHeartbeat();
       if (isHost && channelName) {
@@ -669,10 +646,6 @@ const LiveStreaming = () => {
               <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
               LIVE
             </div>
-            <div className="bg-gray-900/80 backdrop-blur px-3 py-1 rounded text-white text-sm flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />${tipsReceived.toLocaleString()}{" "}
-              Received
-            </div>
           </div>
 
           {/* Video */}
@@ -704,30 +677,6 @@ const LiveStreaming = () => {
           </div>
 
           {/* Chat Messages */}
-          {/* <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {chatMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className={msg.isGift ? "bg-orange-100 p-3 rounded-lg" : ""}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-sm">{msg.user}</span>
-                  {msg.badge && (
-                    <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded">
-                      {msg.badge}
-                    </span>
-                  )}
-                  {msg.isGift && <span className="text-xs">sent 🔥 Fire</span>}
-                  <span className="text-xs text-gray-500 ml-auto">
-                    {msg.time}
-                  </span>
-                </div>
-                {!msg.isGift && (
-                  <p className="text-sm text-gray-800">{msg.message}</p>
-                )}
-              </div>
-            ))}
-          </div> */}
           <div
             ref={chatContainerRef} // ✅ ADD ref
             className="flex-1 overflow-y-auto p-4 space-y-3"
@@ -765,25 +714,6 @@ const LiveStreaming = () => {
           </div>
 
           {/* Chat Input */}
-          {/* <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder="Send a message..."
-                className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                onClick={handleSendMessage}
-                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition"
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            </div>
-          </div> */}
-
           <div className="p-4 border-t">
             <div className="flex gap-2">
               <input

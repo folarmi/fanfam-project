@@ -5,6 +5,7 @@
 
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -51,6 +52,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const stompClientRef = useRef<Client | null>(null);
   const liveNotifySubscriptionRef = useRef<any>(null);
   const hasSubscribedThisConnection = useRef(false);
+  const creatorEndSubsRef = useRef<Map<string, any>>(new Map());
+  const notifiedCreatorsRef = useRef<Set<string>>(new Set());
 
   // Fetch currently live hosts
   const { data: getLiveHosts, refetch: refetchLiveHosts } = useGetData({
@@ -61,6 +64,42 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   });
 
   const WS_URL = getWebSocketUrl();
+
+  const removeCreatorFromLive = useCallback((creatorId: string) => {
+    console.log("📴 Removing creator from live:", creatorId);
+
+    setLiveCreators((prev) => {
+      const updated = new Map(prev);
+      const existed = updated.has(creatorId);
+
+      if (existed) {
+        updated.delete(creatorId);
+        console.log(`✅ Creator ${creatorId} removed from live list`);
+      } else {
+        console.log(`ℹ️ Creator ${creatorId} was not in live list`);
+      }
+
+      return updated;
+    });
+
+    // Clear notification tracking
+    notifiedCreatorsRef.current.delete(creatorId);
+
+    // Unsubscribe from their end event
+    const endSub = creatorEndSubsRef.current.get(creatorId);
+    if (endSub) {
+      try {
+        endSub.unsubscribe();
+        creatorEndSubsRef.current.delete(creatorId);
+        console.log(`🧹 Unsubscribed from end events for ${creatorId}`);
+      } catch (e) {
+        console.warn(
+          `Failed to unsubscribe from end event for ${creatorId}:`,
+          e,
+        );
+      }
+    }
+  }, []);
 
   // Initialize WebSocket Connection
   useEffect(() => {
@@ -92,12 +131,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           refetchLiveHosts();
         }, 100);
       },
-
-      // onStompError: (frame) => {
-      //   console.error("❌ STOMP Error:", frame);
-      //   setIsConnected(false);
-      //   liveNotifySubscriptionRef.current = null;
-      // },
 
       onStompError: (frame) => {
         console.error("❌ STOMP Error:", frame);
@@ -156,9 +189,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       liveNotifySubscriptionRef.current &&
       hasSubscribedThisConnection.current
     ) {
-      console.log(
-        "ℹ️ Already subscribed to /user/queue/live-notify on this connection",
-      );
       return;
     }
 
