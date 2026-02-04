@@ -113,11 +113,7 @@ const LiveStreaming = () => {
     if (!isHost) return;
     if (heartbeatRef.current) return; // already running
 
-    // // send immediately once
-    console.log("💓 HEARTBEAT START");
-
     heartbeatRef.current = window.setInterval(() => {
-      console.log("💓 HEARTBEAT TICK");
       sendMessage("/app/live/streaming", { isStreaming: true });
     }, 25000);
   };
