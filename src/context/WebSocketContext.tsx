@@ -169,8 +169,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     };
   }, []);
 
-  // Subscribe to live notifications
-
   // ✅ IMPROVED: Subscribe to live notifications with retry logic
   const subscribeToLiveNotifications = () => {
     const client = stompClientRef.current;
@@ -200,7 +198,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
 
     const topic = "/user/queue/live-notify";
-    console.log("🔔 Subscribing to:", topic);
 
     try {
       liveNotifySubscriptionRef.current = client.subscribe(topic, (message) => {
@@ -229,38 +226,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
   };
 
-  // Sync live hosts data from API with local state
-  // useEffect(() => {
-  //   if (getLiveHosts?.data) {
-  //     const liveHostsData = Array.isArray(getLiveHosts?.data)
-  //       ? getLiveHosts?.data
-  //       : getLiveHosts?.data?.content || [];
-  //     setLiveCreators((prev) => {
-  //       const updated = new Map(prev);
-
-  //       // Add or update live hosts from the API
-  //       liveHostsData.forEach((host: any) => {
-  //         const creatorId = host?.creatorID;
-  //         const sessionId = host?.session;
-
-  //         if (creatorId) {
-  //           // Only update if not already in the map or if session changed
-  //           const existing = updated.get(creatorId);
-  //           if (!existing || existing.sessionId !== sessionId) {
-  //             updated.set(creatorId, {
-  //               creatorId,
-  //               sessionId,
-  //             });
-  //           }
-  //         }
-  //       });
-
-  //       return updated;
-  //     });
-
-  //     console.log(`📊 Synced ${liveHostsData.length} live hosts from API`);
-  //   }
-  // }, [getLiveHosts]);
   useEffect(() => {
     if (getLiveHosts?.data) {
       const liveHostsData = Array.isArray(getLiveHosts?.data)
@@ -280,20 +245,21 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           const creatorId = host?.creatorID;
           const sessionId = host?.session;
           const streamStartTime = host?.streamStartTime || host?.startTime;
-
+          console.log("Time from backend:", streamStartTime);
           if (creatorId) {
             activeCreatorIds.add(creatorId); // Mark as active
 
             const existing = updated.get(creatorId);
-            if (!existing || existing.sessionId !== sessionId) {
-              updated.set(creatorId, {
-                creatorId,
-                sessionId,
-                streamStartTime: streamStartTime
-                  ? Number(streamStartTime)
-                  : undefined,
-              });
-            }
+            // Might need to remove this condition
+            // if (!existing || existing.sessionId !== sessionId) {
+            updated.set(creatorId, {
+              creatorId,
+              sessionId,
+              streamStartTime: streamStartTime
+                ? Number(streamStartTime)
+                : undefined,
+            });
+            // }
           }
         });
 
@@ -319,24 +285,22 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Handle live notifications from WebSocket
   const handleLiveNotification = (payload: LiveNotification) => {
-    console.log(payload);
     const creatorId = payload?.creatorId;
     if (!creatorId) {
-      console.warn("⚠️ Live notification missing creatorId");
       return;
     }
-
-    console.log(`🔴 Live notification for creator: ${creatorId}`, payload);
-
     // Check if already marked as live
     const alreadyLive = liveCreators.has(creatorId);
 
+    const streamStartTime = (payload as any)?.timestamp || Date.now();
+    console.log("🔔 Live notification with start time:", streamStartTime);
     setLiveCreators((prev) => {
       const updated = new Map(prev);
 
       updated.set(creatorId, {
         creatorId,
         sessionId: (payload as any)?.session || (payload as any)?.sessionId,
+        streamStartTime: Number(streamStartTime),
       });
 
       return updated;
@@ -373,7 +337,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     const client = stompClientRef.current;
 
     if (!client || !client.connected) {
-      console.error("❌ Cannot send: WebSocket not connected");
       toast.error("Not connected to server");
       return;
     }

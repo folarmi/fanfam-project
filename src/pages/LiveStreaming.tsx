@@ -28,7 +28,16 @@ import { useWebSocket } from "@/context/WebSocketContext";
 import { formatDuration } from "@/utils/helperTwo";
 import { useLiveStream } from "@/hooks/useLiveStream";
 import { useFetchProfile } from "@/hooks/apiHooks";
-import type { ChatMessage } from "@/lib/types";
+import type {
+  ChatMessage,
+  FloatingReaction,
+  LiveReaction,
+  ReactionCount,
+  ReactionType,
+} from "@/lib/types";
+import { ReactionCounter } from "@/components/live/ReactionCounter";
+import { FloatingReactions } from "@/components/live/FloatingReactions";
+import { ReactionButton } from "@/components/live/ReactionButton";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
@@ -38,6 +47,7 @@ const LiveStreaming = () => {
     sendMessage,
     removeCreatorFromLive,
     refetchLiveHosts,
+    getLiveSession,
   } = useWebSocket();
   const { creatorId: urlCreatorIdEncoded, sessionId: urlSessionId } =
     useParams();
@@ -55,6 +65,7 @@ const LiveStreaming = () => {
 
   const [channelName, setChannelName] = useState("");
   const [streamDuration, setStreamDuration] = useState(0);
+  const [streamStartTime, setStreamStartTime] = useState<number | null>(null);
   const [streamDescription, setStreamDescription] = useState("");
   const [showTips, setShowTips] = useState(true);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -64,6 +75,15 @@ const LiveStreaming = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const activeSession = isHost ? channelName : urlSessionId || "";
   const [chatMessage, setChatMessage] = useState("");
+  const [floatingReactions, setFloatingReactions] = useState<
+    FloatingReaction[]
+  >([]);
+  const [reactionCounts, setReactionCounts] = useState<ReactionCount>({
+    LIKE: 0,
+    LOVE: 0,
+    DISLIKE: 0,
+    LOL: 0,
+  });
 
   const handleCommentReceived = useCallback((comment: any) => {
     console.log("📨 Received live comment:", comment);
@@ -91,14 +111,63 @@ const LiveStreaming = () => {
     setChatMessages((prev) => [...prev, newMessage]);
   }, []);
 
-  const { viewerCount, isStreamEnded, sendComment, leaveLiveStream } =
-    useLiveStream({
-      sessionId: activeSession || "",
-      creatorId: isHost ? userObject?.usid : urlCreatorId,
-      role: isHost ? "HOST" : "VIEWER",
-      enabled: isStreaming && !!activeSession,
-      onCommentReceived: handleCommentReceived,
-    });
+  const handleReactionReceived = useCallback((reaction: LiveReaction) => {
+    // Update counts
+    setReactionCounts((prev) => ({
+      ...prev,
+      [reaction.reactionType]: prev[reaction.reactionType] + 1,
+    }));
+
+    // Add floating animation
+    const floatingReaction: FloatingReaction = {
+      id: `${reaction.id}-${Date.now()}`,
+      type: reaction.reactionType,
+      x: Math.random() * 80 + 10,
+      y: 0,
+    };
+
+    setFloatingReactions((prev) => [...prev, floatingReaction]);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      setFloatingReactions((prev) =>
+        prev.filter((r) => r.id !== floatingReaction.id),
+      );
+    }, 3000);
+  }, []);
+
+  const {
+    viewerCount,
+    isStreamEnded,
+    sendComment,
+    leaveLiveStream,
+    sendReaction,
+  } = useLiveStream({
+    sessionId: activeSession || "",
+    creatorId: isHost ? userObject?.usid : urlCreatorId,
+    role: isHost ? "HOST" : "VIEWER",
+    enabled: isStreaming && !!activeSession,
+    onCommentReceived: handleCommentReceived,
+    onReactionReceived: handleReactionReceived,
+  });
+
+  // ✅ Handle reaction clicks
+  const handleReaction = (reactionType: ReactionType) => {
+    if (!isStreaming || !sendReaction) return;
+
+    const success = sendReaction(reactionType);
+    if (success) {
+      // Optimistically show own reaction
+      handleReactionReceived({
+        id: Date.now(),
+        session: activeSession || "",
+        reactionType: reactionType,
+        user: "You",
+        userId: userObject?.usid,
+        timestamp: Date.now(),
+      });
+    }
+  };
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const agoraClientRef = useRef<any>(null);
@@ -177,24 +246,51 @@ const LiveStreaming = () => {
     };
   }, []);
 
-  // Stream duration timer
+  // ✅ Get stream start time from backend (for BOTH host and viewer)
   useEffect(() => {
-    if (isStreaming) {
-      streamTimerRef.current = setInterval(() => {
-        setStreamDuration((prev) => prev + 1);
-      }, 1000);
+    if (!isStreaming) return;
+
+    const creatorId = isHost ? userObject?.usid : urlCreatorId;
+    if (!creatorId) return;
+
+    const liveSession = getLiveSession(creatorId);
+
+    if (liveSession?.streamStartTime) {
+      console.log("⏰ Using backend start time:", liveSession.streamStartTime);
+      console.log(
+        "⏰ Stream has been live for:",
+        (Date.now() - liveSession.streamStartTime) / 1000,
+        "seconds",
+      );
+      setStreamStartTime(liveSession.streamStartTime);
     } else {
-      if (streamTimerRef.current) {
-        clearInterval(streamTimerRef.current);
-      }
-      setStreamDuration(0);
+      console.warn("⚠️ No start time from backend yet, waiting...");
     }
-    return () => {
-      if (streamTimerRef.current) {
-        clearInterval(streamTimerRef.current);
-      }
+  }, [isStreaming, isHost, userObject?.usid, urlCreatorId, getLiveSession]);
+
+  // ✅ Stream duration timer - simple and clean
+  useEffect(() => {
+    if (!isStreaming) {
+      setStreamDuration(0);
+      setStreamStartTime(null);
+      return;
+    }
+
+    if (!streamStartTime) {
+      console.log("⏰ Waiting for backend start time...");
+      return;
+    }
+
+    const updateDuration = () => {
+      const elapsed = Math.floor((Date.now() - streamStartTime) / 1000);
+      setStreamDuration(elapsed);
     };
-  }, [isStreaming]);
+
+    updateDuration(); // Update immediately
+    const interval = setInterval(updateDuration, 1000);
+
+    return () => clearInterval(interval);
+  }, [isStreaming, streamStartTime]);
 
   // Add this useEffect to handle stream end for viewers
   useEffect(() => {
@@ -275,7 +371,6 @@ const LiveStreaming = () => {
 
       // Listen for remote users joining
       client.on("user-joined", (_user) => {});
-
       client.on("user-left", (_user) => {});
 
       setIsStreaming(true);
@@ -348,7 +443,7 @@ const LiveStreaming = () => {
       }
 
       // ✅ NEW: Remove self from live list immediately
-      if (userObject?.usid) {
+      if (userObject?.usid && isHost) {
         removeCreatorFromLive(userObject?.usid);
       }
 
@@ -657,6 +752,9 @@ const LiveStreaming = () => {
               <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
               LIVE
             </div>
+
+            {/* ✅ Reaction Counter */}
+            <ReactionCounter counts={reactionCounts} />
           </div>
 
           {/* Video */}
@@ -675,6 +773,9 @@ const LiveStreaming = () => {
               </div>
             )}
           </div>
+
+          {/* ✅ Floating Reactions */}
+          <FloatingReactions reactions={floatingReactions} />
         </div>
 
         {/* Chat Sidebar */}
@@ -781,6 +882,10 @@ const LiveStreaming = () => {
 
           {/* Center - Controls */}
           <div className="flex items-center gap-4">
+            <ReactionButton
+              onReaction={handleReaction}
+              disabled={!isStreaming}
+            />
             <button
               onClick={toggleCamera}
               className={`p-3 rounded-full transition-all ${

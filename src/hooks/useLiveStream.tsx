@@ -4,13 +4,19 @@
 import { useWebSocket } from "@/context/WebSocketContext";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
-import type { LiveComment, UseLiveStreamProps } from "@/lib/types";
+import type {
+  LiveComment,
+  LiveReaction,
+  ReactionType,
+  UseLiveStreamProps,
+} from "@/lib/types";
 import { parseLiveEvent } from "@/utils/helper";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 interface UseLiveStreamPropsExtended extends UseLiveStreamProps {
   onCommentReceived?: (comment: LiveComment) => void;
+  onReactionReceived?: (reaction: LiveReaction) => void;
 }
 
 export const useLiveStream = ({
@@ -19,6 +25,7 @@ export const useLiveStream = ({
   role,
   enabled = true,
   onCommentReceived,
+  onReactionReceived,
 }: UseLiveStreamPropsExtended) => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
@@ -126,11 +133,11 @@ export const useLiveStream = ({
       // END
       if (!endSubRef.current) {
         endSubRef.current = client.subscribe(endTopic, (message) => {
-          console.log("🛑 END EVENT RAW:", message.body);
+          // console.log("🛑 END EVENT RAW:", message.body);
           const payload = parseLiveEvent(message.body);
           if (!payload) return;
 
-          console.log("🛑 END EVENT PARSED:", payload);
+          // console.log("🛑 END EVENT PARSED:", payload);
 
           if (payload.event !== "CREATOR_ENDED_LIVE") return;
 
@@ -139,21 +146,7 @@ export const useLiveStream = ({
         });
       }
 
-      // COMMENT
-      // if (!commentSubRef.current) {
-      //   commentSubRef.current = client.subscribe(commentTopic, (message) => {
-      //     const payload = parseLiveEvent(message.body);
-      //     if (!payload) return;
-
-      //     console.log("💬 COMMENT EVENT:", payload);
-
-      //     if (payload.event !== "LIVE_COMMENT") return;
-
-      //     // next step: push to chat UI
-      //   });
-      // }
-
-      // ✅ IMPROVED: COMMENT subscription
+      // COMMENT subscription
       if (!commentSubRef.current) {
         commentSubRef.current = client.subscribe(commentTopic, (message) => {
           console.log("💬 COMMENT EVENT RAW:", message.body);
@@ -207,15 +200,25 @@ export const useLiveStream = ({
 
       // REACTION
       if (!reactionSubRef.current) {
+        console.log("reactedddd");
+
         reactionSubRef.current = client.subscribe(reactionTopic, (message) => {
           const payload = parseLiveEvent(message.body);
+          console.log("🛑 REACTION EVENT RAW:", message.body);
           if (!payload) return;
 
-          console.log("❤️ REACTION EVENT:", payload);
+          const reaction: LiveReaction = {
+            id: payload?.id || Date.now(),
+            session: payload.session || sessionId,
+            reactionType: payload?.reactionType,
+            user: payload.user,
+            userId: payload.userId,
+            timestamp: payload.timestamp || Date.now(),
+          };
 
-          if (payload.event !== "LIVE_REACTION") return;
-
-          // next step: show floating hearts / counters
+          if (onReactionReceived) {
+            onReactionReceived(reaction);
+          }
         });
       }
 
@@ -301,11 +304,6 @@ export const useLiveStream = ({
         return false;
       }
 
-      console.log("💬 Sending comment:", {
-        session: sessionId,
-        message: message.trim(),
-      });
-
       try {
         sendMessage("/app/live/comment", {
           session: sessionId,
@@ -319,6 +317,26 @@ export const useLiveStream = ({
         toast.error("Failed to send comment");
         return false;
       }
+    },
+    [sessionId, isConnected, sendMessage],
+  );
+
+  // Add sendReaction function
+  const sendReaction = useCallback(
+    (reactionType: ReactionType) => {
+      if (!sessionId || !isConnected) {
+        return false;
+      }
+
+      sendMessage("/app/live/reaction", {
+        session: sessionId,
+        reactionType: reactionType,
+      });
+      console.log({
+        session: sessionId,
+        reactionType: reactionType,
+      });
+      return true;
     },
     [sessionId, isConnected, sendMessage],
   );
@@ -342,5 +360,6 @@ export const useLiveStream = ({
     joinLiveStream,
     leaveLiveStream,
     sendComment,
+    sendReaction,
   };
 };

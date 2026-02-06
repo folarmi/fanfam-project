@@ -3,6 +3,7 @@ import type {
   MediaType,
   PromotionCampaignQualifier,
   PromotionCampaignType,
+  ReactionType,
 } from "@/lib/types";
 // import { formatDistanceToNowStrict } from "date-fns";
 
@@ -113,7 +114,7 @@ export const parseFormattedNumber = (value?: string | number): number => {
 };
 
 export const mapQualifier = (
-  value: string | PromotionCampaignQualifier
+  value: string | PromotionCampaignQualifier,
 ): string | PromotionCampaignQualifier | undefined => {
   const nameToType: Record<string, PromotionCampaignQualifier> = {
     "Both new and expired": "BOTH",
@@ -141,7 +142,7 @@ export const mapQualifier = (
 };
 
 export const mapPromotionType = (
-  value: string | PromotionCampaignType
+  value: string | PromotionCampaignType,
 ): string | PromotionCampaignType | undefined => {
   const nameToType: Record<string, PromotionCampaignType> = {
     "Free trial": "FREE_TRIAL",
@@ -161,11 +162,11 @@ export const mapPromotionType = (
 
 export function isActivelySubscribed(
   subscriptions: any[],
-  creatorUsid: string | undefined
+  creatorUsid: string | undefined,
 ): { isActive: boolean; subscription: any } {
   // Find the subscription for this creator
   const subscription = subscriptions?.find(
-    (sub) => sub?.creator?.usid === creatorUsid
+    (sub) => sub?.creator?.usid === creatorUsid,
   );
 
   // If no subscription found, return false
@@ -188,4 +189,11 @@ export const formatDuration = (seconds: any) => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+};
+
+export const REACTION_EMOJIS: Record<ReactionType, string> = {
+  LIKE: "👍",
+  LOVE: "❤️",
+  DISLIKE: "👎",
+  LOL: "😂",
 };

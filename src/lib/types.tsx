@@ -77,6 +77,38 @@ export interface ReactionItem {
   createdBy: string[];
 }
 
+// Live Reactions
+export interface LiveReaction {
+  id: string | number;
+  session: string;
+  reactionType: ReactionType;
+  user?: string;
+  userId?: string;
+  username?: string;
+  timestamp?: number;
+}
+
+export interface LiveReactionPayload {
+  session: string;
+  reactionType: ReactionType;
+}
+
+// ✅ Floating reaction for animation
+export interface FloatingReaction {
+  id: string;
+  type: ReactionType;
+  x: number; // Random horizontal position
+  y: number; // Starting vertical position
+}
+
+// ✅ Reaction count for display
+export interface ReactionCount {
+  LIKE: number;
+  LOVE: number;
+  DISLIKE: number;
+  LOL: number;
+}
+
 export interface StoryPost {
   publicId: string;
   createdBy: string;
