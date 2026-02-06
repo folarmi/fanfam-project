@@ -139,7 +139,7 @@ export const useLiveStream = ({
             console.log("🛑 End Payload:", payload);
             
             // Check for various forms of END event
-            if (payload?.event === "CREATOR_ENDED_LIVE" || payload?.event === "END_LIVE" || payload?.type === "END") {
+            if (payload?.event === "CREATOR_ENDED_LIVE" ) {
               setIsStreamEnded(true);
               setHasJoined(false);
             }
