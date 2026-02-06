@@ -139,9 +139,17 @@ export const useLiveStream = ({
             console.log("🛑 End Payload:", payload);
             
             // Check for various forms of END event
-            if (payload?.event === "CREATOR_ENDED_LIVE" ) {
+            // restoring broader check just in case, and logging specific debug info
+            if (
+                payload?.event === "CREATOR_ENDED_LIVE" || 
+                payload?.event === "END_LIVE" || 
+                payload?.type === "END"
+            ) {
+              console.log("✅ Stream End Condition Met. Setting isStreamEnded = true. Am I host?", userObject?.usid === channelName);
               setIsStreamEnded(true);
               setHasJoined(false);
+            } else {
+                console.log("⚠️ Stream End Event received but condition NOT met:", payload);
             }
         } catch (e) { console.error("Error parsing end", e); }
       });

@@ -18,7 +18,7 @@ const Sidebar = () => {
   const userObject = userString ? JSON.parse(userString) : null;
   const { data: profileData } = useFetchProfile(userObject);
 
-  console.log('userobjectttt',userObject);
+
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
     successMessage: (data: any) => data?.data?.message,

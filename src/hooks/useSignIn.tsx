@@ -23,17 +23,35 @@ export const useSignIn = ({
     endpoint,
     successMessage: (data: any) => data?.message,
     onSuccessCallback: (data) => {
+      console.log("✅ SignIn/Verify Success Data:", data);
       setNotVerifiedError(false);
+      
+      // Robust extraction: Handle if data is nested in data.data (common in axios+backend wrappings) or flat
+      const responseData = data?.data || data;
+      
+      const accessToken = responseData?.accessToken || responseData?.token || data?.accessToken || data?.token;
+      const refreshToken = responseData?.refreshToken || data?.refreshToken;
+
       const userObject = {
-        email: data?.data?.email,
-        role: data?.data?.role,
-        usid: data?.data?.usid || data?.data?.userId,
+        email: responseData?.email,
+        role: responseData?.role,
+        usid: responseData?.usid || responseData?.userId,
       };
 
-      localStorage.setItem("token", data?.data?.accessToken);
-      localStorage.setItem("refreshToken", data?.data?.refreshToken);
-      localStorage.setItem("userObject", JSON.stringify(userObject));
-      dispatch(updateUserObject(userObject));
+      if (accessToken) {
+        localStorage.setItem("token", accessToken);
+      } else {
+        console.error("❌ No access token found in response", data);
+      }
+      
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+      
+      if (userObject.usid) {
+        localStorage.setItem("userObject", JSON.stringify(userObject));
+        dispatch(updateUserObject(userObject));
+      }
 
       // Dispatch custom event
       window.dispatchEvent(new Event("auth-complete"));
