@@ -1,31 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import CustomButton from "@/components/forms/CustomButton";
 import Typography from "@/components/forms/Typography";
-import {
-  ArrowLeft,
-  Mic,
-  Video,
-  MicOff,
-  VideoOff,
-  Users,
-  Settings,
-  MessageCircle,
-  Send,
-  Phone,
-} from "lucide-react";
+import { ArrowLeft, Mic, Video, MicOff, VideoOff } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import AgoraRTC from "agora-rtc-sdk-ng";
-import type { RootState } from "@/lib/store";
+import AgoraRTC, {
+  type IAgoraRTCClient,
+  type ICameraVideoTrack,
+  type IMicrophoneAudioTrack,
+} from "agora-rtc-sdk-ng";
 import { useAppSelector } from "@/lib/hook";
 import { useGetData } from "@/hooks/apiCalls";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { MAX_CHANNEL_LENGTH } from "@/utils/helper";
 import { useWebSocket } from "@/context/WebSocketContext";
-import { formatDuration } from "@/utils/helperTwo";
 import { useLiveStream } from "@/hooks/useLiveStream";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import type {
@@ -37,12 +27,10 @@ import type {
 } from "@/lib/types";
 import { ReactionCounter } from "@/components/live/ReactionCounter";
 import { FloatingReactions } from "@/components/live/FloatingReactions";
-import { ReactionButton } from "@/components/live/ReactionButton";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
   const {
-    client: stompClient,
     isConnected,
     sendMessage,
     removeCreatorFromLive,
@@ -57,14 +45,14 @@ const LiveStreaming = () => {
     ? decodeURIComponent(urlCreatorIdEncoded)
     : undefined;
 
-  const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const { userObject } = useAppSelector((state) => state.auth);
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const { data: profileData } = useFetchProfile(userObject);
   // Determine if current user is the host
   const isHost = !urlCreatorId || urlCreatorId === userObject?.usid;
 
   const [channelName, setChannelName] = useState("");
-  const [streamDuration, setStreamDuration] = useState(0);
+  const [_streamDuration, setStreamDuration] = useState(0);
   const [streamStartTime, setStreamStartTime] = useState<number | null>(null);
   const [streamDescription, setStreamDescription] = useState("");
   const [showTips, setShowTips] = useState(true);
@@ -88,6 +76,18 @@ const LiveStreaming = () => {
   const handleCommentReceived = useCallback((comment: any) => {
     console.log("📨 Received live comment:", comment);
 
+    // Filter out our own comments to prevent duplication if we do optimistic updates
+    // OR if we rely on optimistic updates, we typically ignore the socket echo for self.
+    const isMe = comment.userId === userObject?.usid || comment.user === userObject?.usid;
+    
+    // However, for comments, it's safer to rely on ID if possible, but distinct filtering works too.
+    // If we receive our own comment via socket, we should ignore it IF we already added it.
+    // But since we are adding optimistic updates, we will ignore socket messages from SELF.
+    if (isMe) {
+        console.log("Ignoring own comment from socket to avoid double render");
+        return;
+    }
+
     const newMessage = {
       id:
         typeof comment.id === "string"
@@ -109,9 +109,14 @@ const LiveStreaming = () => {
     };
 
     setChatMessages((prev) => [...prev, newMessage]);
-  }, []);
+  }, [userObject?.usid]);
 
   const handleReactionReceived = useCallback((reaction: LiveReaction) => {
+    // Filter out self-reactions from WebSocket to duplicate optimistic update
+    if (reaction.userId === userObject?.usid) {
+        return;
+    }
+
     // Update counts
     setReactionCounts((prev) => ({
       ...prev,
@@ -134,13 +139,12 @@ const LiveStreaming = () => {
         prev.filter((r) => r.id !== floatingReaction.id),
       );
     }, 3000);
-  }, []);
+  }, [userObject?.usid]);
 
   const {
     viewerCount,
     isStreamEnded,
     sendComment,
-    leaveLiveStream,
     sendReaction,
   } = useLiveStream({
     sessionId: activeSession || "",
@@ -157,24 +161,33 @@ const LiveStreaming = () => {
 
     const success = sendReaction(reactionType);
     if (success) {
-      // Optimistically show own reaction
-      handleReactionReceived({
-        id: Date.now(),
-        session: activeSession || "",
-        reactionType: reactionType,
-        user: "You",
-        userId: userObject?.usid,
-        timestamp: Date.now(),
-      });
+      // Optimistically show own reaction and update count
+      setReactionCounts((prev) => ({
+        ...prev,
+        [reactionType]: prev[reactionType] + 1,
+      }));
+      
+      const floatingReaction: FloatingReaction = {
+        id: `optimistic-${Date.now()}`,
+        type: reactionType,
+        x: Math.random() * 80 + 10,
+        y: 0,
+      };
+
+      setFloatingReactions((prev) => [...prev, floatingReaction]);
+
+      setTimeout(() => {
+        setFloatingReactions((prev) =>
+          prev.filter((r) => r.id !== floatingReaction.id),
+        );
+      }, 3000);
     }
   };
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const agoraClientRef = useRef<any>(null);
-  const localAudioTrackRef = useRef<any>(null);
-  const localVideoTrackRef = useRef<any>(null);
-  const streamTimerRef = useRef<any>(null);
-  const joinSubRef = useRef<any>(null);
+  const agoraClientRef = useRef<IAgoraRTCClient | null>(null);
+  const localAudioTrackRef = useRef<IMicrophoneAudioTrack | null>(null);
+  const localVideoTrackRef = useRef<ICameraVideoTrack | null>(null);
   const heartbeatRef = useRef<number | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -191,7 +204,6 @@ const LiveStreaming = () => {
     if (heartbeatRef.current) {
       window.clearInterval(heartbeatRef.current);
       heartbeatRef.current = null;
-      // console.log("💓 HEARTBEAT STOP");
     }
   };
 
@@ -227,7 +239,6 @@ const LiveStreaming = () => {
         }
       })
       .catch((_err) => {
-        // console.error("Error accessing media devices:", err);
         toast.error("Please allow camera and microphone access");
       });
 
@@ -240,9 +251,6 @@ const LiveStreaming = () => {
       if (agoraClientRef.current) {
         agoraClientRef.current.leave();
       }
-      if (streamTimerRef.current) {
-        clearInterval(streamTimerRef.current);
-      }
     };
   }, []);
 
@@ -253,24 +261,9 @@ const LiveStreaming = () => {
     const creatorId = isHost ? userObject?.usid : urlCreatorId;
     if (!creatorId) return;
 
-    console.log(
-      "userObjectUSID",
-      userObject?.usid,
-      "urlCreatorId",
-      urlCreatorId,
-    );
-
-    console.log("Live session from webSocket:", getLiveSession(creatorId));
     const liveSession = getLiveSession(creatorId);
-    console.log("Live session data:", liveSession);
 
     if (liveSession?.streamStartTime) {
-      console.log("⏰ Using backend start time:", liveSession.streamStartTime);
-      console.log(
-        "⏰ Stream has been live for:",
-        (Date.now() - liveSession.streamStartTime) / 1000,
-        "seconds",
-      );
       setStreamStartTime(liveSession.streamStartTime);
     } else {
       console.warn("⚠️ No start time from backend yet, waiting...");
@@ -286,7 +279,6 @@ const LiveStreaming = () => {
     }
 
     if (!streamStartTime) {
-      console.log("⏰ Waiting for backend start time...");
       return;
     }
 
@@ -489,9 +481,6 @@ const LiveStreaming = () => {
         videoRef.current.srcObject = stream;
       }
 
-      joinSubRef.current?.unsubscribe();
-      joinSubRef.current = null;
-
       toast.success("Stream ended");
     } catch (error) {
       console.error("Error stopping stream:", error);
@@ -516,11 +505,8 @@ const LiveStreaming = () => {
     const message = chatMessage.trim();
 
     if (!message) {
-      console.log("⚠️ Empty message, not sending");
       return;
     }
-
-    console.log("📤 Attempting to send message:", message);
 
     // If streaming, send via WebSocket
     if (isStreaming && sendComment) {
@@ -541,16 +527,11 @@ const LiveStreaming = () => {
 
         setChatMessages((prev) => [...prev, newMessage]);
         setChatMessage("");
-
-        console.log("✅ Message sent and added to local chat");
       } else {
-        console.error("❌ Failed to send message");
         toast.error("Failed to send message");
       }
     } else {
       // Fallback: Local only (for pre-stream setup)
-      console.log("ℹ️ Not streaming, adding message locally only");
-
       setChatMessages((prev) => [
         ...prev,
         {
@@ -756,10 +737,27 @@ const LiveStreaming = () => {
         {/* Main Video Stream */}
         <div className="flex-1 relative bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
           {/* Top Bar */}
-          <div className="absolute top-4 left-4 flex items-center gap-3 z-10">
-            <div className="bg-red-600 px-3 py-1 rounded text-white text-sm font-bold flex items-center gap-2">
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              LIVE
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+            <div className="flex items-center gap-3">
+              <div className="bg-red-600 px-3 py-1 rounded text-white text-sm font-bold flex items-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                LIVE
+              </div>
+
+              {/* ✅ Viewer Count */}
+              {isStreaming && (
+                <div className="bg-black/30 backdrop-blur-md px-3 py-1 rounded text-white text-sm font-medium border border-white/10 flex items-center gap-2">
+                   <span className="w-2 h-2 bg-green-500 rounded-full" />
+                   {viewerCount} Viewers
+                </div>
+              )}
+
+              {/* ✅ Stream Duration */}
+              {isStreaming && (
+                <div className="bg-black/30 backdrop-blur-md px-3 py-1 rounded text-white text-sm font-medium border border-white/10">
+                  {new Date(_streamDuration * 1000).toISOString().substr(11, 8)}
+                </div>
+              )}
             </div>
 
             {/* ✅ Reaction Counter */}
@@ -785,6 +783,49 @@ const LiveStreaming = () => {
 
           {/* ✅ Floating Reactions */}
           <FloatingReactions reactions={floatingReactions} />
+
+          {/* ✅ Media Controls (Restored) */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
+            <button
+              onClick={toggleMic}
+              className={`p-4 rounded-full transition-all shadow-lg border border-white/10 backdrop-blur-md ${
+                isMicOn
+                  ? "bg-white/20 hover:bg-white/30 text-white"
+                  : "bg-red-500 hover:bg-red-600 text-white"
+              }`}
+              title={isMicOn ? "Mute Microphone" : "Unmute Microphone"}
+            >
+              {isMicOn ? <Mic size={24} /> : <MicOff size={24} />}
+            </button>
+
+            {isHost ? (
+              <CustomButton
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg backdrop-blur-md border border-red-500/50"
+                onClick={handleStopLive}
+              >
+                End Stream
+              </CustomButton>
+            ) : (
+              <CustomButton
+                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg backdrop-blur-md border border-white/10"
+                onClick={handleStopLive}
+              >
+                Leave Stream
+              </CustomButton>
+            )}
+
+            <button
+              onClick={toggleCamera}
+              className={`p-4 rounded-full transition-all shadow-lg border border-white/10 backdrop-blur-md ${
+                isCameraOn
+                  ? "bg-white/20 hover:bg-white/30 text-white"
+                  : "bg-red-500 hover:bg-red-600 text-white"
+              }`}
+              title={isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
+            >
+              {isCameraOn ? <Video size={24} /> : <VideoOff size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Chat Sidebar */}
@@ -799,158 +840,99 @@ const LiveStreaming = () => {
 
           {/* Chat Messages */}
           <div
-            ref={chatContainerRef} // ✅ ADD ref
+            ref={chatContainerRef}
             className="flex-1 overflow-y-auto p-4 space-y-3"
           >
-            {chatMessages.length === 0 ? (
-              <div className="text-center text-gray-400 text-sm mt-4">
-                No messages yet. Be the first to comment!
-              </div>
-            ) : (
-              chatMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={msg.isGift ? "bg-orange-100 p-3 rounded-lg" : ""}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-sm">{msg.user}</span>
-                    {msg.badge && (
-                      <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded">
-                        {msg.badge}
-                      </span>
-                    )}
-                    {msg.isGift && (
-                      <span className="text-xs">sent 🔥 Fire</span>
-                    )}
-                    <span className="text-xs text-gray-500 ml-auto">
-                      {msg.time}
-                    </span>
-                  </div>
-                  {!msg.isGift && (
-                    <p className="text-sm text-gray-800">{msg.message}</p>
-                  )}
+            {chatMessages.map((msg) => (
+              <div key={msg.id} className="flex gap-2">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">
+                  {msg.user?.[0]?.toUpperCase() || "A"}
                 </div>
-              ))
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-semibold text-sm">
+                      {msg.username || msg.user}
+                    </span>
+                    <span className="text-xs text-gray-400">{msg.time}</span>
+                  </div>
+                  <p className="text-sm text-gray-800">{msg.message}</p>
+                </div>
+              </div>
+            ))}
+            {chatMessages.length === 0 && (
+              <div className="text-center text-gray-400 mt-10">
+                No messages yet. Say hello! 👋
+              </div>
             )}
           </div>
 
           {/* Chat Input */}
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
+          <div className="p-4 border-t bg-gray-50">
+            <div className="flex items-center gap-2">
               <input
                 type="text"
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }}
-                placeholder={
-                  isStreaming
-                    ? "Send a message..."
-                    : "Start streaming to enable chat"
-                }
-                disabled={!isStreaming}
-                maxLength={500}
-                className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                placeholder="Type a message..."
+                className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!isStreaming || !chatMessage.trim()}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-2 rounded-full transition"
+                disabled={!chatMessage.trim()}
+                className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                title="Send Message"
               >
-                <Send className="w-5 h-5" />
+                <span className="sr-only">Send</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
               </button>
             </div>
 
-            {/* Character count */}
-            <div className="text-xs text-gray-400 text-right mt-1">
-              {chatMessage.length}/500
+            {/* Simple Reaction Buttons for quick access */}
+            <div className="flex justify-between mt-3 px-2">
+              <button
+                onClick={() => handleReaction("LIKE")}
+                className="text-xl hover:scale-125 transition-transform"
+                title="Like"
+              >
+                👍
+              </button>
+              <button
+                onClick={() => handleReaction("LOVE")}
+                className="text-xl hover:scale-125 transition-transform"
+                title="Love"
+              >
+                ❤️
+              </button>
+              <button
+                onClick={() => handleReaction("LOL")}
+                className="text-xl hover:scale-125 transition-transform"
+                title="Haha"
+              >
+                😂
+              </button>
+              <button
+                onClick={() => handleReaction("DISLIKE")}
+                className="text-xl hover:scale-125 transition-transform"
+                title="Dislike"
+              >
+                👎
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Bottom Control Bar */}
-      <div className="bg-gray-800 border-t border-gray-700 px-6 py-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          {/* Left - Stats */}
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-white">
-              <Users className="w-5 h-5" />
-              <span className="font-semibold">
-                {viewerCount.toLocaleString()}
-              </span>
-            </div>
-            <div className="text-white font-mono">
-              {formatDuration(streamDuration)}
-            </div>
-          </div>
-
-          {/* Center - Controls */}
-          <div className="flex items-center gap-4">
-            <ReactionButton
-              onReaction={handleReaction}
-              disabled={!isStreaming}
-            />
-            <button
-              onClick={toggleCamera}
-              className={`p-3 rounded-full transition-all ${
-                isCameraOn
-                  ? "bg-gray-700 hover:bg-gray-600 text-white"
-                  : "bg-red-600 hover:bg-red-700 text-white"
-              }`}
-            >
-              {isCameraOn ? (
-                <Video className="w-5 h-5" />
-              ) : (
-                <VideoOff className="w-5 h-5" />
-              )}
-            </button>
-
-            <button
-              onClick={toggleMic}
-              className={`p-3 rounded-full transition-all ${
-                isMicOn
-                  ? "bg-gray-700 hover:bg-gray-600 text-white"
-                  : "bg-red-600 hover:bg-red-700 text-white"
-              }`}
-            >
-              {isMicOn ? (
-                <Mic className="w-5 h-5" />
-              ) : (
-                <MicOff className="w-5 h-5" />
-              )}
-            </button>
-
-            <button className="p-3 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition-all">
-              <MessageCircle className="w-5 h-5" />
-            </button>
-
-            <button className="p-3 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition-all">
-              <Settings className="w-5 h-5" />
-            </button>
-
-            <button
-              onClick={async () => {
-                if (isHost) {
-                  await handleStopLive();
-                } else {
-                  leaveLiveStream(); // send leave + keep subs alive briefly
-                  setTimeout(() => handleStopLive(), 600); // leave agora + navigate after 600ms
-                }
-              }}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-all"
-            >
-              <Phone className="w-5 h-5" />
-              {isHost ? "End Stream" : "Leave Stream"}
-            </button>
-          </div>
-
-          {/* Right - Placeholder */}
-          <div className="w-32"></div>
         </div>
       </div>
     </div>
