@@ -253,7 +253,16 @@ const LiveStreaming = () => {
     const creatorId = isHost ? userObject?.usid : urlCreatorId;
     if (!creatorId) return;
 
+    console.log(
+      "userObjectUSID",
+      userObject?.usid,
+      "urlCreatorId",
+      urlCreatorId,
+    );
+
+    console.log("Live session from webSocket:", getLiveSession(creatorId));
     const liveSession = getLiveSession(creatorId);
+    console.log("Live session data:", liveSession);
 
     if (liveSession?.streamStartTime) {
       console.log("⏰ Using backend start time:", liveSession.streamStartTime);

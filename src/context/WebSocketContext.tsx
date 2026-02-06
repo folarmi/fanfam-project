@@ -239,12 +239,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
         // ✅ Track which creators are in the current API response
         const activeCreatorIds = new Set<string>();
-
         // Add or update live hosts
         liveHostsData.forEach((host: any) => {
           const creatorId = host?.creatorID;
           const sessionId = host?.session;
-          const streamStartTime = host?.streamStartTime || host?.startTime;
+          const streamStartTime = host?.liveAt;
           console.log("Time from backend:", streamStartTime);
           if (creatorId) {
             activeCreatorIds.add(creatorId); // Mark as active
@@ -285,16 +284,18 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Handle live notifications from WebSocket
   const handleLiveNotification = (payload: LiveNotification) => {
+    console.log("payloaddddd", payload);
     const creatorId = payload?.creatorId;
     if (!creatorId) {
       return;
     }
     // Check if already marked as live
-    const alreadyLive = liveCreators.has(creatorId);
-
+    let alreadyLive;
     const streamStartTime = (payload as any)?.timestamp || Date.now();
     console.log("🔔 Live notification with start time:", streamStartTime);
     setLiveCreators((prev) => {
+      alreadyLive = liveCreators.has(creatorId);
+
       const updated = new Map(prev);
 
       updated.set(creatorId, {
@@ -329,6 +330,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Get live session info for a creator
   const getLiveSession = (creatorId: string): LiveCreator | undefined => {
+    console.log("Livee creators", liveCreators);
     return liveCreators.get(creatorId);
   };
 
