@@ -84,18 +84,21 @@ const VerifyEmailForm = () => {
   };
 
   const submitForm = async () => {
-    // Location is REQUIRED: ensure granted before verify
-    const hasLocation =
-      locStatus === "granted" && Boolean(location)
-        ? true
-        : await requestLocation();
+    // Location is OPTIONAL now.
+    // If we don't have it yet, we try to request it once.
+    // If user denies or it fails, we proceed anyway.
+    
+    if (locStatus === "idle") {
+        await requestLocation();
+    }
 
-    if (!hasLocation) return;
-
+    const finalLocation = location || "Unknown";
+    
+    // Proceed regardless of location status
     const formData = {
       deviceOS: getDeviceOS(),
       deviceIP: ip,
-      location,
+      location: finalLocation,
       platform,
       browser,
       firebaseClientToken: await getFCMToken(),
@@ -103,8 +106,6 @@ const VerifyEmailForm = () => {
 
     verifyUserMutation.mutate(formData);
   };
-
-  const needsLocation = locStatus !== "granted";
 
   return (
     <AuthLayout>
@@ -129,7 +130,7 @@ const VerifyEmailForm = () => {
           variant="primary"
           className="shadow-custom mb-6 px-6 w-full"
         >
-          {needsLocation ? "Allow location to verify" : "Verify Email"}
+          Verify Email
         </CustomButton>
       </form>
     </AuthLayout>

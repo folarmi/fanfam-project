@@ -19,8 +19,8 @@ export function LocationPermissionCard({
   const subtitle = useMemo(() => {
     if (status === "granted") return location || "Location captured";
     if (status === "requesting")
-      return "Please respond to the browser prompt to continue.";
-    return "We use your location to confirm this verification is coming from your device.";
+      return "Please respond to the browser prompt.";
+    return "Optional: Grant location to improve account security.";
   }, [status, location]);
 
   const badge = useMemo(() => {
