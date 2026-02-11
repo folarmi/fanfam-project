@@ -45,6 +45,9 @@ const LiveStreaming = () => {
     ? decodeURIComponent(urlCreatorIdEncoded)
     : undefined;
 
+  // IMPORTANT: Host sanitizes channel name to lowercase/underscores. Viewer must do same.
+  const normalizedUrlSessionId = urlSessionId?.toLowerCase();
+
   const { userObject } = useAppSelector((state) => state.auth);
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const { data: profileData } = useFetchProfile(userObject);
@@ -61,7 +64,7 @@ const LiveStreaming = () => {
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const activeSession = isHost ? channelName : urlSessionId || "";
+  const activeSession = isHost ? channelName : normalizedUrlSessionId || "";
   const [chatMessage, setChatMessage] = useState("");
   const [floatingReactions, setFloatingReactions] = useState<
     FloatingReaction[]
