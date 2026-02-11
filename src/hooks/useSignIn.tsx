@@ -23,14 +23,13 @@ export const useSignIn = ({
     endpoint,
     successMessage: (data: any) => data?.message,
     onSuccessCallback: (data) => {
-      console.log("✅ SignIn/Verify Success Data:", data);
       setNotVerifiedError(false);
       
       // Robust extraction: Handle if data is nested in data.data (common in axios+backend wrappings) or flat
-      const responseData = data?.data || data;
-      
-      const accessToken = responseData?.accessToken || responseData?.token || data?.accessToken || data?.token;
-      const refreshToken = responseData?.refreshToken || data?.refreshToken;
+      const responseData = data?.data;
+    
+      const accessToken = responseData?.accessToken;
+      const refreshToken = responseData?.refreshToken ;
 
       const userObject = {
         email: responseData?.email,
@@ -39,12 +38,25 @@ export const useSignIn = ({
       };
 
       if (accessToken) {
+        console.log("✅ [useSignIn] Storing accessToken:", accessToken.substring(0, 20) + "...");
+        
+        try {
+            const parts = accessToken.split('.');
+            if (parts.length === 3) {
+                const payload = JSON.parse(atob(parts[1]));
+                console.log("📜 [useSignIn] Decoded Token Payload:", payload);
+            }
+        } catch (e) {
+            console.error("❌ [useSignIn] Failed to decode token:", e);
+        }
+
         localStorage.setItem("token", accessToken);
       } else {
-        console.error("❌ No access token found in response", data);
+        console.error("❌ [useSignIn] No access token found in response", data);
       }
       
       if (refreshToken) {
+        console.log("✅ [useSignIn] Storing refreshToken:", refreshToken.substring(0, 20) + "...");
         localStorage.setItem("refreshToken", refreshToken);
       }
       
@@ -52,6 +64,9 @@ export const useSignIn = ({
         localStorage.setItem("userObject", JSON.stringify(userObject));
         dispatch(updateUserObject(userObject));
       }
+      
+      // Immediate verification check
+      console.log("🔍 [useSignIn] Immediate check - localStorage token:", localStorage.getItem("token")?.substring(0, 20) + "...");
 
       // Dispatch custom event
       window.dispatchEvent(new Event("auth-complete"));
