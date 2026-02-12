@@ -121,6 +121,7 @@ export interface StoryPost {
   comments: PostComment[];
   reactions: Reaction[];
   viewers: string[];
+  mentions: string[];
   meta: PostMeta;
   replies: StoryPost[];
 }

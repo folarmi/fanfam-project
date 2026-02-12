@@ -45,9 +45,6 @@ const LiveStreaming = () => {
     ? decodeURIComponent(urlCreatorIdEncoded)
     : undefined;
 
-  // IMPORTANT: Host sanitizes channel name to lowercase/underscores. Viewer must do same.
-  const normalizedUrlSessionId = urlSessionId?.toLowerCase();
-
   const { userObject } = useAppSelector((state) => state.auth);
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const { data: profileData } = useFetchProfile(userObject);
@@ -64,7 +61,7 @@ const LiveStreaming = () => {
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const activeSession = isHost ? channelName : normalizedUrlSessionId || "";
+  const activeSession = isHost ? channelName : urlSessionId || "";
   const [chatMessage, setChatMessage] = useState("");
   const [floatingReactions, setFloatingReactions] = useState<
     FloatingReaction[]
@@ -76,87 +73,91 @@ const LiveStreaming = () => {
     LOL: 0,
   });
 
-  const handleCommentReceived = useCallback((comment: any) => {
-    console.log("📨 Received live comment:", comment);
+  const handleCommentReceived = useCallback(
+    (comment: any) => {
+      console.log("📨 Received live comment:", comment);
 
-    // Filter out our own comments to prevent duplication if we do optimistic updates
-    // OR if we rely on optimistic updates, we typically ignore the socket echo for self.
-    const isMe = comment.userId === userObject?.usid || comment.user === userObject?.usid;
-    
-    // However, for comments, it's safer to rely on ID if possible, but distinct filtering works too.
-    // If we receive our own comment via socket, we should ignore it IF we already added it.
-    // But since we are adding optimistic updates, we will ignore socket messages from SELF.
-    if (isMe) {
+      // Filter out our own comments to prevent duplication if we do optimistic updates
+      // OR if we rely on optimistic updates, we typically ignore the socket echo for self.
+      const isMe =
+        comment.userId === userObject?.usid ||
+        comment.user === userObject?.usid;
+
+      // However, for comments, it's safer to rely on ID if possible, but distinct filtering works too.
+      // If we receive our own comment via socket, we should ignore it IF we already added it.
+      // But since we are adding optimistic updates, we will ignore socket messages from SELF.
+      if (isMe) {
         console.log("Ignoring own comment from socket to avoid double render");
         return;
-    }
+      }
 
-    const newMessage = {
-      id:
-        typeof comment.id === "string"
-          ? parseInt(comment.id)
-          : (comment.id as number),
-      user: comment.user || comment.userId || "Anonymous",
-      username: comment.username,
-      message: comment.message,
-      time: comment.timestamp
-        ? new Date(comment.timestamp).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : new Date().toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-      isComment: true,
-    };
+      const newMessage = {
+        id:
+          typeof comment.id === "string"
+            ? parseInt(comment.id)
+            : (comment.id as number),
+        user: comment.user || comment.userId || "Anonymous",
+        username: comment.username,
+        message: comment.message,
+        time: comment.timestamp
+          ? new Date(comment.timestamp).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : new Date().toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+        isComment: true,
+      };
 
-    setChatMessages((prev) => [...prev, newMessage]);
-  }, [userObject?.usid]);
+      setChatMessages((prev) => [...prev, newMessage]);
+    },
+    [userObject?.usid],
+  );
 
-  const handleReactionReceived = useCallback((reaction: LiveReaction) => {
-    // Filter out self-reactions from WebSocket to duplicate optimistic update
-    if (reaction.userId === userObject?.usid) {
+  const handleReactionReceived = useCallback(
+    (reaction: LiveReaction) => {
+      // Filter out self-reactions from WebSocket to duplicate optimistic update
+      if (reaction.userId === userObject?.usid) {
         return;
-    }
+      }
 
-    // Update counts
-    setReactionCounts((prev) => ({
-      ...prev,
-      [reaction.reactionType]: prev[reaction.reactionType] + 1,
-    }));
+      // Update counts
+      setReactionCounts((prev) => ({
+        ...prev,
+        [reaction.reactionType]: prev[reaction.reactionType] + 1,
+      }));
 
-    // Add floating animation
-    const floatingReaction: FloatingReaction = {
-      id: `${reaction.id}-${Date.now()}`,
-      type: reaction.reactionType,
-      x: Math.random() * 80 + 10,
-      y: 0,
-    };
+      // Add floating animation
+      const floatingReaction: FloatingReaction = {
+        id: `${reaction.id}-${Date.now()}`,
+        type: reaction.reactionType,
+        x: Math.random() * 80 + 10,
+        y: 0,
+      };
 
-    setFloatingReactions((prev) => [...prev, floatingReaction]);
+      setFloatingReactions((prev) => [...prev, floatingReaction]);
 
-    // Remove after 3 seconds
-    setTimeout(() => {
-      setFloatingReactions((prev) =>
-        prev.filter((r) => r.id !== floatingReaction.id),
-      );
-    }, 3000);
-  }, [userObject?.usid]);
+      // Remove after 3 seconds
+      setTimeout(() => {
+        setFloatingReactions((prev) =>
+          prev.filter((r) => r.id !== floatingReaction.id),
+        );
+      }, 3000);
+    },
+    [userObject?.usid],
+  );
 
-  const {
-    viewerCount,
-    isStreamEnded,
-    sendComment,
-    sendReaction,
-  } = useLiveStream({
-    sessionId: activeSession || "",
-    creatorId: isHost ? userObject?.usid : urlCreatorId,
-    role: isHost ? "HOST" : "VIEWER",
-    enabled: isStreaming && !!activeSession,
-    onCommentReceived: handleCommentReceived,
-    onReactionReceived: handleReactionReceived,
-  });
+  const { viewerCount, isStreamEnded, sendComment, sendReaction } =
+    useLiveStream({
+      sessionId: activeSession || "",
+      creatorId: isHost ? userObject?.usid : urlCreatorId,
+      role: isHost ? "HOST" : "VIEWER",
+      enabled: isStreaming && !!activeSession,
+      onCommentReceived: handleCommentReceived,
+      onReactionReceived: handleReactionReceived,
+    });
 
   // ✅ Handle reaction clicks
   const handleReaction = (reactionType: ReactionType) => {
@@ -169,7 +170,7 @@ const LiveStreaming = () => {
         ...prev,
         [reactionType]: prev[reactionType] + 1,
       }));
-      
+
       const floatingReaction: FloatingReaction = {
         id: `optimistic-${Date.now()}`,
         type: reactionType,
@@ -313,13 +314,20 @@ const LiveStreaming = () => {
     // 2. Fallback: Check if creator is still in the "liveCreators" list from Context
     // This handles cases where we missed the specific "END" event but the polling/notification updated the list
     if (isConnected && isStreaming && urlCreatorId) {
-        //  const session = getLiveSession(urlCreatorId);
-         // If we have a valid session ID but the context says this creator is NOT live anymore
-         // we should probably end it.
-         // WARNING: We must be careful not to kill it during initial load.
-         // We'll rely on isStreamEnded mostly, but this serves as a backup.
+      const session = getLiveSession(urlCreatorId);
+      // If we have a valid session ID but the context says this creator is NOT live anymore
+      // we should probably end it.
+      // WARNING: We must be careful not to kill it during initial load.
+      // We'll rely on isStreamEnded mostly, but this serves as a backup.
     }
-  }, [isStreamEnded, isHost, isConnected, isStreaming, urlCreatorId, getLiveSession]);
+  }, [
+    isStreamEnded,
+    isHost,
+    isConnected,
+    isStreaming,
+    urlCreatorId,
+    getLiveSession,
+  ]);
 
   useEffect(() => {
     if (!isHost) return;
@@ -395,7 +403,7 @@ const LiveStreaming = () => {
       setIsStreaming(true);
       // ✅ Set start time immediately for Host
       setStreamStartTime(Date.now());
-      
+
       await new Promise((resolve) => setTimeout(resolve, 100));
       // Send "go live" message
       console.log("📡 Sending GO LIVE message");
@@ -768,8 +776,8 @@ const LiveStreaming = () => {
               {/* ✅ Viewer Count */}
               {isStreaming && (
                 <div className="bg-black/30 backdrop-blur-md px-3 py-1 rounded text-white text-sm font-medium border border-white/10 flex items-center gap-2">
-                   <span className="w-2 h-2 bg-green-500 rounded-full" />
-                   {viewerCount} Viewers
+                  <span className="w-2 h-2 bg-green-500 rounded-full" />
+                  {viewerCount} Viewers
                 </div>
               )}
 
