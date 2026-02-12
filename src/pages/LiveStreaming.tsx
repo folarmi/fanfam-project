@@ -313,7 +313,7 @@ const LiveStreaming = () => {
     // 2. Fallback: Check if creator is still in the "liveCreators" list from Context
     // This handles cases where we missed the specific "END" event but the polling/notification updated the list
     if (isConnected && isStreaming && urlCreatorId) {
-         const session = getLiveSession(urlCreatorId);
+        //  const session = getLiveSession(urlCreatorId);
          // If we have a valid session ID but the context says this creator is NOT live anymore
          // we should probably end it.
          // WARNING: We must be careful not to kill it during initial load.
