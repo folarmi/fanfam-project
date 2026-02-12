@@ -6,6 +6,7 @@ import {
   // UseQueryOptions,
   useMutation,
   useQuery,
+  useInfiniteQuery,
   type UseMutationOptions,
   type UseMutationResult,
   type UseQueryOptions,
@@ -234,6 +235,38 @@ export const useGetData = ({
     refetchOnWindowFocus: false,
     staleTime: 0,
     ...rest,
+  });
+};
+
+export const useInfiniteGetData = ({
+  url,
+  queryKey,
+  enabled,
+  pageSize = 20,
+}: {
+  url: string; // Base URL without page params
+  queryKey: string[];
+  enabled?: boolean;
+  pageSize?: number;
+}) => {
+  return useInfiniteQuery({
+    queryKey,
+    queryFn: async ({ pageParam = 0 }) => {
+      // Determine if url already has params
+      const separator = url.includes("?") ? "&" : "?";
+      const fullUrl = `${url}${separator}page=${pageParam}&size=${pageSize}`;
+      const response = await api.get(fullUrl);
+      return response?.data;
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage?.data) return undefined;
+      const { last, number, totalPages } = lastPage.data;
+      return last || number + 1 >= totalPages ? undefined : number + 1;
+    },
+    enabled,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 };
 

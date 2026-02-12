@@ -7,15 +7,17 @@ import CommentBox from "../../components/CommentBox";
 import TimeLineHomeModal from "../../components/modals/TimeLineHomeModal";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
-import { useCustomMutation, useGetData } from "@/hooks/apiCalls";
-import { Loader } from "@/components/molecules/Loader";
+import { useCustomMutation, useGetData, useInfiniteGetData } from "@/hooks/apiCalls";
 import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
+
 import ViewPost from "../../components/cards/ViewPost";
+import { InfiniteScroll } from "@/components/InfiniteScroll"; // Added import
 import { transformReactions } from "@/lib/reaction";
 import { CommentOnPost } from "@/components/modals/CommentOnPost";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CreatorLiveCard } from "@/components/cards/CreatorLiveCard";
+import { Loader } from "@/components/molecules/Loader";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -26,11 +28,35 @@ const Home = () => {
 
   // const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
-  // value shown in input
-  const searchTerm = searchParams.get("search") ?? "";
+  // value shown in input (local state)
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchParams.get("search") ?? "");
+  
+  // debounced value for querying
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(localSearchTerm);
+
+  // Sync local state with URL param on mount (or if URL changes externally)
+  useEffect(() => {
+    const urlSearch = searchParams.get("search") ?? "";
+    if (urlSearch !== localSearchTerm) {
+        setLocalSearchTerm(urlSearch);
+    }
+  }, [searchParams]);
+
+  // Debounce logic
+  useEffect(() => {
+    const handler = setTimeout(() => {
+        setDebouncedSearchTerm(localSearchTerm);
+        // Update URL only when debounce settles
+        setSearchParams(localSearchTerm ? { search: localSearchTerm } : {}, { replace: true });
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [localSearchTerm, setSearchParams]);
 
   // value used for querying
-  const activeSearchTerm = searchTerm;
+  const activeSearchTerm = debouncedSearchTerm;
 
   // const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
   //   useGetData({
@@ -42,20 +68,28 @@ const Home = () => {
   //     queryKey: ["GetContents", activeSearchTerm],
   //   });
 
-  const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
-    useGetData({
-      url:
-        // userObject?.role === UserRole.creator
-        isCreator
-          ? `contents?creator=${
-              userObject?.email
-            }&page=0&size=20&sort=createdDate,desc${
-              activeSearchTerm ? `&search=${activeSearchTerm}` : ""
-            }`
-          : `contents?page=0&size=20&sort=createdDate,desc`,
-      // queryKey: ["GetContents", activeSearchTerm],
-      queryKey: ["GetContents"],
+  const {
+      data: getCreatorContent,
+      isLoading: getCreatorContentIsLoading,
+      fetchNextPage,
+      hasNextPage,
+      isFetchingNextPage,
+    } = useInfiniteGetData({
+      url: isCreator
+        ? `contents?creator=${
+            userObject?.email
+          }&sort=createdDate,desc${
+            activeSearchTerm ? `&search=${activeSearchTerm}` : ""
+          }`
+        : `contents?sort=createdDate,desc${
+            activeSearchTerm ? `&search=${activeSearchTerm}` : ""
+          }`,
+      queryKey: ["GetContents", activeSearchTerm],
+      pageSize: 20,
     });
+    
+    // Flatten the pages for rendering
+    const allPosts = getCreatorContent?.pages.flatMap((page: any) => page.content) || [];
   // console.log(getCreatorContent?.data?.content);
   const useRecordContentView = (contentId: string) => {
     return useCustomMutation({
@@ -202,12 +236,13 @@ const Home = () => {
     );
   };
   const handleSearchChange = (value: string) => {
-    // update input visually ONLY (no query trigger)
-    setSearchParams(value ? { search: value } : {}, { replace: true });
+    setLocalSearchTerm(value);
   };
 
   const handleSearch = (value: string) => {
-    // commit search (URL already updated)
+    // immediate trigger on Enter/Click
+    setLocalSearchTerm(value);
+    setDebouncedSearchTerm(value);
     setSearchParams(value ? { search: value } : {}, { replace: false });
   };
 
@@ -216,7 +251,7 @@ const Home = () => {
       <div className="">
         <>
           <SearchInput
-            searchTerm={searchTerm}
+            searchTerm={localSearchTerm}
             onSearchChange={handleSearchChange}
             onSearch={handleSearch}
             placeholder="Search..."
@@ -246,9 +281,16 @@ const Home = () => {
               <StoryUploader onFileUpload={handleFileUpload} />
             )}
           </div> */}
-          {getCreatorContent?.data?.content?.map((data: StoryPost) => (
-            <PostItem key={data?.publicId} data={data} />
-          ))}
+          <InfiniteScroll
+            onLoader={fetchNextPage}
+            isLoading={isFetchingNextPage}
+            hasMore={hasNextPage || false}
+            endMessage={<p className="text-center text-gray-500 py-4">You have seen it all!</p>}
+          >
+            {allPosts.map((data: StoryPost) => (
+              <PostItem key={data?.publicId} data={data} />
+            ))}
+          </InfiniteScroll>
         </>
 
         {/* {userObject.role !== UserRole.creator && ( */}

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import CustomInput from "../components/forms/CustomInput";
 import { useForm } from "react-hook-form";
 import CustomButton from "../components/forms/CustomButton";
 import AuthLayout from "../layouts/AuthLayout";
 import Typography from "../components/forms/Typography";
 import { handleCopy, handleCut, handlePaste } from "../utils/helper";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useCustomMutation } from "@/hooks/apiCalls";
+import {  useSearchParams } from "react-router-dom";
+import { useSignIn } from "@/hooks/useSignIn";
 
 const ResetPassword = () => {
   //   const navigate = useNavigate();
@@ -21,9 +21,17 @@ const ResetPassword = () => {
 };
 
 const ResetPasswordForm = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // Extracted to be inside Suspense
+  const [searchParams] = useSearchParams(); 
   const { control, handleSubmit, getValues } = useForm();
+
+    const [, setNotVerifiedError] = useState(false);
+  
+    const resetPasswordMutation = useSignIn({
+      setNotVerifiedError,
+      endpoint: `auth/reset-password?mafanf=${searchParams.get(
+      "mafanf"
+    )}&fanfam=${searchParams.get("fanfam")}`,
+    });
 
   // const resetPasswordMutation = useMutation({
   //   mutationFn: async (data: any) => {
@@ -50,17 +58,17 @@ const ResetPasswordForm = () => {
   //   },
   // });
 
-  const resetPasswordMutation = useCustomMutation({
-    endpoint: `auth/reset-password?mafanf=${searchParams.get(
-      "mafanf"
-    )}&fanfam=${searchParams.get("fanfam")}`,
-    successMessage: (data: any) => data?.message,
-    onSuccessCallback: (data) => {
-      localStorage.setItem("token", data?.data?.data?.accessToken);
-      localStorage.setItem("refreshToken", data?.data?.data?.refreshToken);
-      navigate("/dashboard");
-    },
-  });
+  // const resetPasswordMutation = useCustomMutation({
+  //   endpoint: `auth/reset-password?mafanf=${searchParams.get(
+  //     "mafanf"
+  //   )}&fanfam=${searchParams.get("fanfam")}`,
+  //   successMessage: (data: any) => data?.message,
+  //   onSuccessCallback: (data) => {
+  //     localStorage.setItem("token", data?.data?.data?.accessToken);
+  //     localStorage.setItem("refreshToken", data?.data?.data?.refreshToken);
+  //     navigate("/dashboard");
+  //   },
+  // });
 
   const submitForm = (data: any) => {
     const formValues = {
