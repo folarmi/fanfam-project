@@ -34,9 +34,9 @@ export const useSignIn = ({
       const userObject = {
         email: responseData?.email,
         role: responseData?.role,
-        usid: responseData?.usid || responseData?.userId,
+        usid: responseData?.usid || responseData?.userId || responseData?.fanfam,
       };
-
+console.log('useSignIn hook',responseData)
       if (accessToken) {
         console.log("✅ [useSignIn] Storing accessToken:", accessToken.substring(0, 20) + "...");
         
@@ -59,8 +59,8 @@ export const useSignIn = ({
         console.log("✅ [useSignIn] Storing refreshToken:", refreshToken.substring(0, 20) + "...");
         localStorage.setItem("refreshToken", refreshToken);
       }
-      
-      if (userObject.usid) {
+      console.log('useSignIn hook',userObject)
+      if (userObject?.usid) {
         localStorage.setItem("userObject", JSON.stringify(userObject));
         dispatch(updateUserObject(userObject));
       }
