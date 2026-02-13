@@ -36,15 +36,14 @@ export const useSignIn = ({
         role: responseData?.role,
         usid: responseData?.usid || responseData?.userId || responseData?.fanfam,
       };
-console.log('useSignIn hook',responseData)
+
       if (accessToken) {
-        console.log("✅ [useSignIn] Storing accessToken:", accessToken.substring(0, 20) + "...");
         
         try {
             const parts = accessToken.split('.');
             if (parts.length === 3) {
                 const payload = JSON.parse(atob(parts[1]));
-                console.log("📜 [useSignIn] Decoded Token Payload:", payload);
+                // console.log("📜 [useSignIn] Decoded Token Payload:", payload);
             }
         } catch (e) {
             console.error("❌ [useSignIn] Failed to decode token:", e);
