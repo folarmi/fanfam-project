@@ -42,7 +42,7 @@ export const useSignIn = ({
         try {
             const parts = accessToken.split('.');
             if (parts.length === 3) {
-                const payload = JSON.parse(atob(parts[1]));
+                // const payload = JSON.parse(atob(parts[1]));
                 // console.log("📜 [useSignIn] Decoded Token Payload:", payload);
             }
         } catch (e) {
