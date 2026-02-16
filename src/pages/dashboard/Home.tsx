@@ -58,15 +58,6 @@ const Home = () => {
   // value used for querying
   const activeSearchTerm = debouncedSearchTerm;
 
-  // const { data: getCreatorContent, isLoading: getCreatorContentIsLoading } =
-  //   useGetData({
-  //     url: `${
-  //       userObject?.role === UserRole.creator
-  //         ? `contents?creator=${userObject?.email}&page=0&size=20&sort=createdDate,desc&search=${activeSearchTerm}`
-  //         : "contents?page=0&size=20&sort=createdDate,desc"
-  //     }`,
-  //     queryKey: ["GetContents", activeSearchTerm],
-  //   });
 
   const {
       data: getCreatorContent,
@@ -79,10 +70,10 @@ const Home = () => {
         ? `contents?creator=${
             userObject?.email
           }&sort=createdDate,desc${
-            activeSearchTerm ? `&search=${activeSearchTerm}` : ""
+            activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
           }`
         : `contents?sort=createdDate,desc${
-            activeSearchTerm ? `&search=${activeSearchTerm}` : ""
+            activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
           }`,
       queryKey: ["GetContents", activeSearchTerm],
       pageSize: 20,

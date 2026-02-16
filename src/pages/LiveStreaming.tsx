@@ -412,6 +412,7 @@ const LiveStreaming = () => {
         creatorId: profileData?.data?.username,
         session: channelName,
       });
+      console.log("📡 Sent GO LIVE message",profileData?.data?.username,channelName);
     } catch (error) {
       toast.error("Failed to start live stream. Check console for details.");
     }
