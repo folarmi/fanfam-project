@@ -78,10 +78,10 @@ const Home = () => {
       queryKey: ["GetContents", activeSearchTerm],
       pageSize: 20,
     });
-    
     // Flatten the pages for rendering
-    const allPosts = getCreatorContent?.pages.flatMap((page: any) => page.content) || [];
-  // console.log(getCreatorContent?.data?.content);
+    const allPosts = getCreatorContent?.pages?.flatMap((page: any) => page.data?.content) || [];
+
+
   const useRecordContentView = (contentId: string) => {
     return useCustomMutation({
       endpoint: `contents/${contentId}/view`,
