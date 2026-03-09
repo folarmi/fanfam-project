@@ -84,27 +84,31 @@ const VerifyEmailForm = () => {
     return false;
   };
 
-  const submitForm = async () => {
+  const submitForm = async (data: any) => {
     // Location is OPTIONAL now.
     // If we don't have it yet, we try to request it once.
     // If user denies or it fails, we proceed anyway.
-    
+
     if (locStatus === "idle") {
-        await requestLocation();
+      await requestLocation();
     }
 
     const finalLocation = location || "Unknown";
-    
-    // Proceed regardless of location status
-    const formData = {
-      deviceOS: getDeviceOS(),
-      deviceIP: ip,
-      location: finalLocation,
-      platform,
-      browser,
-      firebaseClientToken: await getFCMToken(),
-    };
 
+    // Proceed regardless of location status
+
+    const formData = {
+      dob: data.dob,
+      deviceMetaDto: {
+        deviceOS: getDeviceOS(),
+        deviceIP: ip,
+        location: finalLocation,
+        platform,
+        browser,
+        firebaseClientToken: await getFCMToken(),
+      },
+    };
+    console.log(formData);
     verifyUserMutation.mutate(formData);
   };
 
@@ -124,32 +128,32 @@ const VerifyEmailForm = () => {
         />
 
         <CustomInput name="email" control={control} readOnly />
-               <CustomInput
-                  label="Date Of Birth"
-                  name="dateOfBirth"
-                  type="date"
-                  control={control}
-                  max={new Date().toISOString().split("T")[0]}
-                  rules={{
-                    required: "Date of birth is required",
-                    validate: (value) => {
-                      const birthDate = new Date(value);
-                      const today = new Date();
-                      
-                      if (birthDate > today) {
-                        return "Date of birth cannot be in the future";
-                      }
-        
-                      let age = today.getFullYear() - birthDate.getFullYear();
-                      const m = today.getMonth() - birthDate.getMonth();
-                      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                        age--;
-                      }
-                      return age >= 18 || "You must be at least 18 years old";
-                    }
-                  }}
-                  rightIcon={<Calendar className="w-5 h-5 pointer-events-none" />}
-                />
+        <CustomInput
+          label="Date Of Birth"
+          name="dob"
+          type="date"
+          control={control}
+          max={new Date().toISOString().split("T")[0]}
+          rules={{
+            required: "Date of birth is required",
+            validate: (value) => {
+              const birthDate = new Date(value);
+              const today = new Date();
+
+              if (birthDate > today) {
+                return "Date of birth cannot be in the future";
+              }
+
+              let age = today.getFullYear() - birthDate.getFullYear();
+              const m = today.getMonth() - birthDate.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+              }
+              return age >= 18 || "You must be at least 18 years old";
+            },
+          }}
+          rightIcon={<Calendar className="w-5 h-5 pointer-events-none" />}
+        />
 
         <CustomButton
           type="submit"
