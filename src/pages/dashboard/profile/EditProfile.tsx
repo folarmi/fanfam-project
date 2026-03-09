@@ -15,6 +15,7 @@ import { useFetchProfile } from "@/hooks/apiHooks";
 import { Loader } from "@/components/molecules/Loader";
 import CustomSelect from "@/components/forms/CustomSelect";
 import { genderOptions } from "@/data";
+import { showErrorToast } from "@/utils/toastUtils";
 
 const EditProfile = () => {
   const queryClient = useQueryClient();
@@ -22,11 +23,17 @@ const EditProfile = () => {
   // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const { data, isLoading } = useFetchProfile(userObject);
-  const { control, getValues, reset, setError, clearErrors, trigger } = useForm(
-    {
-      defaultValues: data?.data,
-    }
-  );
+  const {
+    control,
+    getValues,
+    reset,
+    setError,
+    clearErrors,
+    trigger,
+    formState: { isDirty },
+  } = useForm({
+    defaultValues: data?.data,
+  });
 
   const { mutate: uploadProfilePicture, isPending: profilePictureIsPending } =
     useFileUpload({
@@ -79,6 +86,30 @@ const EditProfile = () => {
         usid: userObject?.usid,
       },
     });
+  };
+
+  const handleUploadClickWrapper = (onClick: () => void) => {
+    const isProfileComplete =
+      data?.data?.fullName &&
+      data?.data?.username &&
+      data?.data?.gender &&
+      data?.data?.location;
+
+    if (!isProfileComplete) {
+      showErrorToast(
+        "Please complete and save your profile information first.",
+      );
+      return;
+    }
+
+    if (isDirty) {
+      showErrorToast(
+        "Please save your profile changes before uploading images.",
+      );
+      return;
+    }
+
+    onClick();
   };
 
   const setUsernameMutation = useCustomMutation({
@@ -170,7 +201,7 @@ const EditProfile = () => {
                     showPreview={false}
                     renderTrigger={(onClick) => (
                       <div
-                        onClick={onClick}
+                        onClick={() => handleUploadClickWrapper(onClick)}
                         className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
                       >
                         <div className="bg-white/90 rounded-full p-3 backdrop-blur-sm">
@@ -198,7 +229,7 @@ const EditProfile = () => {
                       showPreview={false}
                       renderTrigger={(onClick) => (
                         <div
-                          onClick={onClick}
+                          onClick={() => handleUploadClickWrapper(onClick)}
                           className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-full"
                         >
                           <div className="bg-white/90 rounded-full p-2 backdrop-blur-sm">

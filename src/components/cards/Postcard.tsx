@@ -6,7 +6,7 @@ import Chat from "@/assets/icons/chat";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import PostHeader from "../molecules/PostHeader";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Repeat } from "lucide-react";
 import { useCustomMutation } from "@/hooks/apiCalls";
 
 // interface PostCardProps {
@@ -89,6 +89,7 @@ const PostCard: React.FC<PostCardProps> = ({
   });
 
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isReposted, setIsReposted] = useState(false);
 
   const handleBookmark = (
     publicId: string | undefined,
@@ -100,7 +101,18 @@ const PostCard: React.FC<PostCardProps> = ({
 
     bookmarkPostMutation.mutate({
       contentPublicId: publicId,
-      reactionType: "BOOKMARK",
+      saveType: "BOOKMARK",
+    });
+  };
+
+  const handleRepost = (publicId: string | undefined, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!publicId) return;
+    setIsReposted(!isReposted);
+
+    bookmarkPostMutation.mutate({
+      contentPublicId: publicId,
+      saveType: "REPOST",
     });
   };
 
@@ -142,6 +154,16 @@ const PostCard: React.FC<PostCardProps> = ({
               isActive={userReaction === type}
             />
           ))}
+
+          <Repeat
+            className={`cursor-pointer transition-colors mr-4 ${
+              isReposted
+                ? "text-[#00BA7C]"
+                : "text-[#8D8E96] hover:text-gray-700"
+            }`}
+            size={24}
+            onClick={(e) => handleRepost(publicId, e)}
+          />
 
           <Bookmark
             className={`cursor-pointer transition-colors ${

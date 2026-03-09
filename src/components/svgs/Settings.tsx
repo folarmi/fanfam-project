@@ -3,7 +3,7 @@ type SettingsIconProps = {
 };
 
 const SettingsIcon = ({ active }: SettingsIconProps) => {
-  const fillColor = active ? "#0000FF" : "#292D32";
+  const fillColor = active ? "#2599F6" : "#292D32";
   return (
     <svg
       width="24"
