@@ -158,7 +158,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <Repeat
             className={`cursor-pointer transition-colors mr-4 ${
               isReposted
-                ? "text-[#00BA7C]"
+                ? "text-[#2599F6] fill-[#2599F6]"
                 : "text-[#8D8E96] hover:text-gray-700"
             }`}
             size={24}
