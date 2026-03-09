@@ -2,6 +2,7 @@
 
 import CustomInput from "../components/forms/CustomInput";
 import { useForm } from "react-hook-form";
+import { CheckCircle2, X } from "lucide-react";
 import Typography from "../components/forms/Typography";
 import CustomButton from "../components/forms/CustomButton";
 import TextBetweenLines from "../components/molecules/TextBetweenLines";
@@ -18,6 +19,7 @@ import {
   getBrowserInfo,
   getPlatformFromUAParser,
   phoneRegex,
+  passwordRegex,
 } from "../utils/helper";
 import { useCustomMutation } from "../hooks/apiCalls";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,7 +29,8 @@ import { useState } from "react";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { control, handleSubmit } = useForm();
+  const { control, handleSubmit, watch } = useForm();
+  const passwordValue = watch("password", "");
   const platform = getPlatformFromUAParser();
   const browser = getBrowserInfo();
   const [ip] = useState<string>("");
@@ -52,6 +55,7 @@ const Signup = () => {
       email: data?.email,
       password: data?.password,
       phoneNumber: data?.phoneNumber,
+      dateOfBirth: data?.dateOfBirth,
       role: UserRole.viewer,
     };
     signUpMutation.mutate(formValues);
@@ -88,12 +92,36 @@ const Signup = () => {
           type="password"
           rules={{
             required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
+            pattern: {
+              value: passwordRegex,
+              message: "Please ensure all password requirements are met",
             },
           }}
         />
+
+
+ 
+
+                <div className="flex flex-col gap-1.5 -mt-3 mb-6 ml-2 text-xs">
+          {[
+            { label: "At least 8 characters long", met: (passwordValue || "").length >= 8 },
+            { label: "Contains an uppercase letter", met: /[A-Z]/.test(passwordValue || "") },
+            { label: "Contains a lowercase letter", met: /[a-z]/.test(passwordValue || "") },
+            { label: "Contains a number", met: /\d/.test(passwordValue || "") },
+            { label: "Contains a special character", met: /[^A-Za-z0-9]/.test(passwordValue || "") },
+          ].map((req, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              {req.met ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+              ) : (
+                <X className="w-3.5 h-3.5 text-gray-400" />
+              )}
+              <span className={req.met ? "text-green-600" : "text-gray-500"}>
+                {req.label}
+              </span>
+            </div>
+          ))}
+        </div>
 
         <Checkbox
           className="mb-10 lg:mb-0"
