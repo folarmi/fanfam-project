@@ -51,6 +51,7 @@ import {
   SetupStrategy,
   SinglePostDetails,
   UnsubscribedProfile,
+  Bookmarks,
 } from "../pages/dashboard";
 import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
@@ -80,6 +81,7 @@ const RoutePage = () => {
           />
           <Route path="profile/promote" element={<PromoteProfile />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="bookmarks" element={<Bookmarks />} />
         </Route>
 
         <Route element={<MessagesLayout />}>

@@ -64,6 +64,20 @@ const Post = ({
   // const tabsToDisplay = isMobile ? profileTabs.slice(0, 2) : profileTabs;
   const contentItems: StoryPost[] = creatorContent || [];
 
+  const getCreatorName = (creator: any) => {
+    if (!creator) return "Unknown User";
+    if (typeof creator === "string") return creator.split("@")[0];
+    if (typeof creator === "object") {
+      return (
+        creator.username ||
+        creator.displayName ||
+        creator.email?.split("@")[0] ||
+        "Unknown User"
+      );
+    }
+    return "Unknown User";
+  };
+
   return (
     <>
       {creatorContentIsLoading ? (
@@ -111,17 +125,17 @@ const Post = ({
             <img src={switchList} alt="demo" />
           </div> */}
 
-          {contentItems.length > 0 ? (
-            contentItems.map((item) => (
-              <div className="relative" key={item.publicId}>
+          {contentItems?.length > 0 ? (
+            contentItems?.map((item) => (
+              <div className="relative" key={item?.publicId}>
                 <ViewPost
-                  profileName={item.creator.split("@")[0]}
+                  profileName={getCreatorName(item?.creator)}
                   avatar={defaultAvatar}
-                  handle={`@${item.creator.split("@")[0]}`}
-                  time={formatTimeAgo(item.createdDate)}
+                  handle={`@${getCreatorName(item?.creator)}`}
+                  time={formatTimeAgo(item?.createdDate)}
                   paragraphOne={item?.message}
                   paragraphTwo=""
-                  timeLineImage={item.mediaFiles || ""}
+                  timeLineImage={item?.mediaFiles || ""}
                   ifParagraph={true}
                   ifIcon={false}
                   bgColor="#fafafa"

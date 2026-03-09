@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Typography from "../forms/Typography";
-import CustomButton from "../forms/CustomButton";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCustomMutation } from "../../hooks/apiCalls";
 import { sideBarItems } from "../../data";
@@ -17,7 +16,6 @@ const Sidebar = () => {
   const userString = localStorage.getItem("userObject");
   const userObject = userString ? JSON.parse(userString) : null;
   const { data: profileData } = useFetchProfile(userObject);
-
 
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
@@ -82,7 +80,9 @@ const Sidebar = () => {
                 key={id}
               >
                 <div className="flex items-center">
-                  {image}
+                  {typeof image === "function"
+                    ? image(location?.pathname === link)
+                    : image}
                   <Typography
                     variant="subtitle2"
                     className="text-grey_400 pl-4"
@@ -105,9 +105,9 @@ const Sidebar = () => {
         </Typography>
       </div>
 
-      <div className="drop-shadow-5xl shadow-post-button w-[221px]">
+      {/* <div className="drop-shadow-5xl shadow-post-button w-[221px]">
         <CustomButton className="mt-6 w-full">Post</CustomButton>
-      </div>
+      </div> */}
     </div>
   );
 };

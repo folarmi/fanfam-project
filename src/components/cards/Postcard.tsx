@@ -85,12 +85,7 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const bookmarkPostMutation = useCustomMutation({
     endpoint: `contents/saves`,
-    onSuccessCallback: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: ["GetContents"],
-      //   exact: false,
-      // });
-    },
+    onSuccessCallback: () => {},
   });
 
   const [isBookmarked, setIsBookmarked] = useState(false);

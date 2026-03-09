@@ -6,6 +6,7 @@ export * from "./profile/EditProfile";
 export * from "./profile/PromoteProfile";
 export * from "./profile/UnsubscribedProfile";
 export * from "./Notifications";
+export * from "./Bookmarks";
 export * from "./messages/Message";
 export * from "./schedule/Schedule";
 export * from "./my-account/subscribed/Subscribed";

@@ -60,6 +60,7 @@ import type {
   PromotionalCampaignType,
 } from "@/lib/types";
 import countryList from "react-select-country-list";
+import { Bookmark } from "lucide-react";
 import { CreatorIcon } from "@/components/svgs/Creator";
 import creatorOne from "@/assets/icons/creatorOne.svg";
 import creatorTwo from "@/assets/icons/creatorTwo.svg";
@@ -156,63 +157,72 @@ export const sideBarItems = [
   {
     id: 1,
     name: "Home",
-    image: <Home />,
+    image: (isActive: boolean) => <Home active={isActive} />,
     link: "/dashboard",
     roles: ["CREATOR", "VIEWER"],
   },
   {
     id: 2,
     name: "Notifications",
-    image: <Notification />,
+    image: (isActive: boolean) => <Notification active={isActive} />,
     link: "/dashboard/notifications",
     roles: ["CREATOR", "VIEWER"],
   },
   // {
   //   id: 3,
   //   name: "Messages",
-  //   image: <Messages />,
+  //   image: (isActive: boolean) => <Messages active={isActive} />,
   //   link: "/dashboard/messages",
   //   roles: ["CREATOR", "VIEWER"],
   // },
   // {
   //   id: 4,
   //   name: "Collections",
-  //   image: <Collections />,
+  //   image: (isActive: boolean) => <Collections active={isActive} />,
   //   link: "/dashboard/collections",
   //   roles: ["CREATOR", "VIEWER"],
   // },
   // {
   //   id: 8,
   //   name: "Schedule",
-  //   image: <Schedule />,
+  //   image: (isActive: boolean) => <Schedule active={isActive} />,
   //   link: "/dashboard/schedule",
   //   roles: ["CREATOR", "VIEWER"],
   // },
   {
     id: 5,
     name: "My Account",
-    image: <MyAccount />,
+    image: (isActive: boolean) => <MyAccount active={isActive} />,
     link: "/dashboard/account/cards",
     roles: ["CREATOR", "VIEWER"],
   },
   {
     id: 6,
     name: "Profile",
-    image: <Profile />,
+    image: (isActive: boolean) => <Profile active={isActive} />,
     link: "/dashboard/profile",
     roles: ["CREATOR", "VIEWER"],
   },
   {
     id: 7,
     name: "Settings",
-    image: <SettingsIcon />,
+    image: (isActive: boolean) => <SettingsIcon active={isActive} />,
     link: "/dashboard/settings/account",
+    roles: ["CREATOR", "VIEWER"],
+  },
+  {
+    id: 10,
+    name: "Bookmarks",
+    image: (isActive: boolean) => (
+      <Bookmark color={isActive ? "#2599F6" : "#8D8E96"} />
+    ),
+    link: "/dashboard/bookmarks",
     roles: ["CREATOR", "VIEWER"],
   },
   {
     id: 9,
     name: "Become a Creator",
-    image: <CreatorIcon />,
+    image: (isActive: boolean) => <CreatorIcon active={isActive} />,
     link: "/dashboard/become-a-creator",
     roles: ["VIEWER"],
     // roles: ["CREATOR", "VIEWER"],

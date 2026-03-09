@@ -3,7 +3,7 @@ type HomeProps = {
 };
 
 const Home = ({ active }: HomeProps) => {
-  const fillColor = active ? "#0000FF" : "#8D8E96";
+  const fillColor = active ? "#2599F6" : "#8D8E96";
   return (
     <svg
       width="24"
