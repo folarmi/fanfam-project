@@ -108,7 +108,7 @@ const VerifyEmailForm = () => {
         firebaseClientToken: await getFCMToken(),
       },
     };
-    console.log(formData);
+
     verifyUserMutation.mutate(formData);
   };
 

@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import type { MediaFile, ReactionItem } from "@/lib/types";
 import IconAndNumber from "../IconAndNumber";
 import MediaGrid from "../molecules/MediaGrid";
@@ -5,6 +6,8 @@ import Chat from "@/assets/icons/chat";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import PostHeader from "../molecules/PostHeader";
+import { Bookmark } from "lucide-react";
+import { useCustomMutation } from "@/hooks/apiCalls";
 
 // interface PostCardProps {
 //   // Core data as object
@@ -77,8 +80,34 @@ const PostCard: React.FC<PostCardProps> = ({
   const hasImages = Array.isArray(timeLineImage) && timeLineImage.length > 0;
 
   const userReaction = reactionsData?.find((reaction) =>
-    reaction.createdBy.includes(userObject?.email)
+    reaction.createdBy.includes(userObject?.email),
   )?.type;
+
+  const bookmarkPostMutation = useCustomMutation({
+    endpoint: `contents/saves`,
+    onSuccessCallback: () => {
+      // queryClient.invalidateQueries({
+      //   queryKey: ["GetContents"],
+      //   exact: false,
+      // });
+    },
+  });
+
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const handleBookmark = (
+    publicId: string | undefined,
+    e: React.MouseEvent,
+  ) => {
+    e.stopPropagation();
+    if (!publicId) return;
+    setIsBookmarked(!isBookmarked);
+
+    bookmarkPostMutation.mutate({
+      contentPublicId: publicId,
+      reactionType: "BOOKMARK",
+    });
+  };
 
   return (
     <article
@@ -118,6 +147,16 @@ const PostCard: React.FC<PostCardProps> = ({
               isActive={userReaction === type}
             />
           ))}
+
+          <Bookmark
+            className={`cursor-pointer transition-colors ${
+              isBookmarked
+                ? "text-[#2599F6] fill-[#2599F6]"
+                : "text-[#8D8E96] hover:text-gray-700"
+            }`}
+            size={24}
+            onClick={(e) => handleBookmark(publicId, e)}
+          />
         </footer>
       )}
     </article>
