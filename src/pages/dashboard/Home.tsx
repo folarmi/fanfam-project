@@ -90,6 +90,7 @@ const Home = () => {
     queryKey: ["GetContents"],
   });
 
+  console.log(getPollData);
   // console.log(getPollData?.data?.content);
   // Flatten the pages for rendering
   const allPosts =
