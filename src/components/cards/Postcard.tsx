@@ -8,6 +8,7 @@ import type { RootState } from "@/lib/store";
 import PostHeader from "../molecules/PostHeader";
 import { Bookmark, Repeat } from "lucide-react";
 import { useCustomMutation } from "@/hooks/apiCalls";
+import AnsweredPoll from "../molecules/AnsweredPoll";
 
 // interface PostCardProps {
 //   // Core data as object
@@ -51,6 +52,7 @@ export interface PostCardProps {
   ifIcon?: boolean;
   className?: string;
   commentslength?: number;
+  pollChoices?: any[];
   headerActions?: React.ReactNode;
   onCommentClick?: (e: React.MouseEvent) => void;
   onCardClick?: (e: React.MouseEvent) => void;
@@ -72,6 +74,7 @@ const PostCard: React.FC<PostCardProps> = ({
   headerActions,
   className,
   commentslength,
+  pollChoices,
   onCommentClick,
   onCardClick,
 }) => {
@@ -137,6 +140,11 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Media Section */}
       {hasImages && (
         <MediaGrid timeLineImage={timeLineImage} onMediaClick={undefined} />
+      )}
+
+      {/* Poll Section */}
+      {pollChoices && pollChoices?.length > 0 && (
+        <AnsweredPoll pollChoices={pollChoices} />
       )}
 
       {/* Action Icons (Reactions) */}

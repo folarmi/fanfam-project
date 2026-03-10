@@ -90,7 +90,7 @@ const Home = () => {
     queryKey: ["GetContents"],
   });
 
-  console.log(getPollData?.data?.content);
+  // console.log(getPollData?.data?.content);
   // Flatten the pages for rendering
   const allPosts =
     getCreatorContent?.pages?.flatMap((page: any) => page.data?.content) || [];
@@ -185,6 +185,7 @@ const Home = () => {
           time={formatTimeAgo(data?.createdDate)}
           paragraphOne={data?.message}
           timeLineImage={data?.mediaFiles}
+          pollChoices={data?.pollChoices}
           ifParagraph
           showModal={showMoreModal === data?.publicId}
           toggleModal={() =>
