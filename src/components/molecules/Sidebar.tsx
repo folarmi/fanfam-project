@@ -17,17 +17,20 @@ const Sidebar = () => {
   const userObject = userString ? JSON.parse(userString) : null;
   const { data: profileData } = useFetchProfile(userObject);
 
+  const handleLogout = () => {
+    navigate("/login");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    dispatch(logout());
+    localStorage.clear();
+  };
+
   const logOutMutation = useCustomMutation({
     endpoint: "auth/logout",
     successMessage: (data: any) => data?.data?.message,
     errorMessage: (error: any) => error,
-    onSuccessCallback: () => {
-      navigate("/login");
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      dispatch(logout());
-      localStorage.clear();
-    },
+    onSuccessCallback: handleLogout,
+    onError: handleLogout,
   });
 
   return (

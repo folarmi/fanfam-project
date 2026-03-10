@@ -7,7 +7,11 @@ import CommentBox from "../../components/CommentBox";
 import TimeLineHomeModal from "../../components/modals/TimeLineHomeModal";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
-import { useCustomMutation, useGetData, useInfiniteGetData } from "@/hooks/apiCalls";
+import {
+  useCustomMutation,
+  useGetData,
+  useInfiniteGetData,
+} from "@/hooks/apiCalls";
 import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
 
@@ -29,25 +33,30 @@ const Home = () => {
   // const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
   // value shown in input (local state)
-  const [localSearchTerm, setLocalSearchTerm] = useState(searchParams.get("search") ?? "");
-  
+  const [localSearchTerm, setLocalSearchTerm] = useState(
+    searchParams.get("search") ?? "",
+  );
+
   // debounced value for querying
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(localSearchTerm);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] =
+    useState(localSearchTerm);
 
   // Sync local state with URL param on mount (or if URL changes externally)
   useEffect(() => {
     const urlSearch = searchParams.get("search") ?? "";
     if (urlSearch !== localSearchTerm) {
-        setLocalSearchTerm(urlSearch);
+      setLocalSearchTerm(urlSearch);
     }
   }, [searchParams]);
 
   // Debounce logic
   useEffect(() => {
     const handler = setTimeout(() => {
-        setDebouncedSearchTerm(localSearchTerm);
-        // Update URL only when debounce settles
-        setSearchParams(localSearchTerm ? { search: localSearchTerm } : {}, { replace: true });
+      setDebouncedSearchTerm(localSearchTerm);
+      // Update URL only when debounce settles
+      setSearchParams(localSearchTerm ? { search: localSearchTerm } : {}, {
+        replace: true,
+      });
     }, 500); // 500ms debounce
 
     return () => {
@@ -58,29 +67,26 @@ const Home = () => {
   // value used for querying
   const activeSearchTerm = debouncedSearchTerm;
 
-
   const {
-      data: getCreatorContent,
-      isLoading: getCreatorContentIsLoading,
-      fetchNextPage,
-      hasNextPage,
-      isFetchingNextPage,
-    } = useInfiniteGetData({
-      url: isCreator
-        ? `contents?creator=${
-            userObject?.email
-          }&sort=createdDate,desc${
-            activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
-          }`
-        : `contents?sort=createdDate,desc${
-            activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
-          }`,
-      queryKey: ["GetContents", activeSearchTerm],
-      pageSize: 20,
-    });
-    // Flatten the pages for rendering
-    const allPosts = getCreatorContent?.pages?.flatMap((page: any) => page.data?.content) || [];
-
+    data: getCreatorContent,
+    isLoading: getCreatorContentIsLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteGetData({
+    url: isCreator
+      ? `contents?creator=${userObject?.email}&sort=createdDate,desc${
+          activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
+        }`
+      : `contents?sort=createdDate,desc${
+          activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
+        }`,
+    queryKey: ["GetContents", activeSearchTerm],
+    pageSize: 20,
+  });
+  // Flatten the pages for rendering
+  const allPosts =
+    getCreatorContent?.pages?.flatMap((page: any) => page.data?.content) || [];
 
   const useRecordContentView = (contentId: string) => {
     return useCustomMutation({
@@ -93,7 +99,7 @@ const Home = () => {
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
     null,
   );
-  const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
+  const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(true);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [pollOptions, setPollOptions] = useState([
     {
@@ -276,7 +282,11 @@ const Home = () => {
             onLoader={fetchNextPage}
             isLoading={isFetchingNextPage}
             hasMore={hasNextPage || false}
-            endMessage={<p className="text-center text-gray-500 py-4">You have seen it all!</p>}
+            endMessage={
+              <p className="text-center text-gray-500 py-4">
+                You have seen it all!
+              </p>
+            }
           >
             {allPosts.map((data: StoryPost) => (
               <PostItem key={data?.publicId} data={data} />
