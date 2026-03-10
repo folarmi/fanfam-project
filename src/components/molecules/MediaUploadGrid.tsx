@@ -1,6 +1,6 @@
 import { PostUploader } from "./PostUploader";
 import Record from "@/assets/icons/record";
-// import Poll from "@/assets/icons/poll";
+import PollIcon from "@/assets/icons/poll";
 // import Smile from "@/assets/icons/smile";
 
 type MediaUploadGridProp = {
@@ -19,6 +19,8 @@ const MediaUploadGrid = ({
   isActive,
   ifRecord,
   onRecordClick,
+  ifPoll,
+  setIfUserIsCreatingPoll,
 }: MediaUploadGridProp) => {
   return (
     <div className="flex items-center gap-x-3">
@@ -28,13 +30,13 @@ const MediaUploadGrid = ({
       />
 
       {/* <Smile isActive={isActive} className="cursor-pointer" /> */}
-      {/* {ifPoll && (
-        <Poll
+      {ifPoll && (
+        <PollIcon
           onClick={() => setIfUserIsCreatingPoll?.(true)}
           isActive={isActive}
           className="cursor-pointer"
         />
-      )} */}
+      )}
       {ifRecord && (
         <Record
           onClick={onRecordClick}

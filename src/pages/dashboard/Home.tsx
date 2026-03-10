@@ -84,6 +84,13 @@ const Home = () => {
     queryKey: ["GetContents", activeSearchTerm],
     pageSize: 20,
   });
+
+  const { data: getPollData, isLoading: getPollDataIsLoading } = useGetData({
+    url: `contents?page=0&size=80`,
+    queryKey: ["GetContents"],
+  });
+
+  console.log(getPollData?.data?.content);
   // Flatten the pages for rendering
   const allPosts =
     getCreatorContent?.pages?.flatMap((page: any) => page.data?.content) || [];
@@ -99,22 +106,11 @@ const Home = () => {
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
     null,
   );
-  const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(true);
+  const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
-  const [pollOptions, setPollOptions] = useState([
-    {
-      id: "1",
-      name: "Option One",
-    },
-    {
-      id: "2",
-      name: "Option Two",
-    },
-  ]);
   const [showCommentModal, setShowCommentModal] = useState<
     string | null | undefined
   >(null);
-  const [activePoll, setActivePoll] = useState(pollOptions[0].name);
   // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const toggleInterestModal = () => {
     setShowInterestModal(!showInterestModal);
@@ -176,7 +172,8 @@ const Home = () => {
       return () => observer.disconnect();
     }, [hasViewed, data?.publicId, data?.viewers, recordViewMutation]);
 
-    if (isLoading || getCreatorContentIsLoading) return <Loader />;
+    if (isLoading || getCreatorContentIsLoading || getPollDataIsLoading)
+      return <Loader />;
 
     return (
       <div className="relative" ref={postRef}>
@@ -254,14 +251,8 @@ const Home = () => {
             placeholder="Search..."
           />
           {!isCreator && <CreatorLiveCard />}
-          {ifUserIsCreatingPoll ? (
-            <Poll
-              pollOptions={pollOptions}
-              setPollOptions={setPollOptions}
-              activePoll={activePoll}
-              setActivePoll={setActivePoll}
-              setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
-            />
+          {ifUserIsCreatingPoll && isCreator ? (
+            <Poll setIfUserIsCreatingPoll={setIfUserIsCreatingPoll} />
           ) : (
             isCreator && (
               <CommentBox
