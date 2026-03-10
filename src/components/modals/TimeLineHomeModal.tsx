@@ -10,6 +10,7 @@ import { useCustomMutation } from "@/hooks/apiCalls";
 import { useQueryClient } from "@tanstack/react-query";
 import type { RootState } from "@/lib/store";
 import { useAppSelector } from "@/lib/hook";
+import { showSuccessToast, showErrorToast } from "@/utils/toastUtils";
 
 type Prop = {
   publicId: string;
@@ -17,7 +18,11 @@ type Prop = {
   toggleTimelineHomeModal: () => void;
 };
 
-const TimeLineHomeModal = ({ publicId, createdBy }: Prop) => {
+const TimeLineHomeModal = ({
+  publicId,
+  createdBy,
+  toggleTimelineHomeModal,
+}: Prop) => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const isOwner = userObject?.email === createdBy;
   const queryClient = useQueryClient();
@@ -78,9 +83,23 @@ const TimeLineHomeModal = ({ publicId, createdBy }: Prop) => {
       : []),
   ];
 
+  const handleCopyLink = async () => {
+    try {
+      const link = `${window.location.origin}/dashboard/${publicId}`;
+      await navigator.clipboard.writeText(link);
+      showSuccessToast("Link copied to clipboard!");
+      toggleTimelineHomeModal();
+    } catch (err) {
+      showErrorToast("Failed to copy link");
+    }
+  };
+
   return (
     <>
-      <div className="flex items-center justify-between py-2 hover:bg-blue_200 hover:rounded-lg cursor-pointer px-6">
+      <div
+        className="flex items-center justify-between py-2 hover:bg-blue_200 hover:rounded-lg cursor-pointer px-6"
+        onClick={handleCopyLink}
+      >
         <Typography variant="p2" className="text-grey_700">
           Copy link to post
         </Typography>
