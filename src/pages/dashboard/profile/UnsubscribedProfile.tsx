@@ -5,7 +5,7 @@ import { ProfileHeader } from "@/components/molecules/ProfileHeader";
 import { useCustomMutation, useGetData } from "@/hooks/apiCalls";
 import { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import blueGift from "@/assets/icons/blueGift.svg";
+// import blueGift from "@/assets/icons/blueGift.svg";
 import Typography from "@/components/forms/Typography";
 import CustomButton from "@/components/forms/CustomButton";
 // import { SubscriptionBundle } from "@/components/molecules/SubscriptionBundle";
@@ -46,7 +46,7 @@ const UnsubscribedProfile = () => {
 
   const currentSub = isActivelySubscribed(
     getViewerSubscriptions?.data?.content,
-    id
+    id,
   );
   const isSubscribed = currentSub ? currentSub.isActive : false;
 
@@ -102,14 +102,14 @@ const UnsubscribedProfile = () => {
 
               <section className="mt-10">
                 <div className="flex justify-end items-center">
-                  <div
+                  {/* <div
                     className={`flex mr-4 items-center gap-x-2 border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white `}
                   >
                     <img src={blueGift} alt="gift" />
                     <Typography variant="subtitle3" className="text-blue_500">
                       Gift Subscription
                     </Typography>
-                  </div>
+                  </div> */}
 
                   <CustomButton
                     onClick={() => toggleSubscriptionModal()}

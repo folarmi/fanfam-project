@@ -46,53 +46,82 @@ export const formatTimeAgo = (dateString: string) => {
   return `${years}y ago`;
 };
 
-export const getFileName = (url: string): string => {
-  try {
-    const urlPath = new URL(url).pathname;
-    const fileName = urlPath.split("/").pop() || "Document";
-    // Decode URI and limit length
-    return (
-      decodeURIComponent(fileName).slice(0, 30) +
-      (fileName.length > 30 ? "..." : "")
-    );
-  } catch {
-    return "Document";
-  }
-};
+// export const getFileName = (url: string): string => {
+//   try {
+//     const urlPath = new URL(url).pathname;
+//     const fileName = urlPath.split("/").pop() || "Document";
+//     // Decode URI and limit length
+//     return (
+//       decodeURIComponent(fileName).slice(0, 30) +
+//       (fileName.length > 30 ? "..." : "")
+//     );
+//   } catch {
+//     return "Document";
+//   }
+// };
+
+// export const getFileIcon = (url: string) => {
+//   const ext = url.split(".").pop()?.toLowerCase();
+
+//   const iconClass = "w-12 h-12 mb-2";
+
+//   if (ext === "pdf") {
+//     return <span className={`${iconClass} text-red-600`}>📄</span>;
+//   } else if (["doc", "docx"].includes(ext || "")) {
+//     return <span className={`${iconClass} text-blue-600`}>📘</span>;
+//   } else if (["xls", "xlsx"].includes(ext || "")) {
+//     return <span className={`${iconClass} text-green-600`}>📊</span>;
+//   } else if (["zip", "rar"].includes(ext || "")) {
+//     return <span className={`${iconClass} text-yellow-600`}>📦</span>;
+//   }
+
+//   return (
+//     <svg
+//       className={`${iconClass} text-gray-600`}
+//       fill="none"
+//       stroke="currentColor"
+//       viewBox="0 0 24 24"
+//     >
+//       <path
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         strokeWidth={2}
+//         d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+//       />
+//     </svg>
+//   );
+// };
+
+// Determine media type based on files
+
+export const getFileName = (url: string) =>
+  decodeURIComponent(url?.split("/").pop()?.split("?")[0] || "File");
 
 export const getFileIcon = (url: string) => {
-  const ext = url.split(".").pop()?.toLowerCase();
-
-  const iconClass = "w-12 h-12 mb-2";
-
-  if (ext === "pdf") {
-    return <span className={`${iconClass} text-red-600`}>📄</span>;
-  } else if (["doc", "docx"].includes(ext || "")) {
-    return <span className={`${iconClass} text-blue-600`}>📘</span>;
-  } else if (["xls", "xlsx"].includes(ext || "")) {
-    return <span className={`${iconClass} text-green-600`}>📊</span>;
-  } else if (["zip", "rar"].includes(ext || "")) {
-    return <span className={`${iconClass} text-yellow-600`}>📦</span>;
-  }
-
+  const ext = url?.split(".").pop()?.toLowerCase();
+  const map: Record<string, { color: string; label: string }> = {
+    pdf: { color: "#ef4444", label: "PDF" },
+    doc: { color: "#3b82f6", label: "DOC" },
+    docx: { color: "#3b82f6", label: "DOC" },
+    xls: { color: "#22c55e", label: "XLS" },
+    xlsx: { color: "#22c55e", label: "XLS" },
+    ppt: { color: "#f97316", label: "PPT" },
+    pptx: { color: "#f97316", label: "PPT" },
+    zip: { color: "#a855f7", label: "ZIP" },
+  };
+  const info = map[ext || ""] || { color: "#6b7280", label: "FILE" };
   return (
-    <svg
-      className={`${iconClass} text-gray-600`}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
+    <div
+      style={{ background: info.color }}
+      className="flex h-12 w-12 items-center justify-center rounded-xl shadow-md"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-      />
-    </svg>
+      <span className="text-xs font-black tracking-wider text-white">
+        {info.label}
+      </span>
+    </div>
   );
 };
 
-// Determine media type based on files
 export const getMediaType = (files: File[]): MediaType => {
   if (files.length === 0) return "PHOTO";
 

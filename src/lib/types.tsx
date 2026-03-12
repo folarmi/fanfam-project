@@ -552,3 +552,8 @@ export type LiveEventPayload = {
   reactionType?: string; // likely for LIVE_REACTION
   [key: string]: any;
 };
+
+export interface MediaGridProps {
+  timeLineImage: MediaItem[];
+  onMediaClick?: () => void;
+}

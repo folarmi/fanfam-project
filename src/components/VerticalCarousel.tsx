@@ -406,7 +406,6 @@
 import "tailwindcss/tailwind.css";
 import horizontalMore from "../assets/icons/horizontalMore.svg";
 import verify from "../assets/icons/verify.svg";
-// import Typography from "./forms/Typography";
 import { useGetData } from "@/hooks/apiCalls";
 import { type UserProfile } from "@/lib/types";
 import type { RootState } from "@/lib/store";

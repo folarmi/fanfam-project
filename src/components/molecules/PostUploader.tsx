@@ -55,9 +55,9 @@ const PostUploader = ({
             isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
           }`}
         >
-          {previews.length > 0 && (
+          {previews?.length > 0 && (
             <div className="flex gap-2 flex-wrap">
-              {previews.map((preview, index) => (
+              {previews?.map((preview, index) => (
                 <div key={index} className="relative">
                   {/* Different preview based on file type */}
                   {preview.file.type.startsWith("image/") && (
