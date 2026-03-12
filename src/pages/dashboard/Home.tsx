@@ -74,13 +74,7 @@ const Home = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteGetData({
-    url: isCreator
-      ? `contents?creator=${userObject?.email}&sort=createdDate,desc${
-          activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
-        }`
-      : `contents?sort=createdDate,desc${
-          activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""
-        }`,
+    url: `contents?sort=createdDate,desc${activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""}`,
     queryKey: ["GetContents", activeSearchTerm],
     pageSize: 20,
   });
@@ -142,11 +136,11 @@ const Home = () => {
     const postRef = useRef<HTMLDivElement>(null);
     const [hasViewed, setHasViewed] = useState(false);
 
-    const { data: profileData, isLoading } = useGetData({
-      url: `profile/${data?.createdBy}`,
-      queryKey: ["GetCreatorProfile", data?.createdBy],
-      enabled: !!data?.createdBy,
-    });
+    // const { data: profileData, isLoading } = useGetData({
+    //   url: `profile/${data?.createdBy}`,
+    //   queryKey: ["GetCreatorProfile", data?.createdBy],
+    //   enabled: !!data?.createdBy,
+    // });
 
     // Record view mutation with the specific contentId
     const recordViewMutation = useRecordContentView(data?.publicId || "");
@@ -173,16 +167,15 @@ const Home = () => {
       return () => observer.disconnect();
     }, [hasViewed, data?.publicId, data?.viewers, recordViewMutation]);
 
-    if (isLoading || getCreatorContentIsLoading || getPollDataIsLoading)
-      return <Loader />;
+    if (getCreatorContentIsLoading || getPollDataIsLoading) return <Loader />;
 
     return (
       <div className="relative" ref={postRef}>
         <ViewPost
           publicId={data?.publicId}
-          profileName={profileData?.data?.displayName || "Unknown User"}
-          avatar={profileData?.data?.profilePic}
-          handle={profileData?.data?.username}
+          profileName={data?.creator?.name || "Unknown User"}
+          avatar={data?.creator?.profilePic}
+          handle={data?.creator?.username}
           time={formatTimeAgo(data?.createdDate)}
           paragraphOne={data?.message}
           timeLineImage={data?.mediaFiles}
@@ -220,9 +213,9 @@ const Home = () => {
             data={{
               id: data?.publicId,
               message: data?.message,
-              avatar: profileData?.data?.profilePic,
-              handle: profileData?.data?.username,
-              profileName: profileData?.data?.displayName || "Unknown User",
+              avatar: data?.creator?.profilePic,
+              handle: data?.creator?.username,
+              profileName: data?.creator?.name || "Unknown User",
               time: formatTimeAgo(data?.createdDate),
               timeLineImage: data?.mediaFiles,
             }}
