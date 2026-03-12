@@ -2,7 +2,7 @@
 
 import CustomInput from "../components/forms/CustomInput";
 import { useForm } from "react-hook-form";
-import { CheckCircle2, X } from "lucide-react";
+import { Calendar, CheckCircle2, X } from "lucide-react";
 import Typography from "../components/forms/Typography";
 import CustomButton from "../components/forms/CustomButton";
 import TextBetweenLines from "../components/molecules/TextBetweenLines";
@@ -51,19 +51,40 @@ const Signup = () => {
   });
 
   const submitForm: any = (data: any) => {
+    delete data.conditions;
     const formValues = {
-      email: data?.email,
-      password: data?.password,
-      phoneNumber: data?.phoneNumber,
-      dateOfBirth: data?.dateOfBirth,
+      ...data,
       role: UserRole.viewer,
     };
+
+    // console.log(formValues);
     signUpMutation.mutate(formValues);
   };
 
   return (
     <AuthLayout>
       <form onSubmit={handleSubmit(submitForm)}>
+        <CustomInput
+          label="First Name"
+          name="firstName"
+          control={control}
+          rules={{ required: "First Name is required" }}
+        />
+
+        <CustomInput
+          label="Last Name"
+          name="lastName"
+          control={control}
+          rules={{ required: "Last Name is required" }}
+        />
+
+        <CustomInput
+          label="Username"
+          name="username"
+          control={control}
+          rules={{ required: "Username is required" }}
+        />
+
         <CustomInput
           label="Phone Number"
           name="phoneNumber"
@@ -75,6 +96,33 @@ const Signup = () => {
               message: "Please enter a valid phone number",
             },
           }}
+        />
+
+        <CustomInput
+          label="Date Of Birth"
+          name="dob"
+          type="date"
+          control={control}
+          max={new Date().toISOString().split("T")[0]}
+          rules={{
+            required: "Date of birth is required",
+            validate: (value) => {
+              const birthDate = new Date(value);
+              const today = new Date();
+
+              if (birthDate > today) {
+                return "Date of birth cannot be in the future";
+              }
+
+              let age = today.getFullYear() - birthDate.getFullYear();
+              const m = today.getMonth() - birthDate.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+              }
+              return age >= 18 || "You must be at least 18 years old";
+            },
+          }}
+          rightIcon={<Calendar className="w-5 h-5 pointer-events-none" />}
         />
 
         <CustomInput
@@ -99,16 +147,25 @@ const Signup = () => {
           }}
         />
 
-
- 
-
-                <div className="flex flex-col gap-1.5 -mt-3 mb-6 ml-2 text-xs">
+        <div className="flex flex-col gap-1.5 -mt-3 mb-6 ml-2 text-xs">
           {[
-            { label: "At least 8 characters long", met: (passwordValue || "").length >= 8 },
-            { label: "Contains an uppercase letter", met: /[A-Z]/.test(passwordValue || "") },
-            { label: "Contains a lowercase letter", met: /[a-z]/.test(passwordValue || "") },
+            {
+              label: "At least 8 characters long",
+              met: (passwordValue || "").length >= 8,
+            },
+            {
+              label: "Contains an uppercase letter",
+              met: /[A-Z]/.test(passwordValue || ""),
+            },
+            {
+              label: "Contains a lowercase letter",
+              met: /[a-z]/.test(passwordValue || ""),
+            },
             { label: "Contains a number", met: /\d/.test(passwordValue || "") },
-            { label: "Contains a special character", met: /[^A-Za-z0-9]/.test(passwordValue || "") },
+            {
+              label: "Contains a special character",
+              met: /[^A-Za-z0-9]/.test(passwordValue || ""),
+            },
           ].map((req, idx) => (
             <div key={idx} className="flex items-center gap-2">
               {req.met ? (

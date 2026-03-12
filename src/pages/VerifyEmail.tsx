@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Suspense, useEffect, useState } from "react";
 import Typography from "../components/forms/Typography";
 import AuthLayout from "../layouts/AuthLayout";
@@ -16,7 +17,6 @@ import { getFCMToken } from "@/oauth/firebaseConfig";
 import { useSignIn } from "@/hooks/useSignIn";
 import type { LocationErrorCode } from "@/lib/types";
 import { LocationPermissionCard } from "@/components/cards/LocationPermissionCard";
-import { Calendar } from "lucide-react";
 
 type LocStatus = "idle" | "requesting" | "granted" | "denied" | "error";
 
@@ -128,32 +128,6 @@ const VerifyEmailForm = () => {
         />
 
         <CustomInput name="email" control={control} readOnly />
-        <CustomInput
-          label="Date Of Birth"
-          name="dob"
-          type="date"
-          control={control}
-          max={new Date().toISOString().split("T")[0]}
-          rules={{
-            required: "Date of birth is required",
-            validate: (value) => {
-              const birthDate = new Date(value);
-              const today = new Date();
-
-              if (birthDate > today) {
-                return "Date of birth cannot be in the future";
-              }
-
-              let age = today.getFullYear() - birthDate.getFullYear();
-              const m = today.getMonth() - birthDate.getMonth();
-              if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-              }
-              return age >= 18 || "You must be at least 18 years old";
-            },
-          }}
-          rightIcon={<Calendar className="w-5 h-5 pointer-events-none" />}
-        />
 
         <CustomButton
           type="submit"
