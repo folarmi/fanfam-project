@@ -109,20 +109,63 @@ export interface ReactionCount {
   LOL: number;
 }
 
+export interface PostCreator {
+  email: string;
+  name: string;
+  profilePic: string;
+  username: string;
+}
+
+export interface PollChoice {
+  choice: string;
+  publicId: string;
+  votes?: string[];
+  createdBy: string;
+  lastModifiedBy: string;
+  createdDate: string;
+  lastModifiedDate: string;
+}
+
+export interface PollDuration {
+  days: number;
+  hours: number;
+  minutes: number;
+}
+// export interface StoryPost {
+//   publicId: string;
+//   createdBy: string;
+//   lastModifiedBy: string;
+//   createdDate: string;
+//   lastModifiedDate: string;
+//   creator: string;
+//   message: string;
+//   mediaFiles: MediaFile[];
+//   comments: PostComment[];
+//   reactions: Reaction[];
+//   viewers: string[];
+//   mentions: string[];
+//   pollChoices?: any[];
+//   meta: PostMeta;
+//   replies: StoryPost[];
+// }
+
 export interface StoryPost {
   publicId: string;
   createdBy: string;
   lastModifiedBy: string;
   createdDate: string;
   lastModifiedDate: string;
-  creator: string;
+  creator: PostCreator;
   message: string;
   mediaFiles: MediaFile[];
   comments: PostComment[];
   reactions: Reaction[];
   viewers: string[];
   mentions: string[];
-  pollChoices?: any[];
+  reposters: string[];
+  bookmarkers: string[];
+  pollChoices?: PollChoice[];
+  pollDuration?: PollDuration;
   meta: PostMeta;
   replies: StoryPost[];
 }

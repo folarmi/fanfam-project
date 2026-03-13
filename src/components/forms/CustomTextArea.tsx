@@ -69,6 +69,7 @@
 // export { CustomTextArea };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
 import {
   Controller,
   type Control,
@@ -81,10 +82,10 @@ interface TextAreaFieldProps {
   rules?: RegisterOptions;
   placeholder?: string;
   rows?: number;
-  cols?: number;
   readOnly?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
+  /** Applied to the outer wrapper div, not the textarea itself */
   className?: string;
 }
 
@@ -99,69 +100,84 @@ const CustomTextArea = ({
   onBlur,
   className = "",
 }: TextAreaFieldProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <Controller
       name={name}
       control={control}
       rules={rules}
-      render={({ field, fieldState: { error } }) => (
-        <div className={`relative w-full group ${className}`}>
-          <textarea
-            readOnly={readOnly}
-            id={name}
-            name={field.name}
-            ref={field.ref}
-            onChange={field.onChange}
-            rows={rows}
-            value={field.value || ""}
-            placeholder={placeholder}
-            onFocus={onFocus}
-            onBlur={() => {
-              field.onBlur();
-              onBlur?.();
-            }}
-            style={{
-              cursor: readOnly ? "not-allowed" : "text",
-              resize: "none",
-            }}
-            className={[
-              // Base layout
-              "w-full px-0 py-2",
-              // Typography
-              "text-sm text-gray-900 placeholder-gray-400 leading-relaxed",
-              // Background — transparent, sits on parent bg
-              "bg-transparent",
-              // Border — only bottom, transitions to brand colour on focus
-              "border-0 border-b border-gray-200",
-              "focus:border-blue_20 focus:outline-none",
-              "transition-colors duration-200",
-              // Disabled / readonly state
-              readOnly ? "opacity-50" : "",
-              // Break long words so text never overflows
-              "break-words whitespace-pre-wrap overflow-auto",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          />
+      render={({ field, fieldState: { error } }) => {
+        const borderColor = error
+          ? "border-red-400"
+          : isFocused
+            ? "border-blue_20"
+            : "border-grey_10";
 
-          {/* Animated underline accent */}
-          <span
-            className={[
-              "absolute bottom-0 left-0 h-[2px] bg-blue_20",
-              "w-0 group-focus-within:w-full",
-              "transition-all duration-300 ease-out",
-            ].join(" ")}
-          />
+        return (
+          <div className={`w-full ${className}`}>
+            {/* Card wrapper — border carries all state feedback */}
+            <div
+              className={`
+                bg-grey_20 rounded-xl border-2 transition-colors duration-200
+                ${borderColor}
+                ${readOnly ? "opacity-60" : ""}
+              `}
+            >
+              <textarea
+                readOnly={readOnly}
+                id={name}
+                name={field.name}
+                ref={field.ref}
+                onChange={field.onChange}
+                rows={rows}
+                value={field.value || ""}
+                placeholder={placeholder}
+                onFocus={() => {
+                  setIsFocused(true);
+                  onFocus?.();
+                }}
+                onBlur={() => {
+                  setIsFocused(false);
+                  field.onBlur();
+                  onBlur?.();
+                }}
+                style={{
+                  resize: "none",
+                  cursor: readOnly ? "not-allowed" : "text",
+                }}
+                className="
+                  w-full px-4 pt-4 pb-2
+                  bg-transparent outline-none
+                  text-sm text-grey_400 placeholder-grey_60
+                  leading-relaxed break-words whitespace-pre-wrap
+                "
+              />
+            </div>
 
-          {error && (
-            <span className="mt-1 flex items-center gap-1 text-xs text-red-500">
-              {/* Inline warning dot */}
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
-              {error.message}
-            </span>
-          )}
-        </div>
-      )}
+            {/* Error message — sits below the card, not inside it */}
+            {error && (
+              <p className="mt-1.5 flex items-center gap-1.5 text-xs text-red-500">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className="flex-shrink-0"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                {error.message}
+              </p>
+            )}
+          </div>
+        );
+      }}
     />
   );
 };

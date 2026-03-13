@@ -116,7 +116,7 @@ const SinglePostDetails = () => {
 
   const { data, isLoading: getContentByIdIsLoading } = useGetData({
     url: `contents/${params?.id}`,
-    queryKey: ["GetContentsById", params?.id],
+    queryKey: ["GetContentsById", JSON.stringify(params?.id)],
   });
 
   const pageIsLoading = getContentByIdIsLoading || isLoading;

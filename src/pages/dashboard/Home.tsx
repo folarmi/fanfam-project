@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
@@ -189,6 +191,9 @@ const Home = () => {
           }
           onCommentClick={() => toggleShowCommentModal(data?.publicId)}
           onCardClick={() => {
+            if (!data?.publicId) return;
+
+            console.log(data);
             toggleShowCommentModal(null);
             navigate(`/dashboard/${data?.publicId}`);
           }}

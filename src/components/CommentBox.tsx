@@ -296,18 +296,8 @@ type CommentBoxProp = {
   ifPoll?: boolean;
   ifRecord?: boolean;
   setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
-  /**
-   * Base endpoint.
-   *
-   * | Use case              | endpoint                  | commentId      | Resolved URL                              |
-   * |-----------------------|---------------------------|----------------|-------------------------------------------|
-   * | New post              | "contents"                | undefined      | POST /contents                            |
-   * | Comment on a post     | "contents/{postId}/comments" | undefined  | POST /contents/{postId}/comments          |
-   * | Reply to a comment    | "contents/comments"       | "{commentId}"  | POST /contents/comments/{commentId}/replies |
-   */
   endpoint?: string;
   placeholder?: string;
-  /** When provided, the form posts to `{endpoint}/{commentId}/replies` */
   commentId?: string;
   onSuccess?: () => void;
   ifGoLive?: boolean;
@@ -320,7 +310,7 @@ const CommentBox = ({
   setIfUserIsCreatingPoll,
   commentId,
   onSuccess,
-  placeholder = "Write a Post..",
+  placeholder = "Write a post…",
   ifGoLive = false,
 }: CommentBoxProp) => {
   const queryClient = useQueryClient();
@@ -337,10 +327,7 @@ const CommentBox = ({
   const [isActive, setIsActive] = useState(false);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
-  const [, setShowLiveStreaming] = useState(true);
   const [isRecorderOpen, setIsRecorderOpen] = useState(false);
-
-  const toggleReportUserModal = () => setShowLiveStreaming((v) => !v);
 
   const {
     uploadFiles,
@@ -369,12 +356,6 @@ const CommentBox = ({
     toast.success("Voice note added successfully");
   };
 
-  /**
-   * Resolve the final mutation endpoint:
-   *   - reply:   {endpoint}/{commentId}/replies
-   *   - comment: {endpoint}   (already includes the post id, e.g. "contents/{postId}/comments")
-   *   - post:    {endpoint}   ("contents")
-   */
   const mutationEndpoint = commentId
     ? `${endpoint}/${commentId}/replies`
     : endpoint;
@@ -404,11 +385,7 @@ const CommentBox = ({
         console.error("Upload failed:", error);
       }
     } else {
-      createContentMutation.mutate({
-        ...data,
-        mediaFiles: [],
-        mentions: [],
-      });
+      createContentMutation.mutate({ ...data, mediaFiles: [], mentions: [] });
     }
   };
 
@@ -430,18 +407,15 @@ const CommentBox = ({
 
   useEffect(() => {
     if (!isSubmitted) return;
-    if (queuedFiles.length > 0) {
-      clearErrors("message");
-    } else {
-      trigger("message");
-    }
+    if (queuedFiles.length > 0) clearErrors("message");
+    else trigger("message");
   }, [queuedFiles.length, clearErrors, trigger]);
 
+  const isPostable = isActive || queuedFiles.length > 0;
+
   return (
-    <form
-      onSubmit={handleSubmit(submitForm)}
-      className="mb-2 p-4 border border-grey_10 bg-grey_20 drop-shadow-4xl"
-    >
+    <form onSubmit={handleSubmit(submitForm)}>
+      {/* CustomTextArea now owns the card border + focus ring */}
       <CustomTextArea
         placeholder={placeholder}
         name="message"
@@ -459,24 +433,21 @@ const CommentBox = ({
         onFocus={handleFocus}
         onBlur={handleBlur}
         rows={commentId ? 3 : 5}
-        className="w-full outline-none pt-3 bg-grey_20"
       />
 
-      {/* Queued file previews */}
+      {/* Queued file chips */}
       {queuedFiles.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-3 mb-2">
+        <div className="flex flex-wrap gap-2 mt-2">
           {queuedFiles.map((file, index) => (
             <div
               key={index}
-              className="relative bg-gray-100 rounded px-3 py-2 flex items-center gap-2"
+              className="flex items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1 text-xs text-gray-700"
             >
-              <Typography variant="p3" className="text-gray-700 text-sm">
-                {file.type.startsWith("audio/") ? "🎤" : "📎"} {file.name}
-              </Typography>
+              {file.type.startsWith("audio/") ? "🎤" : "📎"} {file.name}
               <button
                 type="button"
                 onClick={() => handleRemoveFile(index)}
-                className="text-red-500 hover:text-red-700"
+                className="text-gray-400 hover:text-red-500 ml-1 leading-none"
               >
                 ✕
               </button>
@@ -485,7 +456,8 @@ const CommentBox = ({
         </div>
       )}
 
-      <div className="flex items-center justify-between py-[5px]">
+      {/* Toolbar row */}
+      <div className="flex items-center justify-between mt-3">
         <MediaUploadGrid
           handleFileUpload={handleFileUpload}
           handleRemoveFile={handleRemoveFile}
@@ -496,31 +468,23 @@ const CommentBox = ({
           onRecordClick={() => setIsRecorderOpen(true)}
         />
 
-        <div className="flex items-center">
-          <div className="w-fit">
-            <CustomButton
-              variant={
-                isActive || queuedFiles.length > 0 ? "primary" : "disabled"
-              }
-              className="bg-grey_90 px-6"
-              disabled={createContentMutation.isPending || isUploading}
-              loading={createContentMutation.isPending || isUploading}
-            >
-              {commentId ? "Reply" : "Post"}
-            </CustomButton>
-          </div>
+        <div className="flex items-center gap-3">
+          <CustomButton
+            variant={isPostable ? "primary" : "disabled"}
+            className="bg-grey_90 px-6 rounded-full"
+            disabled={createContentMutation.isPending || isUploading}
+            loading={createContentMutation.isPending || isUploading}
+          >
+            {commentId ? "Reply" : "Post"}
+          </CustomButton>
 
           {ifGoLive && (
             <div
-              onClick={toggleReportUserModal}
-              className="border border-blue_1000 py-2 px-4 flex items-center rounded-3xl ml-3 cursor-pointer"
+              className="border border-blue_1000 py-2 px-4 flex items-center rounded-3xl cursor-pointer"
+              onClick={() => navigate("livestreaming")}
             >
-              <img src={video} alt="video" className="mr-1" />
-              <Typography
-                variant="subtitle3"
-                className="text-blue_20"
-                onClick={() => navigate("livestreaming")}
-              >
+              <img src={video} alt="video" className="mr-1 w-4 h-4" />
+              <Typography variant="subtitle3" className="text-blue_20">
                 Go Live
               </Typography>
             </div>

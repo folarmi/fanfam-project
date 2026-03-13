@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import type { MediaFile, ReactionItem } from "@/lib/types";
 import IconAndNumber from "../IconAndNumber";
