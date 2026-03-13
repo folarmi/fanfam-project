@@ -145,7 +145,7 @@ const PostCard: React.FC<PostCardProps> = ({
 
       {/* Poll Section */}
       {pollChoices && pollChoices?.length > 0 && (
-        <AnsweredPoll pollChoices={pollChoices} />
+        <AnsweredPoll pollChoices={pollChoices} postId={publicId} />
       )}
 
       {/* Action Icons (Reactions) */}

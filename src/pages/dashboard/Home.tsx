@@ -193,7 +193,6 @@ const Home = () => {
           onCardClick={() => {
             if (!data?.publicId) return;
 
-            console.log(data);
             toggleShowCommentModal(null);
             navigate(`/dashboard/${data?.publicId}`);
           }}

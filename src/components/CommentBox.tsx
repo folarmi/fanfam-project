@@ -457,7 +457,7 @@ const CommentBox = ({
       )}
 
       {/* Toolbar row */}
-      <div className="flex items-center justify-between mt-3">
+      <div className="flex items-center justify-between mt-3 p-4">
         <MediaUploadGrid
           handleFileUpload={handleFileUpload}
           handleRemoveFile={handleRemoveFile}
