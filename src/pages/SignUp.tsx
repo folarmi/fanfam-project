@@ -26,10 +26,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserRole } from "@/data";
 import { GoogleSignIn } from "@/oauth/Google";
 import { useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { control, handleSubmit, watch } = useForm();
+  const { control, handleSubmit, watch, clearErrors, setError, getValues } =
+    useForm();
   const passwordValue = watch("password", "");
   const platform = getPlatformFromUAParser();
   const browser = getBrowserInfo();
@@ -49,6 +51,33 @@ const Signup = () => {
       navigate("/email-sent");
     },
   });
+
+  const setUsernameMutation = useCustomMutation({
+    endpoint: `auth/set-username`,
+    successMessage: () => {
+      clearErrors("username");
+      return "Username set successfully";
+    },
+    onError: () => {
+      setError("username", {
+        message: "Username is already taken",
+        type: "manual",
+      });
+    },
+  });
+
+  const handleUserNameBlur = useDebouncedCallback(() => {
+    const username = getValues("username");
+    const email = getValues("email");
+    console.log(username, email);
+    // Only validate if there is a username, if username isn't empty and has changed and is not empty
+    if (username && username.trim() !== "") {
+      setUsernameMutation.mutate({ email, username });
+    }
+    // else if (username === data?.data?.username) {
+    //   clearErrors("username");
+    // }
+  }, 500);
 
   const submitForm: any = (data: any) => {
     delete data.conditions;
@@ -79,10 +108,33 @@ const Signup = () => {
         />
 
         <CustomInput
+          label="Email"
+          name="email"
+          type="email"
+          control={control}
+          rules={{ required: "Email is required" }}
+        />
+
+        <CustomInput
+          label="Password"
+          name="password"
+          control={control}
+          type="password"
+          rules={{
+            required: "Password is required",
+            pattern: {
+              value: passwordRegex,
+              message: "Please ensure all password requirements are met",
+            },
+          }}
+        />
+
+        <CustomInput
           label="Username"
           name="username"
           control={control}
-          rules={{ required: "Username is required" }}
+          onBlur={() => handleUserNameBlur()}
+          isVerified={setUsernameMutation.isSuccess}
         />
 
         <CustomInput
@@ -90,7 +142,6 @@ const Signup = () => {
           name="phoneNumber"
           control={control}
           rules={{
-            required: "Phone Number is required",
             pattern: {
               value: phoneRegex,
               message: "Please enter a valid phone number",
@@ -123,28 +174,6 @@ const Signup = () => {
             },
           }}
           rightIcon={<Calendar className="w-5 h-5 pointer-events-none" />}
-        />
-
-        <CustomInput
-          label="Email"
-          name="email"
-          type="email"
-          control={control}
-          rules={{ required: "Email is required" }}
-        />
-
-        <CustomInput
-          label="Password"
-          name="password"
-          control={control}
-          type="password"
-          rules={{
-            required: "Password is required",
-            pattern: {
-              value: passwordRegex,
-              message: "Please ensure all password requirements are met",
-            },
-          }}
         />
 
         <div className="flex flex-col gap-1.5 -mt-3 mb-6 ml-2 text-xs">

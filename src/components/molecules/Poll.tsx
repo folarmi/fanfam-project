@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import Typography from "../forms/Typography";
-import block from "../../assets/icons/block.svg";
+// import block from "../../assets/icons/block.svg";
 import { Plus, X } from "lucide-react";
 
 import CustomButton from "../forms/CustomButton";
@@ -9,6 +7,8 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import CustomSelect from "../forms/CustomSelect";
+import { pollDaysOptions, pollHoursOptions, pollMinutesOptions } from "@/data";
 
 type pollProps = {
   setIfUserIsCreatingPoll: (val: boolean) => void;
@@ -17,17 +17,24 @@ type pollProps = {
 type PollFormValues = {
   question: string;
   options: { name: string }[];
+  pollDuration: {
+    days: number;
+    hours: number;
+    minutes: number;
+  };
 };
 
 const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
   const queryClient = useQueryClient();
 
-  const { control, register, handleSubmit, watch } = useForm<PollFormValues>({
-    defaultValues: {
-      question: "",
-      options: [{ name: "" }, { name: "" }],
-    },
-  });
+  const { control, register, handleSubmit, watch, setError } =
+    useForm<PollFormValues>({
+      defaultValues: {
+        question: "",
+        options: [{ name: "" }, { name: "" }],
+        pollDuration: { days: 1, hours: 0, minutes: 0 },
+      },
+    });
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -44,6 +51,7 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
         queryKey: ["GetContents"],
         exact: false,
       });
+      setIfUserIsCreatingPoll(false);
     },
     successMessage: () => "Poll posted successfully",
     onError: () => {},
@@ -60,6 +68,11 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
   };
 
   const submitForm = (data: PollFormValues) => {
+    const { days, hours, minutes } = data.pollDuration;
+    if (!days && !hours && !minutes) {
+      setError("pollDuration.days", { message: "Set at least one duration" });
+      return;
+    }
     if (!data.question.trim()) {
       toast.error("Please enter a question");
       return;
@@ -73,7 +86,12 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
 
     const formData = {
       message: data?.question,
-      choices: validOptions?.map((opt) => ({ choice: opt.name })),
+      pollChoices: validOptions?.map((opt) => ({ choice: opt.name })),
+      pollDuration: {
+        days,
+        hours,
+        minutes,
+      },
     };
     // console.log(formData);
     createContentMutation.mutate(formData);
@@ -123,18 +141,18 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
                   >
                     <X size={16} strokeWidth={2.5} />
                   </button>
-                  <img
+                  {/* <img
                     src={block}
                     alt="drag handle"
                     className="cursor-grab opacity-50 hover:opacity-100 transition-opacity p-1"
-                  />
+                  /> */}
                 </div>
               </div>
             );
           })}
         </div>
 
-        <div className="flex justify-between items-center mt-4 border-b border-grey_100 pb-5">
+        {/* <div className="flex justify-between items-center mt-4 border-b border-grey_100 pb-5">
           {fields.length < 5 ? (
             <button
               type="button"
@@ -149,6 +167,53 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
               Maximum 5 options
             </span>
           )}
+        </div> */}
+        <div className="mt-4 border-b border-grey_100 pb-5 space-y-3">
+          <div className="flex justify-between items-center">
+            {fields.length < 5 ? (
+              <button
+                type="button"
+                onClick={addOption}
+                className="flex items-center gap-2 py-2 px-4 bg-blue_50 hover:bg-blue-100 text-blue_500 rounded-full transition-colors font-medium text-sm focus:outline-none"
+              >
+                <Plus size={16} strokeWidth={2.5} />
+                <span>Add option</span>
+              </button>
+            ) : (
+              <span className="text-sm text-grey_400 italic">
+                Maximum 5 options
+              </span>
+            )}
+          </div>
+
+          <div>
+            <p className="text-grey_500 text-xs font-semibold uppercase tracking-wide mb-2">
+              Poll length
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              <CustomSelect
+                name="pollDuration.days"
+                control={control}
+                placeholder="Days"
+                options={pollDaysOptions}
+                isSearchable={false}
+              />
+              <CustomSelect
+                name="pollDuration.hours"
+                control={control}
+                placeholder="Hours"
+                options={pollHoursOptions}
+                isSearchable={false}
+              />
+              <CustomSelect
+                name="pollDuration.minutes"
+                control={control}
+                placeholder="Minutes"
+                options={pollMinutesOptions}
+                isSearchable={false}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center justify-end mt-6 gap-4">

@@ -176,7 +176,7 @@ const Sidebar = () => {
               variant="titleTwo"
               className="truncate whitespace-nowrap text-grey_900"
             >
-              {profileData?.data?.displayName || "John Doe"}
+              {profileData?.data?.fullName || "John Doe"}
             </Typography>
           </div>
 

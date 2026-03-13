@@ -2205,3 +2205,30 @@ export const actions: Action[] = [
     ),
   },
 ];
+
+export const pollDaysOptions = [
+  { value: 0, label: "0 days" },
+  { value: 1, label: "1 day" },
+  { value: 2, label: "2 days" },
+  { value: 3, label: "3 days" },
+  { value: 4, label: "4 days" },
+  { value: 5, label: "5 days" },
+  { value: 6, label: "6 days" },
+  { value: 7, label: "7 days" },
+];
+export const pollHoursOptions = [
+  { value: 0, label: "0 hrs" },
+  { value: 1, label: "1 hr" },
+  { value: 2, label: "2 hrs" },
+  { value: 3, label: "3 hrs" },
+  { value: 6, label: "6 hrs" },
+  { value: 12, label: "12 hrs" },
+  { value: 18, label: "18 hrs" },
+  { value: 23, label: "23 hrs" },
+];
+export const pollMinutesOptions = [
+  { value: 0, label: "0 min" },
+  { value: 15, label: "15 min" },
+  { value: 30, label: "30 min" },
+  { value: 45, label: "45 min" },
+];

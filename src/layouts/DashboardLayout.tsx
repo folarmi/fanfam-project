@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/molecules/Sidebar";
@@ -25,7 +26,7 @@ const DashboardLayout = () => {
       {/* Right Suggestions Panel */}
       <aside className="hidden md:block md:w-[360px] shrink-0 px-8">
         <div className="sticky top-0 h-screen overflow-y-auto pt-20">
-          <p className="mb-4 text-sm font-medium text-grey_800">SUGGESTIONS</p>
+          {/* <p className="mb-4 text-sm font-medium text-grey_800">SUGGESTIONS</p> */}
 
           <div className="max-h-[calc(100vh-140px)] overflow-y-auto pr-1">
             <VerticalCarousel />
