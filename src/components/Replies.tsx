@@ -12,7 +12,7 @@ const Replies = ({
 }: ProfilePostProps) => {
   const contentItems: StoryPost[] = creatorContent || [];
   const postsWithReplies = contentItems?.filter(
-    (item) => item.meta.commentCount > 0
+    (item) => item.meta.commentCount > 0,
   );
 
   if (creatorContentIsLoading) {
@@ -26,9 +26,9 @@ const Replies = ({
             <Timeline
               showModal={false}
               toggleModal={() => {}}
-              profileName={item.creator.split("@")[0]}
+              profileName={item.creator?.name.split("@")[0]}
               avatar={defaultAvatar}
-              handle={`@${item.creator.split("@")[0]}`}
+              handle={`@${item.creator?.username.split("@")[0]}`}
               time={formatTimeAgo(item.createdDate)}
               paragraphOne={item.message}
               paragraphTwo=""

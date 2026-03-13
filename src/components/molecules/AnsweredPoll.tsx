@@ -14,7 +14,7 @@ type FormValues = {
 type AnsweredPollProps = {
   pollChoices: PollChoice[];
   /** publicId of the post — used to build the vote endpoint */
-  postId: string;
+  postId: string | undefined;
   /** publicId of the option the current user already voted for (from API) */
   userVote?: string;
 };
