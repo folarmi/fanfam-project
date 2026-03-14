@@ -60,7 +60,6 @@ import type {
   PromotionalCampaignType,
 } from "@/lib/types";
 import countryList from "react-select-country-list";
-import { Bookmark } from "lucide-react";
 import { CreatorIcon } from "@/components/svgs/Creator";
 import creatorOne from "@/assets/icons/creatorOne.svg";
 import creatorTwo from "@/assets/icons/creatorTwo.svg";
@@ -72,6 +71,7 @@ import { Link } from "react-router-dom";
 import BlueBorderedButton from "@/components/forms/BlueBorderedButton";
 import landingIconOne from "@/assets/icons/landingIconOne.svg";
 import landingIconTwo from "@/assets/icons/landingIconTwo.svg";
+import Collections from "@/components/svgs/Collections";
 
 export const landingPageMenu = [
   {
@@ -175,13 +175,13 @@ export const sideBarItems = [
   //   link: "/dashboard/messages",
   //   roles: ["CREATOR", "VIEWER"],
   // },
-  // {
-  //   id: 4,
-  //   name: "Collections",
-  //   image: (isActive: boolean) => <Collections active={isActive} />,
-  //   link: "/dashboard/collections",
-  //   roles: ["CREATOR", "VIEWER"],
-  // },
+  {
+    id: 4,
+    name: "Collections",
+    image: (isActive: boolean) => <Collections active={isActive} />,
+    link: "/dashboard/collections",
+    roles: ["CREATOR", "VIEWER"],
+  },
   // {
   //   id: 8,
   //   name: "Schedule",
@@ -210,15 +210,15 @@ export const sideBarItems = [
     link: "/dashboard/settings/account",
     roles: ["CREATOR", "VIEWER"],
   },
-  {
-    id: 10,
-    name: "Bookmarks",
-    image: (isActive: boolean) => (
-      <Bookmark color={isActive ? "#2599F6" : "#8D8E96"} />
-    ),
-    link: "/dashboard/bookmarks",
-    roles: ["CREATOR", "VIEWER"],
-  },
+  // {
+  //   id: 10,
+  //   name: "Bookmarks",
+  //   image: (isActive: boolean) => (
+  //     <Bookmark color={isActive ? "#2599F6" : "#8D8E96"} />
+  //   ),
+  //   link: "/dashboard/bookmarks",
+  //   roles: ["CREATOR", "VIEWER"],
+  // },
   {
     id: 9,
     name: "Become a Creator",
