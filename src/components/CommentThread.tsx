@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,43 +7,8 @@ import { useCustomMutation } from "@/hooks/apiCalls";
 import CommentBox from "@/components/CommentBox";
 import { transformReactions } from "@/lib/reaction";
 import { formatTimeAgo } from "@/utils/helperTwo";
-import type { StoryPost } from "@/lib/types";
+import type { ApiComment, DeleteButtonProps, StoryPost } from "@/lib/types";
 import ViewPost from "@/components/cards/ViewPost";
-import { toast } from "react-toastify";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export type ApiUserInfo = {
-  email: string;
-  name: string;
-  profilePic: string | null;
-  username: string;
-};
-
-export type ApiComment = {
-  publicId: string;
-  createdDate: string;
-  createdBy: string; // email of the author
-  userInfo: ApiUserInfo;
-  message: string;
-  replies: ApiComment[];
-  reactions: any[];
-  mediaFiles?: any[];
-};
-
-export function extractComments(raw: any): ApiComment[] {
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw;
-  if (Array.isArray(raw.comments)) return raw.comments;
-  if (raw.data) {
-    if (Array.isArray(raw.data)) return raw.data;
-    if (Array.isArray(raw.data.comments)) return raw.data.comments;
-  }
-  console.warn("[CommentThread] Unrecognised commentsData shape:", raw);
-  return [];
-}
-
-// ─── Delete button ────────────────────────────────────────────────────────────
 
 const TrashIcon = () => (
   <svg
@@ -64,13 +28,7 @@ const TrashIcon = () => (
   </svg>
 );
 
-type DeleteButtonProps = {
-  commentId: string;
-  onDeleted: () => void;
-};
-
 const DeleteButton = ({ commentId, onDeleted }: DeleteButtonProps) => {
-  const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
 
   const deleteMutation = useCustomMutation({
@@ -79,13 +37,7 @@ const DeleteButton = ({ commentId, onDeleted }: DeleteButtonProps) => {
     onSuccessCallback: () => {
       onDeleted();
     },
-    successMessage: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["GetContentsById"],
-        exact: false,
-      });
-      toast.success("Comment deleted successfully");
-    },
+    successMessage: () => "Comment deleted successfully",
     onError: () => {
       setConfirming(false);
     },

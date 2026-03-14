@@ -83,7 +83,7 @@ const Home = () => {
 
   const { data: getPollData, isLoading: getPollDataIsLoading } = useGetData({
     url: `contents?page=0&size=80`,
-    queryKey: ["GetContents"],
+    queryKey: ["GetPollData"],
   });
 
   console.log(getPollData);
@@ -112,15 +112,6 @@ const Home = () => {
   const toggleInterestModal = () => {
     setShowInterestModal(!showInterestModal);
   };
-
-  // const toggleIsEditingStoryModal = () => {
-  //   setIsEditingStory(!isEditingStory);
-  // };
-
-  // const handleFileUpload = (file: File) => {
-  //   setUploadedFile(file);
-  //   toggleIsEditingStoryModal();
-  // };
 
   const toggleTimelineHomeModal = () => {
     setShowMoreModal(!showMoreModal);

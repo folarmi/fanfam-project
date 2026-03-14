@@ -1,12 +1,12 @@
 import ViewPost from "@/components/cards/ViewPost";
-import { CommentThread, extractComments } from "@/components/CommentThread";
+import { CommentThread } from "@/components/CommentThread";
 import { Loader } from "@/components/molecules/Loader";
 import { useGetData } from "@/hooks/apiCalls";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { useAppSelector } from "@/lib/hook";
 import { transformReactions } from "@/lib/reaction";
 import type { RootState } from "@/lib/store";
-import { formatTimeAgo } from "@/utils/helperTwo";
+import { extractComments, formatTimeAgo } from "@/utils/helperTwo";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";

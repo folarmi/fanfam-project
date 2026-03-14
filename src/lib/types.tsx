@@ -600,3 +600,26 @@ export interface MediaGridProps {
   timeLineImage: MediaItem[];
   onMediaClick?: () => void;
 }
+
+export type ApiUserInfo = {
+  email: string;
+  name: string;
+  profilePic: string | null;
+  username: string;
+};
+
+export type ApiComment = {
+  publicId: string;
+  createdDate: string;
+  createdBy: string; // email of the author
+  userInfo: ApiUserInfo;
+  message: string;
+  replies: ApiComment[];
+  reactions: any[];
+  mediaFiles?: any[];
+};
+
+export type DeleteButtonProps = {
+  commentId: string;
+  onDeleted: () => void;
+};

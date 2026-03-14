@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
+  ApiComment,
   MediaType,
   PromotionCampaignQualifier,
   PromotionCampaignType,
@@ -226,3 +227,15 @@ export const REACTION_EMOJIS: Record<ReactionType, string> = {
   DISLIKE: "👎",
   LOL: "😂",
 };
+
+export function extractComments(raw: any): ApiComment[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (Array.isArray(raw.comments)) return raw.comments;
+  if (raw.data) {
+    if (Array.isArray(raw.data)) return raw.data;
+    if (Array.isArray(raw.data.comments)) return raw.data.comments;
+  }
+  console.warn("[CommentThread] Unrecognised commentsData shape:", raw);
+  return [];
+}

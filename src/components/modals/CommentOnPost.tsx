@@ -1,9 +1,10 @@
 import close from "@/assets/close.svg";
 import PostHeader from "@/components/molecules/PostHeader";
 import MediaGrid from "@/components/molecules/MediaGrid";
-import { CommentThread, extractComments } from "@/components/CommentThread";
+import { CommentThread } from "@/components/CommentThread";
 import type { MediaFile } from "@/lib/types";
 import { useGetData } from "@/hooks/apiCalls";
+import { extractComments } from "@/utils/helperTwo";
 
 type Prop = {
   publicId: string | undefined;
