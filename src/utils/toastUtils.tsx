@@ -38,20 +38,20 @@ export const showSuccessToast = (message: string) => {
 // Optional: Generic toast with custom type
 export const showToast = (
   message: string,
-  type: "success" | "error" | "info" | "warning"
+  type: "success" | "error" | "info" | "warning",
 ) => {
   const style =
     type === "success"
       ? successToastStyle
       : type === "error"
-      ? errorToastStyle
-      : /* default */ successToastStyle;
+        ? errorToastStyle
+        : /* default */ successToastStyle;
 
   toast[type](message, { style });
 };
 
 export const showErrorToast = (
-  message: string | string[] | Record<string, string[]>
+  message: string | string[] | Record<string, string[]>,
 ) => {
   if (typeof message === "string") {
     toast.error(message, {
@@ -74,7 +74,7 @@ export const showErrorToast = (
       </div>,
       {
         style: errorToastStyle,
-      }
+      },
     );
   } else if (typeof message === "object" && message !== null) {
     const errorMessages = Object.entries(message)
@@ -99,14 +99,14 @@ export const showErrorToast = (
       </div>,
       {
         style: errorToastStyle,
-      }
+      },
     );
   }
 };
 
 // utils/errorUtils.ts
 export const getApiErrors = (
-  error: any
+  error: any,
 ): string | string[] | Record<string, string[]> => {
   return (
     error?.response?.data?.data?.message ||

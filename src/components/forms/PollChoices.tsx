@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect, useRef } from "react";
 import {
   useController,
   type Control,
@@ -13,103 +15,260 @@ export type PollChoice = {
   lastModifiedBy?: string;
   createdDate?: string;
   lastModifiedDate?: string;
-  /** Populated by the API after votes exist */
-  voteCount?: number;
+  votes?: string[];
 };
 
-// ─── Shared base props ────────────────────────────────────────────────────────
+const ListIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <line x1="8" y1="6" x2="21" y2="6" />
+    <line x1="8" y1="12" x2="21" y2="12" />
+    <line x1="8" y1="18" x2="21" y2="18" />
+    <line x1="3" y1="6" x2="3.01" y2="6" />
+    <line x1="3" y1="12" x2="3.01" y2="12" />
+    <line x1="3" y1="18" x2="3.01" y2="18" />
+  </svg>
+);
 
-type BaseProps = {
+const ChartIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
+);
+
+type PollResultsProps = {
   pollChoices: PollChoice[];
-  className?: string;
-};
-
-// ─── Results view (no react-hook-form needed) ─────────────────────────────────
-
-type PollResultsProps = BaseProps & {
-  /** publicId the current user voted for — highlights their choice */
   userVote?: string;
-  totalVotes?: number;
+  totalVotes: number;
+  /** e.g. "4h 26min left" — pass undefined to hide */
+  timeLeft?: string;
+  className?: string;
 };
 
 const PollResults = ({
   pollChoices,
-  className = "",
   userVote,
-  totalVotes = 0,
+  totalVotes,
+  timeLeft,
+  className = "",
 }: PollResultsProps) => {
-  const winnerCount = Math.max(...pollChoices.map((c) => c.voteCount ?? 0));
+  const [view, setView] = useState<"list" | "chart">("list");
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chartRef = useRef<any>(null);
+
+  const voteCounts = pollChoices.map((c) => c.votes?.length ?? 0);
+  const winnerCount = Math.max(...voteCounts, 0);
+
+  const percentages = pollChoices.map((c) => {
+    const count = c.votes?.length ?? 0;
+    return totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+  });
+
+  // Build/destroy chart when switching to chart view
+  useEffect(() => {
+    if (view !== "chart" || !canvasRef.current) return;
+
+    // Dynamically import Chart.js to avoid SSR issues
+    import("chart.js/auto").then(({ default: Chart }) => {
+      if (chartRef.current) chartRef.current.destroy();
+
+      const labels = pollChoices.map((c, i) => c.choice || `Option ${i + 1}`);
+      const colors = pollChoices.map((c, i) => {
+        const optionValue = c.publicId ?? `option-${i}`;
+        return optionValue === userVote ? "#2599F6" : "#2599F6";
+      });
+
+      chartRef.current = new Chart(canvasRef.current!, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              data: percentages,
+              backgroundColor: colors,
+              borderRadius: 4,
+              borderSkipped: false,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: { label: (ctx) => ctx.parsed.y + "%" },
+            },
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 25,
+                callback: (v) => v + "%",
+                font: { size: 11 },
+                color: "#888",
+              },
+              grid: { color: "rgba(0,0,0,0.06)" },
+              border: { display: false },
+            },
+            x: {
+              ticks: {
+                font: { size: 12 },
+                color: "#888",
+                maxRotation: 0,
+                callback: function (_val, index) {
+                  const label = labels[index];
+                  return label.length > 10 ? label.slice(0, 10) + "…" : label;
+                },
+              },
+              grid: { display: false },
+              border: { display: false },
+            },
+          },
+        },
+      });
+    });
+
+    return () => {
+      chartRef.current?.destroy();
+      chartRef.current = null;
+    };
+  }, [view]);
 
   return (
     <div className={className}>
-      {pollChoices.map((item, index) => {
-        const optionValue = item?.publicId ?? `option-${index}`;
-        const votes = item?.voteCount ?? 0;
-        const pct = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
-        const isWinner = votes === winnerCount && winnerCount > 0;
-        const isUserChoice = optionValue === userVote;
-
-        return (
-          <div
-            key={optionValue}
-            className="relative mb-[10px] overflow-hidden rounded-full"
-            style={{
-              border: isUserChoice
-                ? "2px solid #0567B5"
-                : "1.5px solid #2599F6",
-            }}
-          >
-            {/* Animated fill bar */}
-            <div
-              className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
-              style={{
-                width: `${pct}%`,
-                background: isUserChoice
-                  ? "#93c5fd"
-                  : isWinner
-                    ? "#b3d9ff"
-                    : "#dbeeff",
-              }}
-            />
-
-            <div className="relative z-10 flex items-center justify-between px-4 py-[10px]">
-              <Typography
-                variant="p2"
-                className="text-grey_800"
-                style={{
-                  fontWeight: isWinner || isUserChoice ? 500 : 400,
-                  color: isUserChoice ? "#0567B5" : undefined,
-                }}
-              >
-                {item?.choice || `Option ${index + 1}`}
-                {isUserChoice && <span className="ml-1.5 text-xs">✓</span>}
-              </Typography>
-
-              <span
-                className="ml-3 min-w-[36px] text-right text-sm font-medium"
-                style={{ color: "#0567B5" }}
-              >
-                {pct}%
-              </span>
-            </div>
-          </div>
-        );
-      })}
-
-      {totalVotes > 0 && (
-        <p className="mt-1.5 text-xs text-grey_60">
+      {/* Header row — vote count + view toggle */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs text-grey_60">
           {totalVotes.toLocaleString()} vote{totalVotes !== 1 ? "s" : ""}
-        </p>
+          {timeLeft ? ` · ${timeLeft}` : ""}
+        </span>
+
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setView("list")}
+            className="p-1 rounded transition-colors"
+            style={{
+              color: view === "list" ? "#2599F6" : undefined,
+              background: view === "list" ? "#e8f4fe" : "transparent",
+            }}
+            aria-label="List view"
+          >
+            <ListIcon />
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("chart")}
+            className="p-1 rounded transition-colors"
+            style={{
+              color: view === "chart" ? "#2599F6" : undefined,
+              background: view === "chart" ? "#e8f4fe" : "transparent",
+            }}
+            aria-label="Chart view"
+          >
+            <ChartIcon />
+          </button>
+        </div>
+      </div>
+
+      {/* ── List view ── */}
+      {view === "list" && (
+        <div>
+          {pollChoices.map((item, index) => {
+            const optionValue = item?.publicId ?? `option-${index}`;
+            const pct = percentages[index];
+            const isWinner =
+              (item.votes?.length ?? 0) === winnerCount && winnerCount > 0;
+            const isUserChoice = optionValue === userVote;
+
+            return (
+              <div
+                key={optionValue}
+                className="flex items-center gap-2 mb-[10px]"
+              >
+                {/* Label — truncated, fixed width */}
+                <span
+                  className="text-sm truncate flex-shrink-0"
+                  style={{
+                    width: "160px",
+                    fontWeight: isWinner || isUserChoice ? 500 : 400,
+                    color: isUserChoice
+                      ? "#2599F6"
+                      : "var(--color-text-primary)",
+                  }}
+                >
+                  {item?.choice || `Option ${index + 1}`}
+                  {isUserChoice && <span className="ml-1 text-xs">✓</span>}
+                </span>
+
+                {/* Bar track */}
+                <div
+                  className="flex-1 h-[10px] rounded-full overflow-hidden"
+                  style={{ background: "#e8f4fe" }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${pct}%`,
+                      background: isUserChoice ? "#2599F6" : "#2599F6",
+                    }}
+                  />
+                </div>
+
+                {/* Percentage */}
+                <span
+                  className="text-xs font-medium text-right flex-shrink-0"
+                  style={{
+                    minWidth: "32px",
+                    color: "var(--color-text-secondary)",
+                  }}
+                >
+                  {pct}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── Chart view ── */}
+      {view === "chart" && (
+        <div style={{ position: "relative", width: "100%", height: "180px" }}>
+          <canvas ref={canvasRef} />
+        </div>
       )}
     </div>
   );
 };
 
-// ─── Voting view (controlled via react-hook-form) ─────────────────────────────
+// ─── Voting view ──────────────────────────────────────────────────────────────
 
-interface PollChoicesProps<T extends FieldValues> extends BaseProps {
+interface PollChoicesProps<T extends FieldValues> {
+  pollChoices: PollChoice[];
   name: Path<T>;
   control: Control<T>;
+  className?: string;
 }
 
 const PollChoices = <T extends FieldValues>({
@@ -128,7 +287,7 @@ const PollChoices = <T extends FieldValues>({
   });
 
   return (
-    <div className={`${className} mt-4`}>
+    <div className={className}>
       {pollChoices?.map((item, index) => {
         const optionValue = item?.publicId ?? `option-${index}`;
         const isSelected = value === optionValue;
