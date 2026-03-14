@@ -222,6 +222,7 @@ const Home = () => {
               profileName: data?.creator?.name || "Unknown User",
               time: formatTimeAgo(data?.createdDate),
               timeLineImage: data?.mediaFiles,
+              createdBy: data?.createdBy,
             }}
           />
         </Modal>

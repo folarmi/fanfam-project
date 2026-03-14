@@ -5,7 +5,7 @@ import "./App.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import { RoutePage } from "./utils/RoutePage";
 import QueryClientContextProvider from "./lib/QueryClientContextProvider";
-import { Bounce, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 // import { AuthProvider } from "./context/AuthContext";
 import StoreProvider from "./lib/StoreProvider";
 import { NotificationsProvider } from "./context/NotificationsContext";
@@ -23,13 +23,14 @@ function App() {
             </Router>
             <NotificationToast />
             <ToastContainer
-              position="top-center"
-              pauseOnHover
+              position="top-right"
+              autoClose={3000}
               hideProgressBar
-              transition={Bounce}
-              closeButton={false}
+              newestOnTop
               closeOnClick
-              autoClose={5000}
+              pauseOnHover
+              draggable
+              theme="light"
             />
             {/* </AuthProvider> */}
           </WebSocketProvider>

@@ -10,6 +10,7 @@ import { transformReactions } from "@/lib/reaction";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import type { StoryPost } from "@/lib/types";
 import ViewPost from "@/components/cards/ViewPost";
+import { toast } from "react-toastify";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -69,6 +70,7 @@ type DeleteButtonProps = {
 };
 
 const DeleteButton = ({ commentId, onDeleted }: DeleteButtonProps) => {
+  const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
 
   const deleteMutation = useCustomMutation({
@@ -77,7 +79,13 @@ const DeleteButton = ({ commentId, onDeleted }: DeleteButtonProps) => {
     onSuccessCallback: () => {
       onDeleted();
     },
-    successMessage: () => "Deleted successfully",
+    successMessage: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["GetContentsById"],
+        exact: false,
+      });
+      toast.success("Comment deleted successfully");
+    },
     onError: () => {
       setConfirming(false);
     },
