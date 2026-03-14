@@ -200,7 +200,6 @@ export interface PostCardProps {
   className?: string;
   commentslength?: number;
   pollChoices?: any[];
-  // ViewPost props folded in
   showModal?: boolean;
   toggleModal?: () => void;
   TimeLineModal?: React.ReactNode;

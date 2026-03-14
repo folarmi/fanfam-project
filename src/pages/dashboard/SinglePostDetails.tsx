@@ -1,4 +1,4 @@
-import ViewPost from "@/components/cards/ViewPost";
+import Postcard from "@/components/cards/Postcard";
 import { CommentThread } from "@/components/CommentThread";
 import { Loader } from "@/components/molecules/Loader";
 import { useGetData } from "@/hooks/apiCalls";
@@ -54,7 +54,7 @@ const SinglePostDetails = () => {
       ) : (
         <div>
           {/* Original post */}
-          <ViewPost
+          <Postcard
             publicId={data?.publicId}
             profileName={profileData?.data?.displayName}
             avatar={profileData?.data?.profilePic}

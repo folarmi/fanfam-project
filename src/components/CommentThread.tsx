@@ -8,7 +8,7 @@ import CommentBox from "@/components/CommentBox";
 import { transformReactions } from "@/lib/reaction";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import type { ApiComment, DeleteButtonProps, StoryPost } from "@/lib/types";
-import ViewPost from "@/components/cards/ViewPost";
+import Postcard from "./cards/Postcard";
 
 const TrashIcon = () => (
   <svg
@@ -127,7 +127,7 @@ const CommentItem = ({
 
   return (
     <div className={level > 0 ? "ml-6 border-l-2 border-grey_10 pl-4" : ""}>
-      <ViewPost
+      <Postcard
         publicId={comment.publicId}
         profileName={profileName}
         avatar={avatar}

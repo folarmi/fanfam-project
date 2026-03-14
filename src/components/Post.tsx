@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import Typography from "./forms/Typography";
 
@@ -10,11 +11,11 @@ import defaultAvatar from "../assets/defaultAvatar.svg";
 import Modal from "./modals/Modal";
 import CreateFolder from "./cards/CreateFolder";
 import PersonPostModal from "./modals/PersonPostModal";
-import ViewPost from "./cards/ViewPost";
 import { Loader } from "./molecules/Loader";
 import type { ProfilePostProps, StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import { transformReactions } from "@/lib/reaction";
+import Postcard from "./cards/Postcard";
 
 const Post = ({
   creatorContent,
@@ -128,7 +129,7 @@ const Post = ({
           {contentItems?.length > 0 ? (
             contentItems?.map((item) => (
               <div className="relative" key={item?.publicId}>
-                <ViewPost
+                <Postcard
                   profileName={getCreatorName(item?.creator)}
                   avatar={defaultAvatar}
                   handle={`@${getCreatorName(item?.creator)}`}

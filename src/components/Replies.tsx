@@ -1,10 +1,10 @@
-import Timeline from "./cards/ViewPost";
 import defaultAvatar from "../assets/defaultAvatar.svg";
 import type { ProfilePostProps, StoryPost } from "@/lib/types";
 import { Loader } from "./molecules/Loader";
 import { transformReactions } from "@/lib/reaction";
 import { formatTimeAgo } from "@/utils/helperTwo";
 import Typography from "./forms/Typography";
+import Postcard from "./cards/Postcard";
 
 const Replies = ({
   creatorContent,
@@ -23,7 +23,7 @@ const Replies = ({
       {postsWithReplies.length > 0 ? (
         postsWithReplies.map((item) => (
           <div className="relative" key={item.publicId}>
-            <Timeline
+            <Postcard
               showModal={false}
               toggleModal={() => {}}
               profileName={item.creator?.name.split("@")[0]}

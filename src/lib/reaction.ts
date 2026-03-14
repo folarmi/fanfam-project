@@ -5,7 +5,7 @@ export type ReactionType = "LIKE" | "DISLIKE" | "LOVE" | "LOL";
 export interface ReactionSummary {
   type: ReactionType;
   number: number;
-  createdBy: string[];
+  createdBy: string[]; // list of emails who reacted with this type
 }
 
 export const transformReactions = (
