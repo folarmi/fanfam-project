@@ -347,24 +347,24 @@ const Media = ({
 
   // Filter posts that have media files
   const mediaItems = contentItems?.filter(
-    (item) => item?.mediaFiles?.length > 0
+    (item) => item?.mediaFiles?.length > 0,
   );
 
   // Count media by type
   const photosCount = mediaItems?.reduce(
     (count, item) =>
       count + item.mediaFiles.filter((m) => m.mediaType === "PHOTO").length,
-    0
+    0,
   );
   const videosCount = mediaItems?.reduce(
     (count, item) =>
       count + item.mediaFiles.filter((m) => m.mediaType === "VIDEO").length,
-    0
+    0,
   );
   const audioCount = mediaItems?.reduce(
     (count, item) =>
       count + item.mediaFiles.filter((m) => m.mediaType === "AUDIO").length,
-    0
+    0,
   );
 
   // Update tab counts
@@ -394,7 +394,7 @@ const Media = ({
 
   // Get audio items
   const audioItems = filteredMedia?.filter((item) =>
-    item?.mediaFiles?.some((m) => m?.mediaType === "AUDIO")
+    item?.mediaFiles?.some((m) => m?.mediaType === "AUDIO"),
   );
 
   if (creatorContentIsLoading) {
@@ -726,8 +726,12 @@ const Media = ({
                   isMediaTabActive === "All"
                     ? item.mediaFiles.find((m: any) => m.mediaType !== "AUDIO")
                     : isMediaTabActive === "Photos"
-                    ? item.mediaFiles.find((m: any) => m.mediaType === "PHOTO")
-                    : item.mediaFiles.find((m: any) => m.mediaType === "VIDEO");
+                      ? item.mediaFiles.find(
+                          (m: any) => m.mediaType === "PHOTO",
+                        )
+                      : item.mediaFiles.find(
+                          (m: any) => m.mediaType === "VIDEO",
+                        );
 
                 if (!displayMedia) return null;
 
@@ -799,8 +803,8 @@ const Media = ({
                 isMediaTabActive === "All"
                   ? item.mediaFiles.find((m: any) => m.mediaType !== "AUDIO")
                   : isMediaTabActive === "Photos"
-                  ? item.mediaFiles.find((m: any) => m.mediaType === "PHOTO")
-                  : item.mediaFiles.find((m: any) => m.mediaType === "VIDEO");
+                    ? item.mediaFiles.find((m: any) => m.mediaType === "PHOTO")
+                    : item.mediaFiles.find((m: any) => m.mediaType === "VIDEO");
 
               if (!firstMedia) return null;
 

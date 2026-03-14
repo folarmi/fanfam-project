@@ -17,13 +17,13 @@ import {
 import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
 
-import ViewPost from "../../components/cards/ViewPost";
 import { InfiniteScroll } from "@/components/InfiniteScroll"; // Added import
 import { transformReactions } from "@/lib/reaction";
 import { CommentOnPost } from "@/components/modals/CommentOnPost";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CreatorLiveCard } from "@/components/cards/CreatorLiveCard";
 import { Loader } from "@/components/molecules/Loader";
+import Postcard from "@/components/cards/Postcard";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -163,8 +163,64 @@ const Home = () => {
     if (getCreatorContentIsLoading || getPollDataIsLoading) return <Loader />;
 
     return (
+      // <div className="relative" ref={postRef}>
+      //   <ViewPost
+      //     publicId={data?.publicId}
+      //     profileName={data?.creator?.name || "Unknown User"}
+      //     avatar={data?.creator?.profilePic}
+      //     handle={data?.creator?.username}
+      //     time={formatTimeAgo(data?.createdDate)}
+      //     paragraphOne={data?.message}
+      //     timeLineImage={data?.mediaFiles}
+      //     pollChoices={data?.pollChoices}
+      //     ifParagraph
+      //     showModal={showMoreModal === data?.publicId}
+      //     toggleModal={() =>
+      //       setShowMoreModal(
+      //         showMoreModal === data?.publicId ? null : data?.publicId,
+      //       )
+      //     }
+      //     onCommentClick={() => toggleShowCommentModal(data?.publicId)}
+      //     onCardClick={() => {
+      //       if (!data?.publicId) return;
+
+      //       toggleShowCommentModal(null);
+      //       navigate(`/dashboard/${data?.publicId}`);
+      //     }}
+      //     commentslength={data?.comments?.length}
+      //     TimeLineModal={
+      //       <TimeLineHomeModal
+      //         toggleTimelineHomeModal={toggleTimelineHomeModal}
+      //         publicId={data?.publicId}
+      //         createdBy={data?.createdBy}
+      //       />
+      //     }
+      //     reactionsData={transformReactions(data?.reactions)}
+      //   />
+
+      //   <Modal
+      //     show={showCommentModal === data?.publicId}
+      //     toggleModal={() => toggleShowCommentModal(null)}
+      //   >
+      //     <CommentOnPost
+      //       publicId={data?.publicId}
+      //       toggleModal={() => toggleShowCommentModal(null)}
+      //       data={{
+      //         id: data?.publicId,
+      //         message: data?.message,
+      //         avatar: data?.creator?.profilePic,
+      //         handle: data?.creator?.username,
+      //         profileName: data?.creator?.name || "Unknown User",
+      //         time: formatTimeAgo(data?.createdDate),
+      //         timeLineImage: data?.mediaFiles,
+      //         createdBy: data?.createdBy,
+      //       }}
+      //     />
+      //   </Modal>
+      // </div>
+
       <div className="relative" ref={postRef}>
-        <ViewPost
+        <Postcard
           publicId={data?.publicId}
           profileName={data?.creator?.name || "Unknown User"}
           avatar={data?.creator?.profilePic}
@@ -183,7 +239,6 @@ const Home = () => {
           onCommentClick={() => toggleShowCommentModal(data?.publicId)}
           onCardClick={() => {
             if (!data?.publicId) return;
-
             toggleShowCommentModal(null);
             navigate(`/dashboard/${data?.publicId}`);
           }}

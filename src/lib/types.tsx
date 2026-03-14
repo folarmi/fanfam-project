@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ComponentType } from "react";
 import { Client } from "@stomp/stompjs";
 
 export type UserRoleType = "CREATOR" | "VIEWER";
@@ -71,10 +70,9 @@ export interface Reaction {
 }
 
 export interface ReactionItem {
-  type: ReactionType;
-  icon: ComponentType<any>;
-  number?: number;
-  createdBy: string[];
+  type: string;
+  number: number;
+  createdBy: string[]; // was this already an array? make sure it is
 }
 
 // Live Reactions
