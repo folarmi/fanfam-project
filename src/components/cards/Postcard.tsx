@@ -442,7 +442,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 onMouseEnter={openPicker}
                 onMouseLeave={closePicker}
               >
-                {REACTIONS.map(({ type, emoji, label }) => (
+                {REACTIONS?.map(({ type, emoji, label }) => (
                   <button
                     key={type}
                     title={label}
