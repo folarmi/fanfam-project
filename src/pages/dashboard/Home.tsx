@@ -195,6 +195,8 @@ const Home = () => {
             />
           }
           reactionsData={transformReactions(data?.reactions)}
+          bookmarkers={data?.bookmarkers}
+          reposters={data?.reposters}
         />
 
         <Modal

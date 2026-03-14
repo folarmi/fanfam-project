@@ -205,6 +205,8 @@ export interface PostCardProps {
   TimeLineModal?: React.ReactNode;
   onCommentClick?: (e?: React.MouseEvent) => void;
   onCardClick?: (e?: React.MouseEvent) => void;
+  bookmarkers?: { email: string }[];
+  reposters?: { email: string }[];
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -228,6 +230,8 @@ const PostCard: React.FC<PostCardProps> = ({
   showModal,
   toggleModal,
   TimeLineModal,
+  bookmarkers = [],
+  reposters = [],
 }) => {
   const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -250,9 +254,10 @@ const PostCard: React.FC<PostCardProps> = ({
     0,
   );
 
-  // ── Bookmark / Repost ──────────────────────────────────────────
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isReposted, setIsReposted] = useState(false);
+  const isBookmarked =
+    bookmarkers?.some((b) => b.email === userObject?.email) ?? false;
+  const isReposted =
+    reposters?.some((r) => r.email === userObject?.email) ?? false;
 
   const saveMutation = useCustomMutation({
     endpoint: `contents/saves`,
@@ -262,18 +267,82 @@ const PostCard: React.FC<PostCardProps> = ({
   const handleBookmark = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!publicId) return;
-    setIsBookmarked((prev) => !prev);
+    // optimistic update
+    const allContentQueries = queryClient.getQueriesData<any>({
+      queryKey: ["GetContents"],
+    });
+    allContentQueries.forEach(([queryKey]) => {
+      queryClient.setQueryData(queryKey, (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            data: {
+              ...page.data,
+              content: page.data?.content?.map((post: any) => {
+                if (post?.publicId !== publicId) return post;
+                const already = post.bookmarkers?.some(
+                  (b: any) => b.email === userObject?.email,
+                );
+                return {
+                  ...post,
+                  bookmarkers: already
+                    ? post.bookmarkers.filter(
+                        (b: any) => b.email !== userObject?.email,
+                      )
+                    : [
+                        ...(post.bookmarkers ?? []),
+                        { email: userObject?.email },
+                      ],
+                };
+              }),
+            },
+          })),
+        };
+      });
+    });
     saveMutation.mutate({ contentPublicId: publicId, saveType: "BOOKMARK" });
   };
 
   const handleRepost = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!publicId) return;
-    setIsReposted((prev) => !prev);
+    // optimistic update
+    const allContentQueries = queryClient.getQueriesData<any>({
+      queryKey: ["GetContents"],
+    });
+    allContentQueries.forEach(([queryKey]) => {
+      queryClient.setQueryData(queryKey, (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            data: {
+              ...page.data,
+              content: page.data?.content?.map((post: any) => {
+                if (post?.publicId !== publicId) return post;
+                const already = post.reposters?.some(
+                  (r: any) => r.email === userObject?.email,
+                );
+                return {
+                  ...post,
+                  reposters: already
+                    ? post.reposters.filter(
+                        (r: any) => r.email !== userObject?.email,
+                      )
+                    : [...(post.reposters ?? []), { email: userObject?.email }],
+                };
+              }),
+            },
+          })),
+        };
+      });
+    });
     saveMutation.mutate({ contentPublicId: publicId, saveType: "REPOST" });
   };
 
-  // ── Reaction optimistic update ─────────────────────────────────
   const reactMutation = useCustomMutation({
     endpoint: `contents/reactions`,
     onSuccessCallback: () => {},

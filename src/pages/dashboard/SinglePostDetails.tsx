@@ -64,6 +64,8 @@ const SinglePostDetails = () => {
             timeLineImage={data?.data?.mediaFiles}
             ifParagraph
             reactionsData={transformReactions(data?.reactions)}
+            bookmarkers={data?.bookmarkers}
+            reposters={data?.reposters}
           />
 
           {/* Comment thread — compose box + all comments + inline reply boxes */}

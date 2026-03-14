@@ -129,6 +129,14 @@ export interface PollDuration {
   hours: number;
   minutes: number;
 }
+
+export interface BookMark {
+  email: string;
+  name: string;
+  profilePic: string;
+  username: string;
+}
+
 // export interface StoryPost {
 //   publicId: string;
 //   createdBy: string;
@@ -160,8 +168,8 @@ export interface StoryPost {
   reactions: Reaction[];
   viewers: string[];
   mentions: string[];
-  reposters: string[];
-  bookmarkers: string[];
+  reposters: { email: string }[];
+  bookmarkers: BookMark[];
   pollChoices?: PollChoice[];
   pollDuration?: PollDuration;
   meta: PostMeta;
