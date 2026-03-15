@@ -474,10 +474,13 @@ export type FCMNotificationPayload = {
   image: string;
 };
 
-export type ProfilePostProps = {
-  creatorContent: any;
+export interface ProfilePostProps {
+  creatorContent: StoryPost[];
   creatorContentIsLoading: boolean;
-};
+  fetchNextPage: () => void;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+}
 
 export interface LiveNotification {
   creatorId: string;

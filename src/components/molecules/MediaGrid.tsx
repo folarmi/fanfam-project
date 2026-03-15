@@ -305,7 +305,6 @@ import type { MediaGridProps } from "@/lib/types";
 
 const MediaGrid = ({ timeLineImage = [], onMediaClick }: MediaGridProps) => {
   const [lightbox, setLightbox] = useState<number | null>(null);
-  console.log(timeLineImage);
   if (!timeLineImage.length) return null;
 
   const shown = timeLineImage.slice(0, 6);
