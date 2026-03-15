@@ -249,10 +249,29 @@ export const useInfiniteGetData = ({
   enabled?: boolean;
   pageSize?: number;
 }) => {
+  // return useInfiniteQuery({
+  //   queryKey,
+  //   queryFn: async ({ pageParam = 0 }) => {
+  //     // Determine if url already has params
+  //     const separator = url.includes("?") ? "&" : "?";
+  //     const fullUrl = `${url}${separator}page=${pageParam}&size=${pageSize}`;
+  //     const response = await api.get(fullUrl);
+  //     return response?.data;
+  //   },
+  //   initialPageParam: 0,
+  //   getNextPageParam: (lastPage) => {
+  //     if (!lastPage?.data) return undefined;
+  //     const { last, number, totalPages } = lastPage.data;
+  //     return last || number + 1 >= totalPages ? undefined : number + 1;
+  //   },
+  //   enabled,
+  //   refetchOnWindowFocus: false,
+  //   retry: false,
+  // });
+
   return useInfiniteQuery({
     queryKey,
     queryFn: async ({ pageParam = 0 }) => {
-      // Determine if url already has params
       const separator = url.includes("?") ? "&" : "?";
       const fullUrl = `${url}${separator}page=${pageParam}&size=${pageSize}`;
       const response = await api.get(fullUrl);
@@ -265,6 +284,7 @@ export const useInfiniteGetData = ({
       return last || number + 1 >= totalPages ? undefined : number + 1;
     },
     enabled,
+    staleTime: 1000 * 60 * 2, // ← don't re-fetch if data is less than 2 min old
     refetchOnWindowFocus: false,
     retry: false,
   });

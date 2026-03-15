@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
 import SearchInput from "../../components/SearchInput";
@@ -17,7 +17,7 @@ import {
 import type { StoryPost } from "@/lib/types";
 import { formatTimeAgo } from "@/utils/helperTwo";
 
-import { InfiniteScroll } from "@/components/InfiniteScroll"; // Added import
+import { InfiniteScroll } from "@/components/InfiniteScroll";
 import { transformReactions } from "@/lib/reaction";
 import { CommentOnPost } from "@/components/modals/CommentOnPost";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -70,8 +70,8 @@ const Home = () => {
   const activeSearchTerm = debouncedSearchTerm;
 
   const {
-    data: getCreatorContent,
-    isLoading: getCreatorContentIsLoading,
+    data: getTimelineContent,
+    isLoading: getTimelineContentIsLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -80,6 +80,10 @@ const Home = () => {
     queryKey: ["GetContents", activeSearchTerm],
     pageSize: 20,
   });
+
+  const handleFetchNext = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const { data: getPollData, isLoading: getPollDataIsLoading } = useGetData({
     url: `contents?page=0&size=80`,
@@ -90,7 +94,7 @@ const Home = () => {
   // console.log(getPollData?.data?.content);
   // Flatten the pages for rendering
   const allPosts =
-    getCreatorContent?.pages?.flatMap((page: any) => page.data?.content) || [];
+    getTimelineContent?.pages?.flatMap((page: any) => page.data?.content) || [];
 
   const useRecordContentView = (contentId: string) => {
     return useCustomMutation({
@@ -160,7 +164,7 @@ const Home = () => {
       return () => observer.disconnect();
     }, [hasViewed, data?.publicId, data?.viewers, recordViewMutation]);
 
-    if (getCreatorContentIsLoading || getPollDataIsLoading) return <Loader />;
+    if (getTimelineContentIsLoading || getPollDataIsLoading) return <Loader />;
 
     return (
       <div className="relative" ref={postRef}>
@@ -262,14 +266,14 @@ const Home = () => {
             )}
           </div> */}
           <InfiniteScroll
-            onLoader={fetchNextPage}
+            onLoader={handleFetchNext}
             isLoading={isFetchingNextPage}
-            hasMore={hasNextPage || false}
-            endMessage={
-              <p className="text-center text-gray-500 py-4">
-                You have seen it all!
-              </p>
-            }
+            hasMore={hasNextPage ?? false}
+            // endMessage={
+            //   <p className="text-center text-gray-500 py-4">
+            //     You have seen it all!
+            //   </p>
+            // }
           >
             {allPosts.map((data: StoryPost) => (
               <PostItem key={data?.publicId} data={data} />
