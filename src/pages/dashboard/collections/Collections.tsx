@@ -1,17 +1,18 @@
 import { dummyCollectionData } from "@/data";
-import plus from "@/assets/icons/plus.svg";
+// import plus from "@/assets/icons/plus.svg";
 import { useState } from "react";
-import CollectionsSearchInput from "@components/forms/CollectionsSearchInput";
-import CollectionCard from "@components/cards/CollectionCard";
-import suggestionOne from "@/assets/suggestionOne.svg";
-import defaultLiveAvatar from "@/assets/defaultLiveAvatar.svg";
-import defaultAvatar from "@/assets/defaultAvatar.svg";
+// import CollectionsSearchInput from "@components/forms/CollectionsSearchInput";
+// import CollectionCard from "@components/cards/CollectionCard";
+// import suggestionOne from "@/assets/suggestionOne.svg";
+// import defaultLiveAvatar from "@/assets/defaultLiveAvatar.svg";
+// import defaultAvatar from "@/assets/defaultAvatar.svg";
 import Typography from "@components/forms/Typography";
-import moreIcon from "@/assets/icons/moreIcon.svg";
-import CollectionSortingOptionsModal from "@components/modals/CollectionSortingOptionsModal";
+// import moreIcon from "@/assets/icons/moreIcon.svg";
+// import CollectionSortingOptionsModal from "@components/modals/CollectionSortingOptionsModal";
 import Modal from "@components/modals/Modal";
 import CreateNewList from "@components/modals/CreateNewList";
 import leftArrow from "@/assets/icons/arrowLeft.svg";
+import { Bookmarks } from "../Bookmarks";
 
 const Collections = () => {
   const [collectionsTab] = useState([
@@ -28,20 +29,20 @@ const Collections = () => {
     { id: 1, name: "Users" },
     { id: 2, name: "Following" },
   ]);
-  const [isActiveTab, setIsActiveTab] = useState("User List");
+  const [isActiveTab, setIsActiveTab] = useState("Bookmarks");
   const [followingActiveTab, setFollowingActiveTab] = useState("User");
-  const [isOptionsShown, setIsOptionsShown] = useState(true);
-  const [blockUserModal, setBlockUserModal] = useState(false);
-  const [restrictUserModal, setRestrictUserModal] = useState(false);
-  const [reportUserModal, setReportUserModal] = useState(false);
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [addUserToList, setAddUserToList] = useState(false);
+  // const [isOptionsShown, setIsOptionsShown] = useState(true);
+  // const [blockUserModal, setBlockUserModal] = useState(false);
+  // const [restrictUserModal, setRestrictUserModal] = useState(false);
+  // const [reportUserModal, setReportUserModal] = useState(false);
+  // const [showMoreOptions, setShowMoreOptions] = useState(false);
+  // const [addUserToList, setAddUserToList] = useState(false);
   const [createNewList, setCreateNewList] = useState(false);
   const [showOnMobile, setShowOnMobile] = useState(false);
 
-  const toggleMoreOptions = () => {
-    setShowMoreOptions(!showMoreOptions);
-  };
+  // const toggleMoreOptions = () => {
+  //   setShowMoreOptions(!showMoreOptions);
+  // };
 
   const toggleCreateNewList = () => {
     setCreateNewList(!createNewList);
@@ -52,13 +53,13 @@ const Collections = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex ">
       <section
-        className={`mt-6 border-r border-r-grey_10 ${
+        className={`mt-6 border-r border-r-grey_10 w-[25%] ${
           showOnMobile ? "hidden" : ""
         }`}
       >
-        <div className="flex items-center px-4 mb-6">
+        {/* <div className="flex items-center px-4 mb-6">
           <CollectionsSearchInput placeholder="Search user list" />
 
           <div
@@ -69,7 +70,7 @@ const Collections = () => {
             <Typography variant="subtitle3">Create New List</Typography>
             <img src={plus} alt="plus" />
           </div>
-        </div>
+        </div> */}
 
         <div className="flex items-center w-full justify-between border-b border-grey_10 cursor-pointer">
           {collectionsTab?.map(({ id, name }) => {
@@ -94,79 +95,87 @@ const Collections = () => {
           })}
         </div>
 
-        {dummyCollectionData?.map(
-          ({ id, folderName, noOfPosts, noOfUsers }) => {
-            return (
-              <div
-                key={id}
-                onClick={toggleMobileView}
-                className="flex items-center justify-between py-[14px] px-4 border-b border-grey_10"
-              >
-                <section>
-                  <Typography variant="titleTwo" className="text-grey_900 pb-1">
-                    {folderName}
-                  </Typography>
-                  <Typography variant="p2" className="text-grey_400">
-                    {noOfUsers}
-                  </Typography>
-                </section>
+        {isActiveTab === "User List" && (
+          <>
+            {dummyCollectionData?.map(({ id, folderName, noOfUsers }) => {
+              return (
+                <div
+                  key={id}
+                  onClick={toggleMobileView}
+                  className="flex items-center justify-between py-[14px] px-4 border-b border-grey_10"
+                >
+                  <section>
+                    <Typography
+                      variant="titleTwo"
+                      className="text-grey_900 pb-1"
+                    >
+                      {folderName}
+                    </Typography>
+                    <Typography variant="p2" className="text-grey_400">
+                      {noOfUsers}
+                    </Typography>
+                  </section>
 
-                <Typography variant="p2" className="text-grey_400">
+                  {/* <Typography variant="p2" className="text-grey_400">
                   {noOfPosts}
-                </Typography>
-              </div>
-            );
-          }
+                </Typography> */}
+                </div>
+              );
+            })}
+          </>
         )}
       </section>
 
-      <section
-        className={`${
-          showOnMobile ? "w-full" : "hidden md:block md:w-[632px]"
-        }`}
-      >
-        <div className="flex items-center">
-          <img
-            src={leftArrow}
-            alt="leftArrow"
-            className="md:hidden ml-4"
-            // onClick={toggleView}
-          />
-          <Typography
-            variant="titleOne"
-            className="my-[30px] text-grey_900 pl-1 md:pl-4"
+      <section className="w-[60%]">
+        {isActiveTab === "User List" && (
+          <section
+            className={`${
+              showOnMobile ? "w-full " : "hidden md:block md:w-[632px] "
+            }`}
           >
-            Following
-          </Typography>
-        </div>
-        <div className="flex items-center  w-full justify-between border-b border-grey_10">
-          {followingTabs?.map(({ id, name }) => {
-            return (
-              <div
-                key={id}
-                onClick={() => setFollowingActiveTab(name)}
-                className={`w-1/2 cursor-pointer pb-1 ${
-                  followingActiveTab === name
-                    ? "border-b-2 border-b-grey_800"
-                    : ""
-                }`}
+            <div className="flex items-center ">
+              <img
+                src={leftArrow}
+                alt="leftArrow"
+                className="md:hidden ml-4"
+                // onClick={toggleView}
+              />
+              <Typography
+                variant="titleOne"
+                className="my-[30px] text-grey_900 pl-1 md:pl-4"
               >
-                <Typography
-                  className={`text-center ${
-                    followingActiveTab === name
-                      ? "text-grey_800"
-                      : "text-grey_500"
-                  }`}
-                  variant="subtitle3"
-                >
-                  {name}
-                </Typography>
-              </div>
-            );
-          })}
-        </div>
+                Following
+              </Typography>
+            </div>
 
-        <div className="w-full flex justify-center items-center">
+            <div className="flex items-center  w-full justify-between border-b border-grey_10">
+              {followingTabs?.map(({ id, name }) => {
+                return (
+                  <div
+                    key={id}
+                    onClick={() => setFollowingActiveTab(name)}
+                    className={`w-1/2 cursor-pointer pb-1 ${
+                      followingActiveTab === name
+                        ? "border-b-2 border-b-grey_800"
+                        : ""
+                    }`}
+                  >
+                    <Typography
+                      className={`text-center ${
+                        followingActiveTab === name
+                          ? "text-grey_800"
+                          : "text-grey_500"
+                      }`}
+                      variant="subtitle3"
+                    >
+                      {name}
+                    </Typography>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* <div className="w-full flex justify-center items-center">
           <CollectionsSearchInput
             className="m-4 w-full"
             placeholder="Search user"
@@ -183,9 +192,9 @@ const Collections = () => {
               <CollectionSortingOptionsModal />
             </div>
           )}
-        </div>
+        </div> */}
 
-        <div className="flex flex-wrap justify-center md:justify-start w-full">
+            {/* <div className="flex flex-wrap justify-center md:justify-start w-full">
           <CollectionCard
             profileName="Priscilia yummy"
             tag="@yummychill54"
@@ -233,7 +242,15 @@ const Collections = () => {
             setIsOptionsShown={setIsOptionsShown}
             isOptionsShown={isOptionsShown}
           />
-        </div>
+        </div> */}
+          </section>
+        )}
+
+        {isActiveTab === "Bookmarks" && (
+          <section>
+            <Bookmarks />
+          </section>
+        )}
       </section>
 
       {

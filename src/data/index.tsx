@@ -382,48 +382,48 @@ export const dummyCollectionData = [
     noOfUsers: "8 users",
     noOfPosts: "56 posts",
   },
-  {
-    id: 2,
-    folderName: "Following",
-    noOfUsers: "5 users",
-    noOfPosts: "56 posts",
-  },
-  {
-    id: 3,
-    folderName: "Restricted",
-    noOfUsers: "8 users",
-    noOfPosts: "56 posts",
-  },
-  {
-    id: 4,
-    folderName: "Blocked",
-    noOfUsers: "8 users",
-    noOfPosts: "56 posts",
-  },
-  {
-    id: 5,
-    folderName: "Friends",
-    noOfUsers: "8 users",
-    noOfPosts: "56 posts",
-  },
-  {
-    id: 6,
-    folderName: "My people",
-    noOfUsers: "8 users",
-    noOfPosts: "56 posts",
-  },
-  {
-    id: 7,
-    folderName: "Following",
-    noOfUsers: "5 users",
-    noOfPosts: "56 posts",
-  },
-  {
-    id: 8,
-    folderName: "Following",
-    noOfUsers: "5 users",
-    noOfPosts: "56 posts",
-  },
+  // {
+  //   id: 2,
+  //   folderName: "Following",
+  //   noOfUsers: "5 users",
+  //   noOfPosts: "56 posts",
+  // },
+  // {
+  //   id: 3,
+  //   folderName: "Restricted",
+  //   noOfUsers: "8 users",
+  //   noOfPosts: "56 posts",
+  // },
+  // {
+  //   id: 4,
+  //   folderName: "Blocked",
+  //   noOfUsers: "8 users",
+  //   noOfPosts: "56 posts",
+  // },
+  // {
+  //   id: 5,
+  //   folderName: "Friends",
+  //   noOfUsers: "8 users",
+  //   noOfPosts: "56 posts",
+  // },
+  // {
+  //   id: 6,
+  //   folderName: "My people",
+  //   noOfUsers: "8 users",
+  //   noOfPosts: "56 posts",
+  // },
+  // {
+  //   id: 7,
+  //   folderName: "Following",
+  //   noOfUsers: "5 users",
+  //   noOfPosts: "56 posts",
+  // },
+  // {
+  //   id: 8,
+  //   folderName: "Following",
+  //   noOfUsers: "5 users",
+  //   noOfPosts: "56 posts",
+  // },
 ];
 
 export const collectionsOptions = [

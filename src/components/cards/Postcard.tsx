@@ -207,6 +207,8 @@ export interface PostCardProps {
   onCardClick?: (e?: React.MouseEvent) => void;
   bookmarkers?: { email: string }[];
   reposters?: { email: string }[];
+  isAlreadyBookmarked?: boolean; // ← override for when bookmarkers array isn't available
+  isAlreadyReposted?: boolean;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -232,6 +234,8 @@ const PostCard: React.FC<PostCardProps> = ({
   TimeLineModal,
   bookmarkers = [],
   reposters = [],
+  isAlreadyBookmarked,
+  isAlreadyReposted,
 }) => {
   const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -255,22 +259,34 @@ const PostCard: React.FC<PostCardProps> = ({
   );
 
   const isBookmarked =
-    bookmarkers?.some((b) => b.email === userObject?.email) ?? false;
+    isAlreadyBookmarked ?? // explicit override wins
+    bookmarkers?.some((b) => b.email === userObject?.email) ?? // derive from array
+    false; // fallback
+
   const isReposted =
-    reposters?.some((r) => r.email === userObject?.email) ?? false;
+    isAlreadyReposted ??
+    reposters?.some((r) => r.email === userObject?.email) ??
+    false;
 
   const saveMutation = useCustomMutation({
     endpoint: `contents/saves`,
-    onSuccessCallback: () => {},
+    onSuccessCallback: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["GetContents"],
+        exact: false,
+      });
+    },
   });
 
   const handleBookmark = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!publicId) return;
-    // optimistic update
+
+    // Optimistically update ALL GetContents cache variants
     const allContentQueries = queryClient.getQueriesData<any>({
       queryKey: ["GetContents"],
     });
+
     allContentQueries.forEach(([queryKey]) => {
       queryClient.setQueryData(queryKey, (oldData: any) => {
         if (!oldData?.pages) return oldData;
@@ -302,7 +318,47 @@ const PostCard: React.FC<PostCardProps> = ({
         };
       });
     });
-    saveMutation.mutate({ contentPublicId: publicId, saveType: "BOOKMARK" });
+
+    // Also optimistically remove from bookmarks-specific cache
+    const allBookmarkQueries = queryClient.getQueriesData<any>({
+      queryKey: ["GetUserBookmarks"],
+    });
+
+    allBookmarkQueries.forEach(([queryKey]) => {
+      queryClient.setQueryData(queryKey, (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            data: {
+              ...page.data,
+              // Remove the post entirely from bookmarks feed
+              content: page.data?.content?.filter(
+                (post: any) => post?.publicId !== publicId,
+              ),
+            },
+          })),
+        };
+      });
+    });
+
+    saveMutation.mutate(
+      { contentPublicId: publicId, saveType: "BOOKMARK" },
+      {
+        onSuccess: () => {
+          // Invalidate both so next focus/mount gets fresh data
+          queryClient.invalidateQueries({
+            queryKey: ["GetContents"],
+            exact: false,
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["GetUserBookmarks"],
+            exact: false,
+          });
+        },
+      },
+    );
   };
 
   const handleRepost = (e: React.MouseEvent) => {
