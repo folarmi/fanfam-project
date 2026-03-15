@@ -13,8 +13,19 @@ import Modal from "@components/modals/Modal";
 import CreateNewList from "@components/modals/CreateNewList";
 import leftArrow from "@/assets/icons/arrowLeft.svg";
 import { Bookmarks } from "../Bookmarks";
+import { useAppSelector } from "@/lib/hook";
+import type { RootState } from "@/lib/store";
+import { useGetData } from "@/hooks/apiCalls";
+import { Loader } from "@/components/molecules/Loader";
+import EmptyState from "@/components/molecules/EmptyState";
+import type { SubscriberProfile } from "@/lib/types";
+import SubscribedCard from "@/components/cards/SubscribedCard";
+import { convertToHumanReadableDate } from "@/utils/helper";
 
 const Collections = () => {
+  const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const isCreator = userObject?.role === "CREATOR";
+
   const [collectionsTab] = useState([
     {
       id: 1,
@@ -26,19 +37,25 @@ const Collections = () => {
     },
   ]);
   const [followingTabs] = useState([
-    { id: 1, name: "Users" },
+    { id: 1, name: "Subscribers" },
     { id: 2, name: "Following" },
   ]);
-  const [isActiveTab, setIsActiveTab] = useState("Bookmarks");
-  const [followingActiveTab, setFollowingActiveTab] = useState("User");
+  const [isActiveTab, setIsActiveTab] = useState("User List");
+  const [createNewList, setCreateNewList] = useState(false);
+  const [showOnMobile, setShowOnMobile] = useState(false);
+  const [followingActiveTab, setFollowingActiveTab] = useState(
+    isCreator ? "Subscribers" : "Following",
+  );
+
+  const visibleTabs = isCreator
+    ? followingTabs
+    : followingTabs.filter((tab) => tab.name === "Following");
   // const [isOptionsShown, setIsOptionsShown] = useState(true);
   // const [blockUserModal, setBlockUserModal] = useState(false);
   // const [restrictUserModal, setRestrictUserModal] = useState(false);
   // const [reportUserModal, setReportUserModal] = useState(false);
   // const [showMoreOptions, setShowMoreOptions] = useState(false);
   // const [addUserToList, setAddUserToList] = useState(false);
-  const [createNewList, setCreateNewList] = useState(false);
-  const [showOnMobile, setShowOnMobile] = useState(false);
 
   // const toggleMoreOptions = () => {
   //   setShowMoreOptions(!showMoreOptions);
@@ -51,6 +68,27 @@ const Collections = () => {
   const toggleMobileView = () => {
     setShowOnMobile(!showOnMobile);
   };
+
+  const {
+    data: getCreatorSubscriptions,
+    isLoading: getCreatorSubscriptionsIsLoading,
+  } = useGetData({
+    url: `subscriptions/creator/${userObject?.usid}/subscribers?page=0&size=20`,
+    queryKey: ["GetSubscriptions"],
+    enabled: isCreator,
+  });
+
+  const {
+    data: getViewerSubscriptions,
+    isLoading: getViewerSubscriptionsIsLoading,
+  } = useGetData({
+    url: `subscriptions?page=0&size=20&subscriberEmail=${userObject?.email}`,
+    queryKey: ["GetSubscriptionsForViewer"],
+    // enabled: !isCreator,
+  });
+
+  const isLoading =
+    getCreatorSubscriptionsIsLoading || getViewerSubscriptionsIsLoading;
 
   return (
     <div className="flex ">
@@ -140,25 +178,17 @@ const Collections = () => {
                 className="md:hidden ml-4"
                 // onClick={toggleView}
               />
-              <Typography
-                variant="titleOne"
-                className="my-[30px] text-grey_900 pl-1 md:pl-4"
-              >
-                Following
-              </Typography>
             </div>
 
-            <div className="flex items-center  w-full justify-between border-b border-grey_10">
-              {followingTabs?.map(({ id, name }) => {
-                return (
+            <div className="">
+              <div className="mt-7 flex items-center w-full justify-between border-b border-grey_10">
+                {visibleTabs.map(({ id, name }) => (
                   <div
                     key={id}
                     onClick={() => setFollowingActiveTab(name)}
-                    className={`w-1/2 cursor-pointer pb-1 ${
-                      followingActiveTab === name
-                        ? "border-b-2 border-b-grey_800"
-                        : ""
-                    }`}
+                    className={`cursor-pointer pb-1 ${
+                      visibleTabs.length === 1 ? "w-full" : "w-1/2"
+                    } ${followingActiveTab === name ? "border-b-2 border-b-grey_800" : ""}`}
                   >
                     <Typography
                       className={`text-center ${
@@ -171,8 +201,84 @@ const Collections = () => {
                       {name}
                     </Typography>
                   </div>
-                );
-              })}
+                ))}
+              </div>
+
+              {isLoading ? (
+                <Loader />
+              ) : (
+                <>
+                  {/* Users tab — who is subscribed to this creator */}
+                  {followingActiveTab === "Subscribers" && isCreator && (
+                    <>
+                      {getCreatorSubscriptionsIsLoading ? (
+                        <Loader />
+                      ) : getCreatorSubscriptions?.data?.content?.length ===
+                        0 ? (
+                        <EmptyState text="No subscribers yet" />
+                      ) : (
+                        <div className="mt-6 flex flex-wrap gap-4">
+                          {getCreatorSubscriptions?.data?.content?.map(
+                            (item: SubscriberProfile) => (
+                              <SubscribedCard
+                                key={item?.publicId}
+                                img={item?.subscriber?.profileImageUrl}
+                                userName={item?.subscriber?.username || "N/A"}
+                                tag={item?.subscriber?.displayName || "N/A"}
+                                expiryStatus={`Expires ${convertToHumanReadableDate(item?.endDate)}`}
+                                buttonText={
+                                  item?.fee
+                                    ? `$${item.fee} per month`
+                                    : "FOR FREE"
+                                }
+                                freeSub
+                                profileName={
+                                  item?.subscriber?.fullName || "Unknown User"
+                                }
+                              />
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Following tab — who this user (creator or viewer) follows */}
+                  {followingActiveTab === "Following" && (
+                    <>
+                      {getViewerSubscriptionsIsLoading ? (
+                        <Loader />
+                      ) : getViewerSubscriptions?.data?.content?.length ===
+                        0 ? (
+                        <EmptyState text="Not following anyone yet" />
+                      ) : (
+                        <div className="mt-6 flex flex-wrap gap-4">
+                          {getViewerSubscriptions?.data?.content?.map(
+                            (item: SubscriberProfile) => (
+                              <SubscribedCard
+                                key={item?.publicId}
+                                img={item?.creator?.profileImageUrl}
+                                userName={item?.creator?.username || "N/A"}
+                                tag={item?.creator?.displayName || "N/A"}
+                                expiryStatus={`Expires ${convertToHumanReadableDate(item?.endDate)}`}
+                                buttonText={
+                                  item?.fee
+                                    ? `$${item.fee} per month`
+                                    : "FOR FREE"
+                                }
+                                freeSub
+                                profileName={
+                                  item?.creator?.fullName || "Unknown User"
+                                }
+                              />
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
             </div>
 
             {/* <div className="w-full flex justify-center items-center">

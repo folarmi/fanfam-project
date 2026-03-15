@@ -15,12 +15,6 @@ const Bookmarks = () => {
     null,
   );
 
-  // const { data: getAllBookMarks, isLoading: getAllBookMarksIsLoading } =
-  //   useGetData({
-  //     url: `contents/saves?saveType=BOOKMARK&createdBy=${userObject?.email}&page=0&size=20&sort=desc`,
-  //     queryKey: ["GetUserBookmarks"],
-  //   });
-
   const {
     data: getAllBookMarksInfinite,
     isLoading: getAllBookMarksIsLoadingInfinite,
