@@ -44,19 +44,12 @@ const Bookmarks = () => {
 
   return (
     <div>
-      {getAllBookMarksIsLoadingInfinite ? (
+      {/* {getAllBookMarksIsLoadingInfinite ? ( */}
+      {true ? (
         <Loader />
       ) : allBookMarks?.length === 0 ? (
         <EmptyState text="No bookmarks yet" />
       ) : (
-        // allBookMarks?.map((item: any) => {
-        //   return (
-        //     <div key={item.usid}>
-        //       <p>{item.fullName}</p>
-        //     </div>
-        //   );
-        // })
-
         <InfiniteScroll
           onLoader={handleFetchNext}
           isLoading={isFetchingNextPage}
