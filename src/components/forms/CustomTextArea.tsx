@@ -111,7 +111,7 @@ const CustomTextArea = ({
         const borderColor = error
           ? "border-red-400"
           : isFocused
-            ? "border-blue_20"
+            ? "border-primary"
             : "border-grey_10";
 
         return (

@@ -44,8 +44,7 @@ const Bookmarks = () => {
 
   return (
     <div>
-      {/* {getAllBookMarksIsLoadingInfinite ? ( */}
-      {true ? (
+      {getAllBookMarksIsLoadingInfinite ? (
         <Loader />
       ) : allBookMarks?.length === 0 ? (
         <EmptyState text="No bookmarks yet" />
