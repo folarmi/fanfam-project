@@ -1,7 +1,7 @@
 import { useAppSelector } from "../../../lib/hook";
 import type { RootState } from "../../../lib/store";
 import { useState } from "react";
-import SearchInput from "../../../components/SearchInput";
+// import SearchInput from "../../../components/SearchInput";
 import Typography from "../../../components/forms/Typography";
 import Post from "../../../components/Post";
 import Replies from "../../../components/Replies";
@@ -66,7 +66,7 @@ const Profile = () => {
   const shouldTruncate = bio.length > MAX_LENGTH;
   const visibleBio = isExpanded ? bio : bio.slice(0, MAX_LENGTH);
 
-  const test = () => {};
+  // const test = () => {};
 
   return (
     <>
@@ -74,12 +74,12 @@ const Profile = () => {
         <Loader />
       ) : (
         <div>
-          <SearchInput
+          {/* <SearchInput
             ifBlur={false}
             onSearch={test}
             onSearchChange={test}
             searchTerm=""
-          />
+          /> */}
           <div className="w-full relative">
             <ProfileHeader
               coverImage={profileData?.data?.coverImageUrl}
