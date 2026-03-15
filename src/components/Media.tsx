@@ -1019,7 +1019,6 @@
 //         allMediaUrls.length === 0 && <VideoMedia />} */
 // }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
 import Typography from "./forms/Typography";
 // import filter from "../assets/icons/filter.svg";
