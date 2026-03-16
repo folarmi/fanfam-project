@@ -42,8 +42,8 @@ const AnsweredPoll = ({
   const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
 
-  // const currentUserEmail = userObject?.email ?? userObject?.usid ?? "";
-  const currentUserEmail = "excessjunior@gmail.com";
+  const currentUserEmail = userObject?.email ?? userObject?.usid ?? "";
+  // const currentUserEmail = "excessjunior@gmail.com";
 
   const userVotedChoice = pollChoices.find((choice) =>
     choice.votes?.includes(currentUserEmail),

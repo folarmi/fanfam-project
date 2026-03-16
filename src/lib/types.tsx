@@ -174,6 +174,7 @@ export interface StoryPost {
   pollDuration?: PollDuration;
   meta: PostMeta;
   replies: StoryPost[];
+  content?: any;
 }
 
 export interface PostComment {
@@ -358,6 +359,7 @@ export interface CreatorInfo {
   websiteUrl: string;
   displayName: string;
   coverImageUrl: string;
+  profileImageUrl?: string;
 }
 
 export interface SubscriberInfo {
@@ -373,6 +375,7 @@ export interface SubscriberInfo {
   bio: string;
   username: string;
   displayName: string;
+  profileImageUrl?: string;
 }
 
 export interface SubscriberProfile {

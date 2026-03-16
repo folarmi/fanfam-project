@@ -46,7 +46,10 @@ const EditProfile = () => {
         };
         delete formValues?.creatorProfile;
         delete formValues?.profilePic;
+
+        console.log("formValues being sent:", formValues);
         updateCreatorProfileMutation.mutate(formValues);
+
         return data?.message || "File uploaded successfully!";
       },
       errorToast: (error: any) =>
@@ -130,7 +133,8 @@ const EditProfile = () => {
     endpoint: `profile/update-user`,
     method: "put",
     successMessage: () => "User Profile updated successfully",
-    onSuccessCallback: () => {
+    onSuccessCallback: (data) => {
+      console.log("on update profile", data);
       queryClient.invalidateQueries({
         queryKey: ["viewProfile"],
         exact: false,

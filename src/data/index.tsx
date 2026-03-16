@@ -378,7 +378,7 @@ export const notificationSampleData = [
 export const dummyCollectionData = [
   {
     id: 1,
-    folderName: "Fans",
+    folderName: "Community",
     noOfUsers: "8 users",
     noOfPosts: "56 posts",
   },
@@ -1008,12 +1008,12 @@ export const privacyAndSafety = [
 ];
 
 export const subscriptionMenu = [
-  {
-    id: 9,
-    name: "Subscribed",
-    path: "/dashboard/account/subscribed",
-    isViewer: true,
-  },
+  // {
+  //   id: 9,
+  //   name: "Subscribed",
+  //   path: "/dashboard/account/subscribed",
+  //   isViewer: true,
+  // },
   // {
   //   id: 1,
   //   name: "Cards",

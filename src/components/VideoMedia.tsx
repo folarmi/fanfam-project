@@ -1,5 +1,4 @@
 import videoMediaDefault from "../assets/videoMediaDefault.svg";
-import Timeline from "./cards/ViewPost";
 import defaultAvatar from "../assets/defaultAvatar.svg";
 import Postcard from "./cards/Postcard";
 
@@ -29,7 +28,7 @@ const VideoMedia = () => {
         //   setShowMoreModal={setShowMoreModalTwo}
         //   showMoreModal={showMoreModalTwo}
       />
-      <Timeline
+      <Postcard
         showModal={false}
         toggleModal={() => {}}
         profileName="Priscilia yummy"
