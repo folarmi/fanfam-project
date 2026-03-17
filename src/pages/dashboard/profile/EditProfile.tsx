@@ -356,13 +356,13 @@ const EditProfile = () => {
                   },
                 }}
               />
-
+              {/* 
               <CustomInput
                 label="Website"
                 name="website"
                 control={control}
                 placeholder="https://"
-              />
+              /> */}
 
               <CustomInput
                 label="Residence"
