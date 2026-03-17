@@ -57,7 +57,7 @@ const CommentBox = ({
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
 
   const [isRecorderOpen, setIsRecorderOpen] = useState(false);
-  const [isPostToBeScheduled, setIsPostToBeScheduled] = useState(true);
+  const [isPostToBeScheduled, setIsPostToBeScheduled] = useState(false);
 
   const {
     uploadFiles,

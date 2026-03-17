@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
-import SearchInput from "../../components/SearchInput";
+// import SearchInput from "../../components/SearchInput";
 import CommentBox from "../../components/CommentBox";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
@@ -97,27 +97,27 @@ const Home = () => {
     setShowInterestModal(!showInterestModal);
   };
 
-  const handleSearchChange = (value: string) => {
-    setLocalSearchTerm(value);
-  };
+  // const handleSearchChange = (value: string) => {
+  //   setLocalSearchTerm(value);
+  // };
 
-  const handleSearch = (value: string) => {
-    // immediate trigger on Enter/Click
-    setLocalSearchTerm(value);
-    setDebouncedSearchTerm(value);
-    setSearchParams(value ? { search: value } : {}, { replace: false });
-  };
+  // const handleSearch = (value: string) => {
+  //   // immediate trigger on Enter/Click
+  //   setLocalSearchTerm(value);
+  //   setDebouncedSearchTerm(value);
+  //   setSearchParams(value ? { search: value } : {}, { replace: false });
+  // };
 
   return (
     <>
       <div className="">
         <>
-          <SearchInput
+          {/* <SearchInput
             searchTerm={localSearchTerm}
             onSearchChange={handleSearchChange}
             onSearch={handleSearch}
             placeholder="Search..."
-          />
+          /> */}
           {!isCreator && <CreatorLiveCard />}
 
           {isCreator && (
