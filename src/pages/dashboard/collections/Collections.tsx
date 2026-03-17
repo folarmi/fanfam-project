@@ -135,7 +135,7 @@ const Collections = () => {
 
         {isActiveTab === "User List" && (
           <>
-            {dummyCollectionData?.map(({ id, folderName, noOfUsers }) => {
+            {dummyCollectionData?.map(({ id, folderName }) => {
               return (
                 <div
                   key={id}
@@ -149,9 +149,9 @@ const Collections = () => {
                     >
                       {folderName}
                     </Typography>
-                    <Typography variant="p2" className="text-grey_400">
+                    {/* <Typography variant="p2" className="text-grey_400">
                       {noOfUsers}
-                    </Typography>
+                    </Typography> */}
                   </section>
 
                   {/* <Typography variant="p2" className="text-grey_400">

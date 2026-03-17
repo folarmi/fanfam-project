@@ -8,6 +8,7 @@ import {
   type PollChoice,
 } from "../forms/PollChoices";
 import { useCustomMutation } from "@/hooks/apiCalls";
+import { showErrorToast } from "@/utils/toastUtils";
 
 type FormValues = {
   selectedPollChoice: string;
@@ -78,7 +79,9 @@ const AnsweredPoll = ({
       });
     },
     successMessage: () => "Vote submitted!",
-    onError: () => {},
+    onError: (data) => {
+      showErrorToast(data?.response?.data?.message);
+    },
   });
 
   const onSubmit = (data: FormValues) => {

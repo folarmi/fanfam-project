@@ -8,7 +8,7 @@ import { useCustomMutation } from "@/hooks/apiCalls";
 import type { RootState } from "@/lib/store";
 import { useAppSelector } from "@/lib/hook";
 import MediaUploadGrid from "./molecules/MediaUploadGrid";
-import { getMediaType } from "@/utils/helperTwo";
+import { combineDateAndTimeToISO, getMediaType } from "@/utils/helperTwo";
 import { useUploadFiles } from "@/hooks/useUploadFiles";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -16,21 +16,24 @@ import video from "@/assets/icons/video.svg";
 import Typography from "./forms/Typography";
 import { useNavigate } from "react-router-dom";
 import VoiceRecorderModal from "./modals/VoiceRecorderModal";
+import { DateTimePicker } from "./forms/DateTimePicker";
 
 type CommentBoxProp = {
   ifPoll?: boolean;
   ifRecord?: boolean;
-  setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
   endpoint?: string;
+  ifGoLive?: boolean;
+  ifSchedule?: boolean;
   placeholder?: string;
   commentId?: string;
+  setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
   onSuccess?: () => void;
-  ifGoLive?: boolean;
 };
 
 const CommentBox = ({
   ifRecord,
   ifPoll,
+  ifSchedule,
   endpoint = "contents",
   setIfUserIsCreatingPoll,
   commentId,
@@ -52,7 +55,9 @@ const CommentBox = ({
   const [isActive, setIsActive] = useState(false);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
+
   const [isRecorderOpen, setIsRecorderOpen] = useState(false);
+  const [isPostToBeScheduled, setIsPostToBeScheduled] = useState(true);
 
   const {
     uploadFiles,
@@ -110,7 +115,19 @@ const CommentBox = ({
         console.error("Upload failed:", error);
       }
     } else {
-      createContentMutation.mutate({ ...data, mediaFiles: [], mentions: [] });
+      const { eventDate, eventTime, ...rest } = data;
+
+      const payload = {
+        ...rest,
+        mediaFiles: [],
+        mentions: [],
+        scheduledFor:
+          isPostToBeScheduled && eventDate && eventTime
+            ? combineDateAndTimeToISO(eventDate, eventTime)
+            : null,
+      };
+      createContentMutation.mutate(payload);
+      // console.log(payload);
     }
   };
 
@@ -140,7 +157,6 @@ const CommentBox = ({
 
   return (
     <form onSubmit={handleSubmit(submitForm)}>
-      {/* CustomTextArea now owns the card border + focus ring */}
       <CustomTextArea
         placeholder={placeholder}
         name="message"
@@ -189,33 +205,54 @@ const CommentBox = ({
           isActive={isActive}
           ifPoll={ifPoll}
           ifRecord={ifRecord}
+          ifSchedule={ifSchedule}
           setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+          setIsPostToBeScheduled={setIsPostToBeScheduled}
           onRecordClick={() => setIsRecorderOpen(true)}
         />
 
-        <div className="flex items-center gap-3">
-          <CustomButton
-            variant={isPostable ? "primary" : "disabled"}
-            className="bg-grey_90 px-6 rounded-full"
-            disabled={createContentMutation.isPending || isUploading}
-            loading={createContentMutation.isPending || isUploading}
-          >
-            {commentId ? "Reply" : "Post"}
-          </CustomButton>
-
-          {ifGoLive && (
-            <div
-              className="border border-blue_1000 py-2 px-4 flex items-center rounded-3xl cursor-pointer"
-              onClick={() => navigate("livestreaming")}
+        {!isPostToBeScheduled && (
+          <div className="flex items-center gap-3">
+            <CustomButton
+              variant={isPostable ? "primary" : "disabled"}
+              className="bg-grey_90 px-6 rounded-full"
+              disabled={createContentMutation.isPending || isUploading}
+              loading={createContentMutation.isPending || isUploading}
             >
-              <img src={video} alt="video" className="mr-1 w-4 h-4" />
-              <Typography variant="subtitle3" className="text-blue_20">
-                Go Live
-              </Typography>
-            </div>
-          )}
-        </div>
+              {commentId ? "Reply" : "Post"}
+            </CustomButton>
+
+            {ifGoLive && (
+              <div
+                className="border border-blue_1000 py-2 px-4 flex items-center rounded-3xl cursor-pointer"
+                onClick={() => navigate("livestreaming")}
+              >
+                <img src={video} alt="video" className="mr-1 w-4 h-4" />
+                <Typography variant="subtitle3" className="text-blue_20">
+                  Go Live
+                </Typography>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {isPostToBeScheduled && (
+        <div className="mx-4 mb-4 flex items-center justify-between border border-grey_50 rounded-md p-4">
+          <DateTimePicker
+            control={control}
+            dateName="eventDate"
+            timeName="eventTime"
+            label=""
+          />
+          <CustomButton
+            // variant={isPostable ? "primary" : "disabled"}
+            className="bg-grey_90 px-6 rounded-full"
+          >
+            Schedule Post
+          </CustomButton>
+        </div>
+      )}
 
       <VoiceRecorderModal
         isOpen={isRecorderOpen}

@@ -239,3 +239,6 @@ export function extractComments(raw: any): ApiComment[] {
   console.warn("[CommentThread] Unrecognised commentsData shape:", raw);
   return [];
 }
+
+export const combineDateAndTimeToISO = (eventDate: string, eventTime: string) =>
+  `${eventDate}T${eventTime}:00.000Z`;

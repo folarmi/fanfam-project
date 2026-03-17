@@ -1,26 +1,31 @@
 import { PostUploader } from "./PostUploader";
 import Record from "@/assets/icons/record";
 import PollIcon from "@/assets/icons/poll";
+import Schedule from "../svgs/Schedule";
 // import Smile from "@/assets/icons/smile";
 
 type MediaUploadGridProp = {
   isActive: boolean;
   ifPoll?: boolean;
   ifRecord?: boolean;
+  ifSchedule?: boolean;
   handleFileUpload: (files: File[]) => void;
   handleRemoveFile: (index: number) => void;
   setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
+  setIsPostToBeScheduled?: (isCreating: boolean) => void;
   onRecordClick?: () => void;
 };
 
 const MediaUploadGrid = ({
-  handleFileUpload,
-  handleRemoveFile,
   isActive,
   ifRecord,
-  onRecordClick,
   ifPoll,
+  ifSchedule,
+  handleFileUpload,
+  handleRemoveFile,
+  onRecordClick,
   setIfUserIsCreatingPoll,
+  setIsPostToBeScheduled,
 }: MediaUploadGridProp) => {
   return (
     <div className="flex items-center gap-x-3">
@@ -42,6 +47,13 @@ const MediaUploadGrid = ({
           onClick={onRecordClick}
           isActive={isActive}
           className="cursor-pointer"
+        />
+      )}
+      {ifSchedule && (
+        <Schedule
+          isActive={isActive}
+          className="cursor-pointer"
+          onClick={() => setIsPostToBeScheduled?.(true)}
         />
       )}
     </div>

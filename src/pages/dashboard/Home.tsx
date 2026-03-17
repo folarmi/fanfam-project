@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../../lib/hook";
 import type { RootState } from "../../lib/store";
 import SearchInput from "../../components/SearchInput";
-import Poll from "../../components/molecules/Poll";
 import CommentBox from "../../components/CommentBox";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
@@ -87,13 +86,13 @@ const Home = () => {
     getTimelineContent?.pages?.flatMap((page: any) => page.data?.content) || [];
 
   // const [isEditingStory, setIsEditingStory] = useState(false);
+  // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
     null,
   );
-  const [ifUserIsCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
+  const [, setIfUserIsCreatingPoll] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
 
-  // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const toggleInterestModal = () => {
     setShowInterestModal(!showInterestModal);
   };
@@ -120,19 +119,16 @@ const Home = () => {
             placeholder="Search..."
           />
           {!isCreator && <CreatorLiveCard />}
-          {ifUserIsCreatingPoll && isCreator ? (
-            <Poll setIfUserIsCreatingPoll={setIfUserIsCreatingPoll} />
-          ) : (
-            isCreator && (
-              <CommentBox
-                ifPoll
-                ifRecord
-                setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
-                ifGoLive
-              />
-            )
-          )}
 
+          {isCreator && (
+            <CommentBox
+              ifPoll
+              ifRecord
+              setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+              ifGoLive
+              ifSchedule
+            />
+          )}
           {/* <div className="my-2">
             {userObject.role === UserRole.creator && (
               <StoryUploader onFileUpload={handleFileUpload} />

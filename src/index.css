@@ -40,3 +40,60 @@
   align-self: center !important;
   opacity: 0.65;
 }
+
+/* Start here */
+/* Import DM Sans for matching the screenshot's clean sans-serif */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
+
+.Toastify__toast-container {
+  width: auto !important;
+  min-width: 280px;
+}
+
+.Toastify__toast {
+  padding: 0 !important;
+  min-height: unset !important;
+  border-radius: 10px !important;
+  margin-bottom: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.Toastify__toast-body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Hide default type-colored progress bar — we use border-left instead */
+.Toastify__progress-bar {
+  display: none !important;
+}
+
+/* Close button sits neatly in the corner */
+.Toastify__close-button {
+  align-self: flex-start !important;
+  margin-top: 2px;
+  opacity: 0.4;
+  color: #667085;
+  transition: opacity 0.15s;
+}
+
+.Toastify__close-button:hover {
+  opacity: 0.8;
+}
+
+/* Slide-in animation from the right */
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.Toastify__toast--enter {
+  animation: toastSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
