@@ -66,11 +66,11 @@ const SignIn = () => {
       // If permission is blocked, inform user
       if (Notification.permission === "denied") {
         console.warn(
-          "⚠️ Notification permission is blocked. User needs to enable it in browser settings."
+          "⚠️ Notification permission is blocked. User needs to enable it in browser settings.",
         );
         // You can show a toast or message to the user here
         toast.warning(
-          "Please enable notifications in your browser settings to receive updates"
+          "Please enable notifications in your browser settings to receive updates",
         );
       } else if (Notification.permission === "default") {
         // Request permission if not yet asked
@@ -194,6 +194,3 @@ const SignIn = () => {
 };
 
 export { SignIn };
-
-
-

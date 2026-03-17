@@ -20,7 +20,7 @@ const Sidebar = () => {
   const { data: profileData } = useFetchProfile(userObject);
 
   const handleLogout = () => {
-    navigate("/login");
+    navigate("/");
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     dispatch(logout());
