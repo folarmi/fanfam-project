@@ -240,5 +240,23 @@ export function extractComments(raw: any): ApiComment[] {
   return [];
 }
 
-export const combineDateAndTimeToISO = (eventDate: string, eventTime: string) =>
-  `${eventDate}T${eventTime}:00.000Z`;
+export const combineDateAndTimeToISO = (
+  eventDate: string,
+  eventTime: string,
+) => {
+  return new Date(`${eventDate}T${eventTime}:00`).toISOString();
+};
+
+export function getPollExpiryDate(
+  createdDate: string,
+  pollDuration: { days: number; hours: number; minutes: number },
+): string {
+  const created = new Date(createdDate).getTime();
+  const durationMs =
+    (pollDuration.days * 24 * 60 * 60 +
+      pollDuration.hours * 60 * 60 +
+      pollDuration.minutes * 60) *
+    1000;
+
+  return new Date(created + durationMs).toISOString();
+}

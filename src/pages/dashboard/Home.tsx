@@ -7,7 +7,7 @@ import type { RootState } from "../../lib/store";
 import CommentBox from "../../components/CommentBox";
 import Modal from "../../components/modals/Modal";
 import InterestModal from "../../components/modals/InterestModal";
-import { useGetData, useInfiniteGetData } from "@/hooks/apiCalls";
+import { useInfiniteGetData } from "@/hooks/apiCalls";
 import type { StoryPost } from "@/lib/types";
 import { InfiniteScroll } from "@/components/InfiniteScroll";
 import { useSearchParams } from "react-router-dom";
@@ -74,12 +74,6 @@ const Home = () => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  const { data: getPollData, isLoading: getPollDataIsLoading } = useGetData({
-    url: `contents?page=0&size=80`,
-    queryKey: ["GetPollData"],
-  });
-
-  console.log(getPollData);
   // console.log(getPollData?.data?.content);
   // Flatten the pages for rendering
   const allPosts =
@@ -143,7 +137,7 @@ const Home = () => {
                 data={data}
                 showMoreModal={showMoreModal}
                 setShowMoreModal={setShowMoreModal}
-                isLoading={getTimelineContentIsLoading || getPollDataIsLoading}
+                isLoading={getTimelineContentIsLoading}
               />
             ))}
           </InfiniteScroll>

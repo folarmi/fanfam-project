@@ -72,10 +72,12 @@ export const FeedPost = ({
         profileName={data?.creator?.name || "Unknown User"}
         avatar={data?.creator?.profilePic}
         handle={data?.creator?.username}
+        createdDate={data?.createdDate}
         time={formatTimeAgo(data?.createdDate)}
         paragraphOne={data?.message}
         timeLineImage={data?.mediaFiles}
         pollChoices={data?.pollChoices}
+        pollDuration={data?.pollDuration}
         ifParagraph
         showModal={showMoreModal === data?.publicId}
         toggleModal={() =>
