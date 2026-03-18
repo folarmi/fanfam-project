@@ -90,13 +90,11 @@ const Home = () => {
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
     null,
   );
-  const [isUserCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
 
   const toggleInterestModal = () => {
     setShowInterestModal(!showInterestModal);
   };
-  console.log(isUserCreatingPoll);
   // const handleSearchChange = (value: string) => {
   //   setLocalSearchTerm(value);
   // };
@@ -124,7 +122,7 @@ const Home = () => {
             <CommentBox
               ifPoll
               ifRecord
-              setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
+              // setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
               ifGoLive
               ifSchedule
             />
@@ -139,7 +137,7 @@ const Home = () => {
             isLoading={isFetchingNextPage}
             hasMore={hasNextPage ?? false}
           >
-            {allPosts.map((data: StoryPost) => (
+            {allPosts?.map((data: StoryPost) => (
               <FeedPost
                 key={data?.publicId}
                 data={data}

@@ -147,33 +147,12 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
                   >
                     <X size={16} strokeWidth={2.5} />
                   </button>
-                  {/* <img
-                    src={block}
-                    alt="drag handle"
-                    className="cursor-grab opacity-50 hover:opacity-100 transition-opacity p-1"
-                  /> */}
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* <div className="flex justify-between items-center mt-4 border-b border-grey_100 pb-5">
-          {fields.length < 5 ? (
-            <button
-              type="button"
-              onClick={addOption}
-              className="flex items-center gap-2 py-2 px-4 bg-blue_50 hover:bg-blue-100 text-blue_500 rounded-full transition-colors font-medium text-sm focus:outline-none"
-            >
-              <Plus size={16} strokeWidth={2.5} />
-              <span>Add option</span>
-            </button>
-          ) : (
-            <span className="text-sm text-grey_400 italic">
-              Maximum 5 options
-            </span>
-          )}
-        </div> */}
         <div className="mt-4 border-b border-grey_100 pb-5 space-y-3">
           <div className="flex justify-between items-center">
             {fields.length < 5 ? (

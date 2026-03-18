@@ -302,6 +302,7 @@ import VoiceRecorderModal from "./modals/VoiceRecorderModal";
 import { DateTimePicker } from "./forms/DateTimePicker";
 import { showInlineToast } from "@/utils/toastUtils";
 import MediaPreviewGrid from "./MediaPreviewGrid";
+import Poll from "./molecules/Poll";
 
 type CommentBoxProp = {
   ifPoll?: boolean;
@@ -311,7 +312,6 @@ type CommentBoxProp = {
   ifSchedule?: boolean;
   placeholder?: string;
   commentId?: string;
-  setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
   onSuccess?: () => void;
 };
 
@@ -320,7 +320,6 @@ const CommentBox = ({
   ifPoll,
   ifSchedule,
   endpoint = "contents",
-  setIfUserIsCreatingPoll,
   commentId,
   onSuccess,
   placeholder = "Write a post…",
@@ -344,6 +343,11 @@ const CommentBox = ({
 
   const [isRecorderOpen, setIsRecorderOpen] = useState(false);
   const [isPostToBeScheduled, setIsPostToBeScheduled] = useState(false);
+  const [isUserCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
+
+  const handleSetIsCreatingPoll = (value: boolean) => {
+    setIfUserIsCreatingPoll?.(value); // still notify parent if needed
+  };
 
   const {
     uploadFiles,
@@ -453,6 +457,11 @@ const CommentBox = ({
 
   const isPostable = isActive || queuedFiles.length > 0;
 
+  // ── When poll mode is active, render Poll exclusively ──────────────
+  if (isUserCreatingPoll) {
+    return <Poll setIfUserIsCreatingPoll={handleSetIsCreatingPoll} />;
+  }
+
   return (
     <form onSubmit={handleSubmit(submitForm)} className="mt-4">
       <CustomTextArea
@@ -474,12 +483,6 @@ const CommentBox = ({
         rows={commentId ? 3 : 5}
       />
 
-      {/*
-       * ─── MEDIA PREVIEWS ───────────────────────────────────────────
-       * Renders above the toolbar so images display full-width in a
-       * clean grid, not as tiny thumbnails wedged into the action bar.
-       * ──────────────────────────────────────────────────────────────
-       */}
       <MediaPreviewGrid files={queuedFiles} onRemove={handleRemoveFile} />
 
       {/* Toolbar row */}
