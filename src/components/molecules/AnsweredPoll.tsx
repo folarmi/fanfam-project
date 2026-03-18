@@ -43,15 +43,17 @@ const AnsweredPoll = ({
 }: AnsweredPollProps) => {
   const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
-
   const currentUserEmail = userObject?.email ?? userObject?.usid ?? "";
-  // const currentUserEmail = "excessjunior@gmail.com";
 
   const userVotedChoice = pollChoices.find((choice) =>
     choice.votes?.includes(currentUserEmail),
   );
   const userVote = userVotedChoice?.publicId;
   const hasVoted = !!userVote;
+
+  const isPollExpired = pollExpiresAt
+    ? new Date(pollExpiresAt).getTime() <= Date.now()
+    : false;
 
   const totalVotes = pollChoices.reduce(
     (sum, c) => sum + (c.votes?.length ?? 0),
@@ -93,7 +95,7 @@ const AnsweredPoll = ({
     e.stopPropagation();
 
   // ── Results view ─────────────────────────────────────────────────────────────
-  if (hasVoted) {
+  if (hasVoted || isPollExpired) {
     return (
       <section className="ml-[68px] mr-4 mb-4" onClick={stopBubbling}>
         <PollResults
