@@ -41,13 +41,13 @@ const EditProfile = () => {
       onSuccess: (data) => {
         const formValues = {
           ...getValues(),
-          profileImageUrl: data?.body,
+          profileImageUrl: data?.body?.url,
           coverImageUrl: getValues("coverImageUrl"),
         };
+        console.log("formValues being sent:", formValues);
         delete formValues?.creatorProfile;
         delete formValues?.profilePic;
 
-        console.log("formValues being sent:", formValues);
         updateCreatorProfileMutation.mutate(formValues);
 
         return data?.message || "File uploaded successfully!";

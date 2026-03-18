@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CustomButton from "./forms/CustomButton";
 import { useForm } from "react-hook-form";
 import { CustomTextArea } from "./forms/CustomTextArea";
@@ -52,6 +52,7 @@ const CommentBox = ({
     formState: { isSubmitted },
   } = useForm();
 
+  const queuedFilesRef = useRef<File[]>([]);
   const [isActive, setIsActive] = useState(false);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
   const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
@@ -72,11 +73,20 @@ const CommentBox = ({
   const handleFocus = () => setIsActive(true);
   const handleBlur = () => setIsActive(false);
 
-  const handleFileUpload = (files: File[]) =>
-    setQueuedFiles((prev) => [...prev, ...files]);
+  const updateQueuedFiles = (files: File[]) => {
+    setQueuedFiles(files);
+    queuedFilesRef.current = files;
+  };
 
-  const handleRemoveFile = (index: number) =>
-    setQueuedFiles((prev) => prev.filter((_, i) => i !== index));
+  const handleFileUpload = (files: File[]) => {
+    const updated = [...queuedFilesRef.current, ...files];
+    updateQueuedFiles(updated);
+  };
+
+  const handleRemoveFile = (index: number) => {
+    const updated = queuedFilesRef.current.filter((_, i) => i !== index);
+    updateQueuedFiles(updated);
+  };
 
   const handleRecordingComplete = (audioBlob: Blob) => {
     const audioFile = new File([audioBlob], `voice-note-${Date.now()}.webm`, {
@@ -156,14 +166,14 @@ const CommentBox = ({
   const isPostable = isActive || queuedFiles.length > 0;
 
   return (
-    <form onSubmit={handleSubmit(submitForm)}>
+    <form onSubmit={handleSubmit(submitForm)} className="mt-4">
       <CustomTextArea
         placeholder={placeholder}
         name="message"
         control={control}
         rules={{
           validate: (value: string) => {
-            if (!value?.trim() && queuedFiles.length === 0) {
+            if (!value?.trim() && queuedFilesRef.current.length === 0) {
               return commentId
                 ? "Reply message or media is required"
                 : "Post message or media is required";
