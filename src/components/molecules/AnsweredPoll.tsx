@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from "@/lib/hook";
@@ -79,8 +80,8 @@ const AnsweredPoll = ({
       });
     },
     successMessage: () => "Vote submitted!",
-    onError: (data) => {
-      showErrorToast(data?.response?.data?.message);
+    onError: (data: any) => {
+      showErrorToast(data?.response?.data?.message || "An error occurred");
     },
   });
 
