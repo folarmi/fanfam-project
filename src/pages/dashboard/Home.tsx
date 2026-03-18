@@ -90,13 +90,13 @@ const Home = () => {
   const [showMoreModal, setShowMoreModal] = useState<string | boolean | null>(
     null,
   );
-  const [, setIfUserIsCreatingPoll] = useState(false);
+  const [isUserCreatingPoll, setIfUserIsCreatingPoll] = useState(false);
   const [showInterestModal, setShowInterestModal] = useState(false);
 
   const toggleInterestModal = () => {
     setShowInterestModal(!showInterestModal);
   };
-
+  console.log(isUserCreatingPoll);
   // const handleSearchChange = (value: string) => {
   //   setLocalSearchTerm(value);
   // };
