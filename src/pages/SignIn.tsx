@@ -21,7 +21,7 @@ import TextBetweenLines from "../components/molecules/TextBetweenLines";
 import { useSignIn } from "@/hooks/useSignIn";
 import { GoogleSignIn } from "@/oauth/Google";
 import { getFCMToken } from "@/oauth/firebaseConfig";
-import { toast } from "react-toastify";
+import { showInlineToast } from "@/utils/toastUtils";
 
 const SignIn = () => {
   const { control, handleSubmit, getValues } = useForm();
@@ -68,10 +68,12 @@ const SignIn = () => {
         console.warn(
           "⚠️ Notification permission is blocked. User needs to enable it in browser settings.",
         );
-        // You can show a toast or message to the user here
-        toast.warning(
-          "Please enable notifications in your browser settings to receive updates",
-        );
+
+        showInlineToast({
+          type: "warning",
+          title:
+            "Please enable notifications in your browser settings to receive updates",
+        });
       } else if (Notification.permission === "default") {
         // Request permission if not yet asked
         const permission = await Notification.requestPermission();

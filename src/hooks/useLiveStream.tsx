@@ -9,8 +9,8 @@ import type {
 } from "@/lib/types";
 import { parseLiveEvent } from "@/utils/helper";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
 import type { StompSubscription } from "@stomp/stompjs";
+import { showInlineToast } from "@/utils/toastUtils";
 
 interface UseLiveStreamPropsExtended extends UseLiveStreamProps {
   onCommentReceived?: (comment: LiveComment) => void;
@@ -312,7 +312,10 @@ export const useLiveStream = ({
         return true;
       } catch (error) {
         console.error("❌ Error sending comment:", error);
-        toast.error("Failed to send comment");
+        showInlineToast({
+          type: "error",
+          title: "Failed to send comment",
+        });
         return false;
       }
     },

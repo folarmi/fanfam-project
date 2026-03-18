@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
+import { showInlineToast } from "@/utils/toastUtils";
 import { useState, useRef, useCallback } from "react";
-import { toast } from "react-toastify";
 
 interface UseVoiceRecorderProps {
   onRecordingComplete: (audioBlob: Blob) => void;
@@ -37,9 +38,10 @@ export const useVoiceRecorder = ({
         const newTime = prev + 1;
         if (newTime >= maxDuration) {
           stopRecording();
-          toast.info(
-            `Maximum recording duration of ${maxDuration / 60} minutes reached`
-          );
+          showInlineToast({
+            type: "info",
+            title: `Maximum recording duration of ${maxDuration / 60} minutes reached`,
+          });
         }
         return newTime;
       });
@@ -70,8 +72,8 @@ export const useVoiceRecorder = ({
       const mimeType = MediaRecorder.isTypeSupported("audio/webm")
         ? "audio/webm"
         : MediaRecorder.isTypeSupported("audio/mp4")
-        ? "audio/mp4"
-        : "audio/ogg";
+          ? "audio/mp4"
+          : "audio/ogg";
 
       const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
@@ -104,10 +106,15 @@ export const useVoiceRecorder = ({
       setIsPaused(false);
       startTimer();
 
-      toast.success("Recording started");
+      showInlineToast({
+        type: "success",
+        title: "Recording started",
+      });
     } catch (error) {
-      console.error("Error starting recording:", error);
-      toast.error("Could not access microphone. Please check permissions.");
+      showInlineToast({
+        type: "error",
+        title: "Could not access microphone. Please check permissions.",
+      });
     }
   }, [onRecordingComplete, startTimer]);
 
@@ -125,7 +132,10 @@ export const useVoiceRecorder = ({
       mediaRecorderRef.current.pause();
       setIsPaused(true);
       stopTimer();
-      toast.info("Recording paused");
+      showInlineToast({
+        type: "info",
+        title: "Recording paused",
+      });
     }
   }, [isRecording, isPaused, stopTimer]);
 
@@ -134,7 +144,10 @@ export const useVoiceRecorder = ({
       mediaRecorderRef.current.resume();
       setIsPaused(false);
       startTimer();
-      toast.info("Recording resumed");
+      showInlineToast({
+        type: "info",
+        title: "Recording resumed",
+      });
     }
   }, [isRecording, isPaused, startTimer]);
 
@@ -152,7 +165,10 @@ export const useVoiceRecorder = ({
       setIsPaused(false);
       setRecordingTime(0);
       stopTimer();
-      toast.info("Recording cancelled");
+      showInlineToast({
+        type: "info",
+        title: "Recording cancelled",
+      });
     }
   }, [stopTimer]);
 

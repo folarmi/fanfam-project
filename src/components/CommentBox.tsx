@@ -11,12 +11,12 @@ import MediaUploadGrid from "./molecules/MediaUploadGrid";
 import { combineDateAndTimeToISO, getMediaType } from "@/utils/helperTwo";
 import { useUploadFiles } from "@/hooks/useUploadFiles";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 import video from "@/assets/icons/video.svg";
 import Typography from "./forms/Typography";
 import { useNavigate } from "react-router-dom";
 import VoiceRecorderModal from "./modals/VoiceRecorderModal";
 import { DateTimePicker } from "./forms/DateTimePicker";
+import { showInlineToast } from "@/utils/toastUtils";
 
 type CommentBoxProp = {
   ifPoll?: boolean;
@@ -67,7 +67,8 @@ const CommentBox = ({
   } = useUploadFiles({
     usid: userObject?.usid,
     onSuccess: () => resetFiles(),
-    onError: (error) => toast.error(error?.message),
+    onError: (error) =>
+      showInlineToast({ type: "error", title: error?.message }),
   });
 
   const handleFocus = () => setIsActive(true);
@@ -93,7 +94,10 @@ const CommentBox = ({
       type: audioBlob.type,
     });
     setQueuedFiles((prev) => [...prev, audioFile]);
-    toast.success("Voice note added successfully");
+    showInlineToast({
+      type: "success",
+      title: "Voice note added successfully",
+    });
   };
 
   const mutationEndpoint = commentId
@@ -102,11 +106,12 @@ const CommentBox = ({
 
   const submitForm = async (data: any) => {
     if (!data.message?.trim() && queuedFiles.length === 0) {
-      toast.error(
-        commentId
+      showInlineToast({
+        type: "error",
+        title: commentId
           ? "Reply message or media is required"
           : "Post message or media is required",
-      );
+      });
       return;
     }
 
@@ -258,6 +263,8 @@ const CommentBox = ({
           <CustomButton
             // variant={isPostable ? "primary" : "disabled"}
             className="bg-grey_90 px-6 rounded-full"
+            disabled={createContentMutation.isPending || isUploading}
+            loading={createContentMutation.isPending || isUploading}
           >
             Schedule Post
           </CustomButton>

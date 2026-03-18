@@ -6,9 +6,9 @@ import CustomButton from "../forms/CustomButton";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 import CustomSelect from "../forms/CustomSelect";
 import { pollDaysOptions, pollHoursOptions, pollMinutesOptions } from "@/data";
+import { showInlineToast } from "@/utils/toastUtils";
 
 type pollProps = {
   setIfUserIsCreatingPoll: (val: boolean) => void;
@@ -74,13 +74,19 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
       return;
     }
     if (!data.question.trim()) {
-      toast.error("Please enter a question");
+      showInlineToast({
+        type: "error",
+        title: "Please enter a question",
+      });
       return;
     }
 
     const validOptions = data.options.filter((opt) => opt.name.trim() !== "");
     if (validOptions.length < 2) {
-      toast.error("Please provide at least 2 options");
+      showInlineToast({
+        type: "error",
+        title: "Please provide at least 2 options",
+      });
       return;
     }
 

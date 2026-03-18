@@ -11,7 +11,7 @@ import { usePersonaVerification } from "@/hooks/usePersonaVerification";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { showInlineToast } from "@/utils/toastUtils";
 
 const BecomeACreator = () => {
   const queryClient = useQueryClient();
@@ -35,8 +35,16 @@ const BecomeACreator = () => {
       setInquiryId(data?.inquiryId);
       // setInquiryId("inq_2P9HD7sfvbt5KVdSpoUz7KKJhuto");
     },
-    onCancel: () => toast.warning("Verification cancelled"),
-    onError: (_error) => toast.error("An error occurred"),
+    onCancel: () =>
+      showInlineToast({
+        type: "warning",
+        title: "Verification cancelled",
+      }),
+    onError: (_error) =>
+      showInlineToast({
+        type: "error",
+        title: "An error occurred",
+      }),
   });
 
   useEffect(() => {

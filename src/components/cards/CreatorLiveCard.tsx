@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useWebSocket } from "@/context/WebSocketContext";
+import { showInlineToast } from "@/utils/toastUtils";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 const CreatorLiveCard = () => {
   const { liveCreators, isConnected } = useWebSocket();
@@ -34,12 +34,18 @@ const CreatorLiveCard = () => {
         const handleWatchLive = () => {
           if (!sessionId) {
             console.error("No session ID available for creator:", creatorId);
-            toast.error("Unable to join stream - missing session ID");
+            showInlineToast({
+              type: "error",
+              title: "Unable to join stream - missing session ID",
+            });
             return;
           }
 
           if (!isConnected) {
-            toast.error("Not connected to server. Please wait...");
+            showInlineToast({
+              type: "error",
+              title: "Not connected to server. Please wait...",
+            });
             return;
           }
 

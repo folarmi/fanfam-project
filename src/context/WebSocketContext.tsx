@@ -8,7 +8,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { toast } from "react-toastify";
 import type {
   LiveCreator,
   LiveNotification,
@@ -18,6 +17,7 @@ import { useAppSelector } from "@/lib/hook";
 import { useGetData } from "@/hooks/apiCalls";
 import { useStompClient } from "@/hooks/useStompClient";
 import type { StompSubscription } from "@stomp/stompjs";
+import { showInlineToast } from "@/utils/toastUtils";
 
 interface WebSocketProviderProps {
   children: React.ReactNode;
@@ -76,8 +76,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       // We do this check FIRST to ensure we toast even if polling already added the creator to the map
       if (!notifiedCreatorsRef.current.has(creatorId)) {
         console.log(`🔔 Live notification for ${creatorId}`);
-        toast.info(`🔴 ${creatorId} is now LIVE!`, {
-          autoClose: 5000,
+
+        showInlineToast({
+          type: "info",
+          title: `🔴 ${creatorId} is now LIVE!`,
         });
         notifiedCreatorsRef.current.add(creatorId);
       }

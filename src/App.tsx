@@ -24,13 +24,13 @@ function App() {
             <NotificationToast />
             <ToastContainer
               position="top-right"
-              autoClose={3000}
+              autoClose={5000}
               hideProgressBar
               newestOnTop
               closeOnClick
               pauseOnHover
-              draggable
-              theme="light"
+              draggable={false}
+              style={{ top: 16, right: 16, width: "auto" }}
             />
             {/* </AuthProvider> */}
           </WebSocketProvider>

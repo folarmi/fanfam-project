@@ -13,7 +13,6 @@ import AgoraRTC, {
 import { useAppSelector } from "@/lib/hook";
 import { useGetData } from "@/hooks/apiCalls";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import { MAX_CHANNEL_LENGTH } from "@/utils/helper";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { useLiveStream } from "@/hooks/useLiveStream";
@@ -27,6 +26,7 @@ import type {
 } from "@/lib/types";
 import { ReactionCounter } from "@/components/live/ReactionCounter";
 import { FloatingReactions } from "@/components/live/FloatingReactions";
+import { showInlineToast } from "@/utils/toastUtils";
 
 const LiveStreaming = () => {
   const navigate = useNavigate();
@@ -243,7 +243,10 @@ const LiveStreaming = () => {
         }
       })
       .catch((_err) => {
-        toast.error("Please allow camera and microphone access");
+        showInlineToast({
+          type: "error",
+          title: "Please allow camera and microphone access",
+        });
       });
 
     return () => {
@@ -304,7 +307,10 @@ const LiveStreaming = () => {
 
     // 1. Check explicit End event from socket
     if (isStreamEnded) {
-      toast.info("The stream has ended");
+      showInlineToast({
+        type: "info",
+        title: "The stream has ended",
+      });
       setTimeout(() => {
         handleStopLive();
       }, 2000);
@@ -350,12 +356,12 @@ const LiveStreaming = () => {
     try {
       // Validate App ID
       if (!APP_ID) {
-        toast.error("App ID is missing");
+        showInlineToast({ type: "error", title: "App ID is missing" });
         return;
       }
 
       if (!channelName?.trim()) {
-        toast.error("Channel name is required");
+        showInlineToast({ type: "error", title: "Channel name is required" });
         return;
       }
 
@@ -363,7 +369,10 @@ const LiveStreaming = () => {
       const token = res?.data?.token;
 
       if (!token) {
-        toast.error("Failed to obtain streaming token");
+        showInlineToast({
+          type: "error",
+          title: "Failed to obtain streaming token",
+        });
         return;
       }
 
@@ -412,21 +421,34 @@ const LiveStreaming = () => {
         creatorId: profileData?.data?.username,
         session: channelName,
       });
-      console.log("📡 Sent GO LIVE message",profileData?.data?.username,channelName);
+      console.log(
+        "📡 Sent GO LIVE message",
+        profileData?.data?.username,
+        channelName,
+      );
     } catch (error) {
-      toast.error("Failed to start live stream. Check console for details.");
+      showInlineToast({
+        type: "error",
+        title: "Failed to start live stream.Check console for details.",
+      });
     }
   };
 
   const joinExistingStream = async (channel: string) => {
     try {
       if (!APP_ID) {
-        toast.error("App ID is missing");
+        showInlineToast({
+          type: "error",
+          title: "App ID is missing",
+        });
         return;
       }
 
       if (!channel) {
-        toast.error("Channel name is missing");
+        showInlineToast({
+          type: "error",
+          title: "Channel name is missing",
+        });
         return;
       }
 
@@ -434,7 +456,10 @@ const LiveStreaming = () => {
       const token = res?.data?.token;
 
       if (!token) {
-        toast.error("Failed to obtain streaming token");
+        showInlineToast({
+          type: "error",
+          title: "Failed to obtain streaming token",
+        });
         return;
       }
 
@@ -456,10 +481,16 @@ const LiveStreaming = () => {
         }
       });
 
-      toast.success("Joined live stream!");
+      showInlineToast({
+        type: "success",
+        title: "Successfully joined live stream",
+      });
     } catch (error) {
       console.error("Error joining stream:", error);
-      toast.error("Failed to join live stream");
+      showInlineToast({
+        type: "error",
+        title: "Failed to join live stream",
+      });
     }
   };
 
@@ -511,7 +542,10 @@ const LiveStreaming = () => {
         videoRef.current.srcObject = stream;
       }
 
-      toast.success("Stream ended");
+      showInlineToast({
+        type: "success",
+        title: "Stream ended",
+      });
     } catch (error) {
       console.error("Error stopping stream:", error);
     }
@@ -558,7 +592,10 @@ const LiveStreaming = () => {
         setChatMessages((prev) => [...prev, newMessage]);
         setChatMessage("");
       } else {
-        toast.error("Failed to send message");
+        showInlineToast({
+          type: "error",
+          title: "Failed to send message",
+        });
       }
     } else {
       // Fallback: Local only (for pre-stream setup)
@@ -970,5 +1007,3 @@ const LiveStreaming = () => {
 };
 
 export { LiveStreaming };
-
-
