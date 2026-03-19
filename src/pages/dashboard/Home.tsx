@@ -74,7 +74,6 @@ const Home = () => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  // console.log(getPollData?.data?.content);
   // Flatten the pages for rendering
   const allPosts =
     getTimelineContent?.pages?.flatMap((page: any) => page.data?.content) || [];
@@ -112,15 +111,7 @@ const Home = () => {
           /> */}
           {!isCreator && <CreatorLiveCard />}
 
-          {isCreator && (
-            <CommentBox
-              ifPoll
-              ifRecord
-              // setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
-              ifGoLive
-              ifSchedule
-            />
-          )}
+          {isCreator && <CommentBox ifPoll ifRecord ifGoLive ifSchedule />}
           {/* <div className="my-2">
             {userObject.role === UserRole.creator && (
               <StoryUploader onFileUpload={handleFileUpload} />

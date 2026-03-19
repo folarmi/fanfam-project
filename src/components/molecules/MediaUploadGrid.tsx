@@ -11,9 +11,9 @@ type MediaUploadGridProp = {
   ifSchedule?: boolean;
   handleFileUpload: (files: File[]) => void;
   handleRemoveFile: (index: number) => void;
-  setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
   setIsPostToBeScheduled?: (isCreating: boolean) => void;
   onRecordClick?: () => void;
+  toggleSchedule?: () => void;
 };
 
 const MediaUploadGrid = ({
@@ -25,7 +25,7 @@ const MediaUploadGrid = ({
   handleRemoveFile,
   onRecordClick,
   setIfUserIsCreatingPoll,
-  setIsPostToBeScheduled,
+  toggleSchedule,
 }: MediaUploadGridProp) => {
   return (
     <div className="flex items-center gap-x-3">
@@ -53,7 +53,8 @@ const MediaUploadGrid = ({
         <Schedule
           isActive={isActive}
           className="cursor-pointer"
-          onClick={() => setIsPostToBeScheduled?.(true)}
+          // onClick={() => setIsPostToBeScheduled?.(true)}
+          onClick={toggleSchedule}
         />
       )}
     </div>
