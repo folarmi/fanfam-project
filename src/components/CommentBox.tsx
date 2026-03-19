@@ -212,8 +212,8 @@ const CommentBox = ({
           ifPoll={ifPoll}
           ifRecord={ifRecord}
           ifSchedule={ifSchedule}
+          setIfUserIsCreatingPoll={setIfUserIsCreatingPoll}
           toggleSchedule={toggleSchedule}
-          setIsPostToBeScheduled={setIsPostToBeScheduled}
           onRecordClick={() => setIsRecorderOpen(true)}
         />
 

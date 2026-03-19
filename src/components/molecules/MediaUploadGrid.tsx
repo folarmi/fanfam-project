@@ -11,7 +11,7 @@ type MediaUploadGridProp = {
   ifSchedule?: boolean;
   handleFileUpload: (files: File[]) => void;
   handleRemoveFile: (index: number) => void;
-  setIsPostToBeScheduled?: (isCreating: boolean) => void;
+  setIfUserIsCreatingPoll?: (isCreating: boolean) => void;
   onRecordClick?: () => void;
   toggleSchedule?: () => void;
 };
