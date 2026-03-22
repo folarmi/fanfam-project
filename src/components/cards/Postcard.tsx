@@ -358,7 +358,7 @@ const PostCard: React.FC<PostCardProps> = ({
         paragraphOne={paragraphOne}
         paragraphTwo={paragraphTwo}
         headerActions={
-          <>
+          <div ref={modalRef} className="relative flex-shrink-0">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -372,7 +372,6 @@ const PostCard: React.FC<PostCardProps> = ({
 
             {showModal && TimeLineModal && (
               <div
-                ref={modalRef}
                 className="absolute right-0 top-8 bg-white w-[262px] rounded-2xl border border-gray-200 z-50 bg-modal-gradient shadow-triple"
                 role="menu"
                 onClick={(e) => e.stopPropagation()}
@@ -380,7 +379,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 {TimeLineModal}
               </div>
             )}
-          </>
+          </div>
         }
       />
 
