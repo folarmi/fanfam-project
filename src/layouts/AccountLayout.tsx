@@ -166,10 +166,19 @@ const AccountLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main
+      {/* <main
         className={`${
           showAccountOnMobile ? "w-full" : "hidden md:block"
         } min-w-0 flex-1`}
+      >
+        <Outlet />
+      </main> */}
+      <main
+        className={`${
+          showAccountOnMobile
+            ? "w-full"
+            : "hidden md:block md:w-[50%] md:pr-[88px]"
+        } min-w-0`}
       >
         <Outlet />
       </main>

@@ -193,7 +193,7 @@ export const sideBarItems = [
     id: 5,
     name: "My Account",
     image: (isActive: boolean) => <MyAccount active={isActive} />,
-    link: "/dashboard/account/cards",
+    link: "/dashboard/account/settings",
     roles: ["CREATOR", "VIEWER"],
   },
   {

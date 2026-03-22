@@ -146,7 +146,7 @@ const SettingLayout = () => {
       <main
         className={`${
           showOnMobile ? "w-full" : "hidden md:block"
-        } min-w-0 flex-1`}
+        } min-w-0 md:w-[50%]`}
       >
         <Outlet />
       </main>
