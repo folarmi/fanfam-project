@@ -41,10 +41,9 @@ const EditProfile = () => {
       onSuccess: (data) => {
         const formValues = {
           ...getValues(),
-          profileImageUrl: data?.body?.url,
+          profileImageUrl: data?.body,
           coverImageUrl: getValues("coverImageUrl"),
         };
-        console.log("formValues being sent:", formValues);
         delete formValues?.creatorProfile;
         delete formValues?.profilePic;
 
