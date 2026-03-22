@@ -125,7 +125,11 @@ const TimeLineHomeModal = ({
       </Modal>
 
       <Modal show={showEditModal} toggleModal={toggleEditPostModal}>
-        <EditPost publicId={publicId} toggleModal={toggleEditPostModal} />
+        <EditPost
+          publicId={publicId}
+          toggleModal={toggleEditPostModal}
+          toggleTimelineHomeModal={toggleTimelineHomeModal}
+        />
       </Modal>
     </>
   );

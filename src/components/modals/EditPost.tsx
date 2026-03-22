@@ -20,6 +20,7 @@ import DefaultAvatar from "../molecules/DefaultAvatar";
 export interface EditPostProps {
   publicId: string;
   toggleModal: () => void;
+  toggleTimelineHomeModal: () => void;
   className?: string;
 }
 
@@ -33,6 +34,7 @@ interface EditMediaItem extends MediaItem {
 export const EditPost: React.FC<EditPostProps> = ({
   publicId,
   toggleModal,
+  toggleTimelineHomeModal,
   className,
 }) => {
   const queryClient = useQueryClient();
@@ -111,8 +113,9 @@ export const EditPost: React.FC<EditPostProps> = ({
       });
 
       toggleModal();
+      toggleTimelineHomeModal();
       queryClient.invalidateQueries({
-        queryKey: ["GetContentsById"],
+        queryKey: ["GetContents"],
         exact: false,
       });
     },
@@ -172,7 +175,7 @@ export const EditPost: React.FC<EditPostProps> = ({
           (media: MediaItem) => ({
             ...media,
             isNew: false,
-          })
+          }),
         );
         setMediaFiles(existingMedia);
       }
