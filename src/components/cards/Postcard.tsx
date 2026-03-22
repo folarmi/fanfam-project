@@ -44,7 +44,7 @@ export interface PostCardProps {
   reposters?: { email: string }[];
   isAlreadyBookmarked?: boolean;
   isAlreadyReposted?: boolean;
-  createdDate: string;
+  createdDate?: string;
   pollDuration?: {
     days: number;
     hours: number;
@@ -338,7 +338,7 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   const pollExpiresAt =
-    pollChoices?.length && pollDuration
+    pollChoices?.length && pollDuration && createdDate
       ? getPollExpiryDate(createdDate, pollDuration)
       : undefined;
 

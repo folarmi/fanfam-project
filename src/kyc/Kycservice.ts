@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // services/kycService.ts
 // ─────────────────────────────────────────────────────────────────────────────
 // MOCK — replace the function bodies with real API calls once backend is ready.
@@ -26,8 +27,8 @@ export type KycStatusResponse = {
  * REAL: replace with → fetch("/api/kyc/initiate", { method: "POST", ... })
  */
 export async function initiateKycVerification(
-  userId: string,
-  email: string,
+  _userId: string,
+  _email: string,
 ): Promise<KycInitiateResponse> {
   // ── MOCK ──────────────────────────────────────────────────────────
   await new Promise((r) => setTimeout(r, 1000)); // fake latency

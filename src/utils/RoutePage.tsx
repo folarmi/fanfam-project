@@ -44,11 +44,11 @@ import {
   BlockCountry,
   Preferences,
   Collections,
-  BecomeACreator,
-  VerifyYourIdentity,
-  BankingInformation,
-  SetupProfile,
-  SetupStrategy,
+  // BecomeACreator,
+  // VerifyYourIdentity,
+  // BankingInformation,
+  // SetupProfile,
+  // SetupStrategy,
   SinglePostDetails,
   UnsubscribedProfile,
   Bookmarks,
@@ -56,8 +56,8 @@ import {
 import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
 import SettingLayout from "@/layouts/SettingsLayout";
-import BecomeACreatorLayout from "@/layouts/BecomeACreatorLayout";
-import KycComplete from "@/kyc/KycComplete";
+// import BecomeACreatorLayout from "@/layouts/BecomeACreatorLayout";
+// import KycComplete from "@/kyc/KycComplete";
 import KycVerification from "@/kyc/Kycverification";
 // import AuthGate from "@/hooks/AuthGate";
 
