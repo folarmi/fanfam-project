@@ -57,6 +57,8 @@ import MessagesLayout from "../layouts/MessagesLayout";
 import AccountLayout from "../layouts/AccountLayout";
 import SettingLayout from "@/layouts/SettingsLayout";
 import BecomeACreatorLayout from "@/layouts/BecomeACreatorLayout";
+import KycComplete from "@/kyc/KycComplete";
+import KycVerification from "@/kyc/Kycverification";
 // import AuthGate from "@/hooks/AuthGate";
 
 const RoutePage = () => {
@@ -82,6 +84,7 @@ const RoutePage = () => {
           <Route path="profile/promote" element={<PromoteProfile />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="bookmarks" element={<Bookmarks />} />
+          <Route path="become-a-creator" element={<KycVerification />} />
         </Route>
 
         <Route element={<MessagesLayout />}>
@@ -137,7 +140,7 @@ const RoutePage = () => {
           <Route path="settings/preferences" element={<Preferences />} />
         </Route>
 
-        <Route element={<BecomeACreatorLayout />}>
+        {/* <Route element={<BecomeACreatorLayout />}>
           <Route path="become-a-creator" element={<BecomeACreator />} />
           <Route
             path="become-a-creator/verify-identity"
@@ -155,13 +158,16 @@ const RoutePage = () => {
             path="become-a-creator/monetization-strategy"
             element={<SetupStrategy />}
           />
-        </Route>
+        </Route> */}
 
         <Route path="livestreaming" element={<LiveStreaming />} />
         <Route
           path="livestreaming/:creatorId/:sessionId"
           element={<LiveStreaming />}
         />
+
+        {/* <Route path="/kyc/success" element={<YourSuccessPage />} />
+        <Route path="/kyc/failed" element={<YourFailedPage />} /> */}
       </Route>
 
       {/* <Route element={<ProtectedRoute />}></Route> */}
