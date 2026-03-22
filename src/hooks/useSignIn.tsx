@@ -5,11 +5,18 @@ import { useNavigate } from "react-router-dom";
 import { useCustomMutation } from "./apiCalls";
 import { updateUserObject } from "@/lib/features/auth/authSlice";
 import { showErrorToast } from "@/utils/toastUtils";
+import { v4 as uuidv4 } from "uuid";
 
 interface UseSignInProps {
   setNotVerifiedError: (value: boolean) => void;
   setErrorMessage?: (value: string | null) => void;
   endpoint: string;
+}
+
+function bindSessionToTab() {
+  const tabId = uuidv4();
+  sessionStorage.setItem("tab_id", tabId);
+  localStorage.setItem("active_tab_id", tabId);
 }
 
 export const useSignIn = ({
@@ -50,6 +57,7 @@ export const useSignIn = ({
         }
 
         localStorage.setItem("token", accessToken);
+        bindSessionToTab();
       } else {
         console.error("❌ [useSignIn] No access token found in response", data);
       }
