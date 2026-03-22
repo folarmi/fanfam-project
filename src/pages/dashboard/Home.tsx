@@ -65,7 +65,7 @@ const Home = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteGetData({
-    url: `contents?sort=createdDate,desc${activeSearchTerm ? `&search=${activeSearchTerm}&liveStream=false` : ""}`,
+    url: `contents?sort=createdDate,desc${activeSearchTerm ? `&search=${activeSearchTerm}` : "&liveStream=false"}`,
     queryKey: ["GetContents", activeSearchTerm],
     pageSize: 20,
   });
