@@ -6,8 +6,9 @@ import CustomButton from "../components/forms/CustomButton";
 import AuthLayout from "../layouts/AuthLayout";
 import Typography from "../components/forms/Typography";
 import { handleCopy, handleCut, handlePaste } from "../utils/helper";
-import {  useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useSignIn } from "@/hooks/useSignIn";
+import PasswordStrengthChecklist from "@/components/atoms/PasswordStrengthChecklist";
 
 const ResetPassword = () => {
   //   const navigate = useNavigate();
@@ -21,17 +22,18 @@ const ResetPassword = () => {
 };
 
 const ResetPasswordForm = () => {
-  const [searchParams] = useSearchParams(); 
-  const { control, handleSubmit, getValues } = useForm();
+  const [searchParams] = useSearchParams();
+  const { control, handleSubmit, getValues, watch } = useForm();
+  const passwordValue = watch("password", "");
 
-    const [, setNotVerifiedError] = useState(false);
-  
-    const resetPasswordMutation = useSignIn({
-      setNotVerifiedError,
-      endpoint: `auth/reset-password?mafanf=${searchParams.get(
-      "mafanf"
+  const [, setNotVerifiedError] = useState(false);
+
+  const resetPasswordMutation = useSignIn({
+    setNotVerifiedError,
+    endpoint: `auth/reset-password?mafanf=${searchParams.get(
+      "mafanf",
     )}&fanfam=${searchParams.get("fanfam")}`,
-    });
+  });
 
   // const resetPasswordMutation = useMutation({
   //   mutationFn: async (data: any) => {
@@ -118,6 +120,8 @@ const ResetPasswordForm = () => {
             },
           }}
         />
+
+        <PasswordStrengthChecklist value={passwordValue} className="mb-6" />
 
         <CustomButton
           loading={resetPasswordMutation.isPending}
