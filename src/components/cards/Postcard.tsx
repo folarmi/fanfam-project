@@ -345,7 +345,7 @@ const PostCard: React.FC<PostCardProps> = ({
   return (
     <article
       style={{ backgroundColor: bgColor }}
-      className={`pt-4 mb-2 drop-shadow-4xl cursor-pointer ${className || ""}`}
+      className={`pt-4  mb-2 drop-shadow-4xl cursor-pointer ${className || ""}`}
       aria-label={`Post by ${profileName}`}
       onClick={onCardClick}
     >
