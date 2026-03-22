@@ -173,7 +173,7 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
 
           <div>
             <p className="text-grey_500 text-xs font-semibold uppercase tracking-wide mb-2">
-              Poll length
+              Poll duration
             </p>
             <div className="grid grid-cols-3 gap-2">
               <CustomSelect
