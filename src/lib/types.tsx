@@ -610,7 +610,7 @@ export type LiveEventPayload = {
 
 export interface MediaGridProps {
   timeLineImage: MediaItem[];
-  onMediaClick?: () => void;
+  onMediaClick?: (e?: React.MouseEvent) => void;
 }
 
 export type ApiUserInfo = {

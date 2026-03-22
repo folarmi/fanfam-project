@@ -310,7 +310,8 @@ const MediaGrid = ({ timeLineImage = [], onMediaClick }: MediaGridProps) => {
   const shown = timeLineImage.slice(0, 6);
   const extra = timeLineImage.length - 6;
 
-  const openLightbox = (index: number) => {
+  const openLightbox = (index: number, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setLightbox(index);
     onMediaClick?.();
   };
@@ -359,7 +360,7 @@ const MediaGrid = ({ timeLineImage = [], onMediaClick }: MediaGridProps) => {
               onClick={(e) => {
                 if (isImage || isVideo) {
                   e.stopPropagation();
-                  openLightbox(index);
+                  openLightbox(index, e);
                 }
               }}
             >
@@ -479,11 +480,13 @@ const MediaGrid = ({ timeLineImage = [], onMediaClick }: MediaGridProps) => {
       </div>
 
       {lightbox !== null && (
-        <Lightbox
-          items={timeLineImage}
-          startIndex={lightbox}
-          onClose={() => setLightbox(null)}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <Lightbox
+            items={timeLineImage}
+            startIndex={lightbox}
+            onClose={() => setLightbox(null)}
+          />
+        </div>
       )}
     </>
   );

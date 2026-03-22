@@ -384,7 +384,11 @@ const PostCard: React.FC<PostCardProps> = ({
       />
 
       {hasImages && (
-        <MediaGrid timeLineImage={timeLineImage} onMediaClick={undefined} />
+        <MediaGrid
+          timeLineImage={timeLineImage}
+          // onMediaClick={undefined}
+          onMediaClick={(e) => e?.stopPropagation()}
+        />
       )}
 
       {pollChoices && pollChoices.length > 0 && (
