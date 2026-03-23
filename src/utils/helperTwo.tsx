@@ -260,3 +260,25 @@ export function getPollExpiryDate(
 
   return new Date(created + durationMs).toISOString();
 }
+
+const URL_REGEX = /(https?:\/\/[^\s]+)/g;
+
+export function linkify(text: string): React.ReactNode[] {
+  const parts = text.split(URL_REGEX);
+
+  return parts.map((part, i) =>
+    /^https?:\/\/[^\s]+$/.test(part) ? (
+      <a
+        key={i}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-500 hover:underline break-all"
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    ),
+  );
+}
