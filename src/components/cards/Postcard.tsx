@@ -11,6 +11,7 @@ import { useCustomMutation } from "@/hooks/apiCalls";
 import AnsweredPoll from "../molecules/AnsweredPoll";
 import { useQueryClient } from "@tanstack/react-query";
 import { getPollExpiryDate } from "@/utils/helperTwo";
+import { showInlineToast } from "@/utils/toastUtils";
 
 const REACTIONS = [
   { type: "LIKE", emoji: "👍", label: "Like" },
@@ -125,6 +126,28 @@ const PostCard: React.FC<PostCardProps> = ({
     e.stopPropagation();
     if (!publicId) return;
 
+    // Derive intent BEFORE updating cache
+    const isCurrentlyBookmarked = (() => {
+      const allContentQueries = queryClient.getQueriesData<any>({
+        queryKey: ["GetContents"],
+      });
+      for (const [, data] of allContentQueries) {
+        for (const page of data?.pages ?? []) {
+          const post = page.data?.content?.find(
+            (p: any) => p?.publicId === publicId,
+          );
+          if (post) {
+            return (
+              post.bookmarkers?.some(
+                (b: any) => b.email === userObject?.email,
+              ) ?? false
+            );
+          }
+        }
+      }
+      return false;
+    })();
+
     // Optimistically update ALL GetContents cache variants
     const allContentQueries = queryClient.getQueriesData<any>({
       queryKey: ["GetContents"],
@@ -190,7 +213,6 @@ const PostCard: React.FC<PostCardProps> = ({
       { contentPublicId: publicId, saveType: "BOOKMARK" },
       {
         onSuccess: () => {
-          // Invalidate both so next focus/mount gets fresh data
           queryClient.invalidateQueries({
             queryKey: ["GetContents"],
             exact: false,
@@ -198,6 +220,20 @@ const PostCard: React.FC<PostCardProps> = ({
           queryClient.invalidateQueries({
             queryKey: ["GetUserBookmarks"],
             exact: false,
+          });
+
+          // Now you know exactly what happened
+          showInlineToast({
+            type: "success",
+            title: isCurrentlyBookmarked
+              ? "Bookmark removed"
+              : "Post bookmarked",
+          });
+        },
+        onError: () => {
+          showInlineToast({
+            type: "error",
+            title: "Something went wrong, please try again",
           });
         },
       },
@@ -386,7 +422,6 @@ const PostCard: React.FC<PostCardProps> = ({
       {hasImages && (
         <MediaGrid
           timeLineImage={timeLineImage}
-          // onMediaClick={undefined}
           onMediaClick={(e) => e?.stopPropagation()}
         />
       )}
@@ -448,14 +483,17 @@ const PostCard: React.FC<PostCardProps> = ({
 
             {/* Trigger */}
             <div className="flex items-center gap-1 cursor-pointer">
-              <ThumbsUp
-                size={24}
-                className={`transition-colors ${
-                  userReaction
-                    ? "text-[#2599F6] fill-[#2599F6]"
-                    : "text-[#8D8E96] hover:text-gray-700"
-                }`}
-              />
+              {userReaction ? (
+                <span className="text-xl leading-none transition-transform scale-110">
+                  {REACTIONS.find((r) => r.type === userReaction)?.emoji}
+                </span>
+              ) : (
+                <ThumbsUp
+                  size={24}
+                  className="text-[#8D8E96] hover:text-gray-700 transition-colors"
+                />
+                // " 👍"
+              )}
               {totalReactions > 0 && (
                 <span className="text-sm text-gray-500">{totalReactions}</span>
               )}
