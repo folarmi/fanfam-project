@@ -5,6 +5,7 @@ import { CommentThread } from "@/components/CommentThread";
 import type { MediaFile } from "@/lib/types";
 import { useGetData } from "@/hooks/apiCalls";
 import { extractComments } from "@/utils/helperTwo";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Prop = {
   publicId: string | undefined;
@@ -23,12 +24,22 @@ type Prop = {
 };
 
 const CommentOnPost = ({ publicId, toggleModal, data }: Prop) => {
+  const queryClient = useQueryClient();
   const { data: commentsData, refetch } = useGetData({
     url: `contents/${data.id}/comments`,
     queryKey: ["comments", data.id],
   });
 
   const comments = extractComments(commentsData);
+
+  const onCommentAdded = () => {
+    toggleModal?.();
+    refetch();
+    queryClient.invalidateQueries({
+      queryKey: ["GetContents"],
+      exact: false,
+    });
+  };
 
   return (
     <div className="bg-white mx-auto w-1/2 rounded-xl p-6 shadow-xl max-h-[90vh] overflow-y-auto">
@@ -62,7 +73,7 @@ const CommentOnPost = ({ publicId, toggleModal, data }: Prop) => {
         postId={data.id}
         postOwnerEmail={data.createdBy ?? ""}
         comments={comments}
-        onCommentAdded={refetch}
+        onCommentAdded={onCommentAdded}
         showPollOption
       />
     </div>

@@ -33,6 +33,7 @@ export interface PostCardProps {
   bgColor?: string;
   ifParagraph?: boolean;
   ifIcon?: boolean;
+  ifHorizontal?: boolean;
   className?: string;
   commentslength?: number;
   pollChoices?: any[];
@@ -80,6 +81,7 @@ const PostCard: React.FC<PostCardProps> = ({
   isAlreadyReposted,
   createdDate,
   pollDuration,
+  ifHorizontal = true,
 }) => {
   const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -395,16 +397,18 @@ const PostCard: React.FC<PostCardProps> = ({
         paragraphTwo={paragraphTwo}
         headerActions={
           <div ref={modalRef} className="relative flex-shrink-0">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleModal?.();
-              }}
-              className="cursor-pointer p-1 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="More options"
-            >
-              <MoreHorizontal className="w-5 h-5 text-gray-600" />
-            </button>
+            {ifHorizontal && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleModal?.();
+                }}
+                className="cursor-pointer p-1 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="More options"
+              >
+                <MoreHorizontal className="w-5 h-5 text-gray-600" />
+              </button>
+            )}
 
             {showModal && TimeLineModal && (
               <div

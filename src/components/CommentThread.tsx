@@ -81,7 +81,7 @@ const DeleteButton = ({ commentId, onDeleted }: DeleteButtonProps) => {
 
 // ─── Single comment or reply ──────────────────────────────────────────────────
 
-const MAX_DEPTH = 3;
+const MAX_DEPTH = 6;
 
 type CommentItemProps = {
   comment: ApiComment | StoryPost;
@@ -123,7 +123,7 @@ const CommentItem = ({
 
   const replies: (ApiComment | StoryPost)[] =
     (comment as ApiComment).replies ?? (comment as any).comments ?? [];
-  const replyCount = replies.length;
+  const replyCount = replies?.length;
 
   return (
     <div className={level > 0 ? "ml-6 border-l-2 border-grey_10 pl-4" : ""}>
@@ -136,6 +136,7 @@ const CommentItem = ({
         paragraphOne={comment.message}
         timeLineImage={(comment as any).mediaFiles}
         ifParagraph={!!comment.message}
+        ifHorizontal={false}
         reactionsData={transformReactions(comment.reactions)}
       />
 
@@ -260,12 +261,12 @@ const CommentThread = ({
       </div>
 
       <div className="mt-4 divide-y divide-grey_10">
-        {comments.length === 0 ? (
+        {comments?.length === 0 ? (
           <p className="text-center text-sm text-grey_60 py-8">
             No comments yet. Be the first to comment!
           </p>
         ) : (
-          comments.map((comment) => (
+          comments?.map((comment) => (
             <div key={comment.publicId} className="py-2">
               <CommentItem
                 comment={comment}
