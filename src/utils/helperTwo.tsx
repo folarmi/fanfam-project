@@ -282,3 +282,34 @@ export function linkify(text: string): React.ReactNode[] {
     ),
   );
 }
+
+// utils/mentions.ts
+export type MentionUser = {
+  username: string;
+  email: string;
+  name: string;
+  avatar: string;
+};
+
+export const parseMentions = (
+  mentions?: string[],
+): Record<string, MentionUser> => {
+  if (!mentions?.length) return {};
+
+  return mentions.reduce<Record<string, MentionUser>>((acc, item) => {
+    const [username = "", email = "", name = "", avatar = ""] = item
+      .split(",")
+      .map((value) => value.trim());
+
+    if (!username || !email) return acc;
+
+    acc[username.toLowerCase()] = {
+      username,
+      email,
+      name,
+      avatar,
+    };
+
+    return acc;
+  }, {});
+};

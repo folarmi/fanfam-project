@@ -258,7 +258,7 @@
 
 import { useAppSelector } from "../../../lib/hook";
 import type { RootState } from "../../../lib/store";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Typography from "../../../components/forms/Typography";
 import Post from "../../../components/Post";
 import Replies from "../../../components/Replies";
@@ -271,16 +271,39 @@ import { ProfileActions } from "@/components/molecules/ProfileActions";
 import { TipModal } from "@/components/molecules/TipModal";
 import { actions } from "@/data";
 import type { TipData } from "@/lib/types";
-import { useInfiniteGetData } from "@/hooks/apiCalls";
+import { useGetData, useInfiniteGetData } from "@/hooks/apiCalls";
 import DefaultAvatar from "@/components/molecules/DefaultAvatar";
 import { MAX_LENGTH } from "@/utils/helperTwo";
+import { useParams } from "react-router-dom";
 
 const TABS = ["Post", "Media", "Replies", "Likes"] as const;
 type Tab = (typeof TABS)[number];
 
 const Profile = () => {
+  const { email } = useParams();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
-  const { data: profileData, isLoading } = useFetchProfile(userObject);
+
+  const decodedEmail = useMemo(
+    () => (email ? decodeURIComponent(email) : ""),
+    [email],
+  );
+
+  const viewingOtherUser = Boolean(decodedEmail);
+  const myProfileQuery = useFetchProfile(userObject, !viewingOtherUser);
+
+  const otherProfileQuery = useGetData({
+    url: `profile/${encodeURIComponent(decodedEmail)}`,
+    queryKey: ["GetProfileByEmail", decodedEmail],
+    enabled: viewingOtherUser,
+  });
+
+  const profileData = viewingOtherUser
+    ? otherProfileQuery.data
+    : myProfileQuery.data;
+
+  const isLoading = viewingOtherUser
+    ? otherProfileQuery.isLoading
+    : myProfileQuery.isLoading;
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isActiveTab, setIsActiveTab] = useState<Tab>("Post");

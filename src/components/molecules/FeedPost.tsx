@@ -4,7 +4,7 @@ import Modal from "@/components/modals/Modal";
 import { CommentOnPost } from "@/components/modals/CommentOnPost";
 import TimeLineHomeModal from "@/components/modals/TimeLineHomeModal";
 import { transformReactions } from "@/lib/reaction";
-import { formatTimeAgo } from "@/utils/helperTwo";
+import { formatTimeAgo, parseMentions } from "@/utils/helperTwo";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
@@ -35,6 +35,7 @@ export const FeedPost = ({
   const navigate = useNavigate();
   const postRef = useRef<HTMLDivElement>(null);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
+  const mentionsMap = parseMentions(data?.mentions);
 
   const [hasViewed, setHasViewed] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -78,6 +79,7 @@ export const FeedPost = ({
         timeLineImage={data?.mediaFiles}
         pollChoices={data?.pollChoices}
         pollDuration={data?.pollDuration}
+        mentionsMap={mentionsMap}
         ifParagraph
         showModal={showMoreModal === data?.publicId}
         toggleModal={() =>

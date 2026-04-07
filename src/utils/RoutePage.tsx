@@ -76,6 +76,7 @@ const RoutePage = () => {
           <Route index element={<Home />} />
           <Route path=":id" element={<SinglePostDetails />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="profile/:email" element={<Profile />} />
           <Route path="profile/edit-profile" element={<EditProfile />} />
           <Route
             path="profile/:id/subscribe"

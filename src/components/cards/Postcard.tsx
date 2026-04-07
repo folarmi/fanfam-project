@@ -10,7 +10,7 @@ import { Bookmark, MoreHorizontal, Repeat, ThumbsUp } from "lucide-react";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import AnsweredPoll from "../molecules/AnsweredPoll";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPollExpiryDate } from "@/utils/helperTwo";
+import { getPollExpiryDate, type MentionUser } from "@/utils/helperTwo";
 import { showInlineToast } from "@/utils/toastUtils";
 
 const REACTIONS = [
@@ -47,6 +47,7 @@ export interface PostCardProps {
   isAlreadyBookmarked?: boolean;
   isAlreadyReposted?: boolean;
   createdDate?: string;
+  mentionsMap?: Record<string, MentionUser>;
   pollDuration?: {
     days: number;
     hours: number;
@@ -82,6 +83,7 @@ const PostCard: React.FC<PostCardProps> = ({
   createdDate,
   pollDuration,
   ifHorizontal = true,
+  mentionsMap,
 }) => {
   const queryClient = useQueryClient();
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -395,6 +397,7 @@ const PostCard: React.FC<PostCardProps> = ({
         ifParagraph={ifParagraph}
         paragraphOne={paragraphOne}
         paragraphTwo={paragraphTwo}
+        mentionsMap={mentionsMap}
         headerActions={
           <div ref={modalRef} className="relative flex-shrink-0">
             {ifHorizontal && (

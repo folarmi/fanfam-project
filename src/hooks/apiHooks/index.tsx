@@ -1,11 +1,12 @@
 import type { UserObject } from "@/lib/types";
 import { useFetchSettings } from "../useFetchSettings";
 
-export const useFetchProfile = (userObject: UserObject) => {
+export const useFetchProfile = (userObject: UserObject, enabled?: boolean) => {
   return useFetchSettings({
     endpoint: "/profile/view",
     queryKeyPrefix: "viewProfile",
     userObject,
+    enabled,
   });
 };
 

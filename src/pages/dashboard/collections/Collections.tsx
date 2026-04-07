@@ -84,7 +84,6 @@ const Collections = () => {
   } = useGetData({
     url: `subscriptions?page=0&size=20&subscriberEmail=${userObject?.email}`,
     queryKey: ["GetSubscriptionsForViewer"],
-    // enabled: !isCreator,
   });
 
   const isLoading =
