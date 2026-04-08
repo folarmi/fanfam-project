@@ -310,6 +310,23 @@ const Profile = () => {
   const [showTipModal, setShowTipModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  // With this — use the viewed profile's email, not always the logged-in user's:
+  const contentEmail = viewingOtherUser
+    ? profileData?.data?.email // the mentioned user's email
+    : userObject?.email; // own profile
+
+  // const {
+  //   data: creatorContentPages,
+  //   isLoading: creatorContentIsLoading,
+  //   fetchNextPage,
+  //   hasNextPage,
+  //   isFetchingNextPage,
+  // } = useInfiniteGetData({
+  //   url: `contents?creator=${userObject?.email}&sort=createdDate,desc`,
+  //   queryKey: ["GetUserContent", userObject?.email ?? ""],
+  //   pageSize: 20,
+  // });
+
   const {
     data: creatorContentPages,
     isLoading: creatorContentIsLoading,
@@ -317,8 +334,9 @@ const Profile = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteGetData({
-    url: `contents?creator=${userObject?.email}&sort=createdDate,desc`,
-    queryKey: ["GetUserContent", userObject?.email ?? ""],
+    url: `contents?creator=${contentEmail}&sort=createdDate,desc`,
+    queryKey: ["GetUserContent", contentEmail ?? ""],
+    enabled: !!contentEmail, // don't fetch until we have the email
     pageSize: 20,
   });
 
