@@ -1,5 +1,3 @@
-# image: node:22.20-alpine
-
 stages:
   - test
   - build
@@ -30,16 +28,14 @@ build:
     - |
       echo "Running Build..."
 
-      docker build \
-        --build-arg VITE_FIREBASE_API_KEY="$VITE_FIREBASE_API_KEY" \
-        --build-arg VITE_FIREBASE_AUTH_DOMAIN="$VITE_FIREBASE_AUTH_DOMAIN" \
-        --build-arg VITE_FIREBASE_PROJECT_ID="$VITE_FIREBASE_PROJECT_ID" \
-        --build-arg VITE_FIREBASE_STORAGE_BUCKET="$VITE_FIREBASE_STORAGE_BUCKET" \
-        --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="$VITE_FIREBASE_MESSAGING_SENDER_ID" \
-        --build-arg VITE_FIREBASE_APP_ID="$VITE_FIREBASE_APP_ID" \
+      printf "%s" "$ENV_FILE" > .env
+
+      DOCKER_BUILDKIT=1 docker build \
+        --secret id=envfile,src=.env \
         -t $DOCKER_REGISTRY \
         -f $DOCKER_FILE .
 
+      rm -f .env
       echo "Build OK"
 
 push:
