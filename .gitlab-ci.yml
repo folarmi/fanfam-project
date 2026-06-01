@@ -28,6 +28,7 @@ build:
     - fanfam
   script:
     - |
+      printf "%s" "$ENV_FILE" > .env
       echo "Running Build..."
       docker build -t $DOCKER_REGISTRY -f $DOCKER_FILE .
       echo "Build OK"
@@ -62,3 +63,4 @@ deploy:
     - |
       printf "%s" "$ENV_FILE" > .env
       docker compose -f $COMPOSE_FILE up -d
+      echo "deploy completed"
