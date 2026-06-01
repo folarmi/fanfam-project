@@ -27,20 +27,16 @@ build:
   script:
     - |
       echo "Running Build..."
-
-      cp "$ENV_FILE" .env
-
-      echo "--- .env contents (key names only) ---"
-      grep -o '^[^=]*' .env
-
-      echo "--- .env line count ---"
-      wc -l < .env
-
+      echo "--- All available variable names ---"
+      env | grep -o '^[^=]*' | sort
+      echo "--- ENV_FILE value ---"
+      echo "$ENV_FILE"
+      echo "--- Does ENV_FILE path exist? ---"
+      ls -la "$ENV_FILE" 2>/dev/null || echo "PATH DOES NOT EXIST"
       DOCKER_BUILDKIT=1 docker build \
         --secret id=envfile,src=.env \
         -t $DOCKER_REGISTRY \
         -f $DOCKER_FILE .
-
       rm -f .env
       echo "Build OK"
 
