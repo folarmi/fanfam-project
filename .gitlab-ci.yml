@@ -31,6 +31,7 @@ build:
       echo "Running Build..."
       docker build -t $DOCKER_REGISTRY -f $DOCKER_FILE .
       echo "Build OK"
+
 push:
   stage: push
   tags:
@@ -48,8 +49,9 @@ cleanup:
     - fanfam
   script:
     - |
-      docker compose -f docker/compose.yml down
-      docker image prune
+      printf "%s" "$ENV_FILE" > .env
+      docker compose -f $COMPOSE_FILE down
+      docker image prune -f
       echo "cleanup done"
 
 deploy:
@@ -58,4 +60,5 @@ deploy:
     - fanfam
   script:
     - |
+      printf "%s" "$ENV_FILE" > .env
       docker compose -f $COMPOSE_FILE up -d
