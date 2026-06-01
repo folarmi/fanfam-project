@@ -30,6 +30,12 @@ build:
 
       printf "%s" "$ENV_FILE" > .env
 
+      echo "--- .env contents (key names only) ---"
+      grep -o '^[^=]*' .env
+
+      echo "--- .env line count ---"
+      wc -l < .env
+
       DOCKER_BUILDKIT=1 docker build \
         --secret id=envfile,src=.env \
         -t $DOCKER_REGISTRY \
