@@ -28,7 +28,7 @@ build:
     - |
       echo "Running Build..."
 
-      printf "%s" "$ENV_FILE" > .env
+      cp "$ENV_FILE" .env
 
       echo "--- .env contents (key names only) ---"
       grep -o '^[^=]*' .env
@@ -61,7 +61,7 @@ cleanup:
     - fanfam
   script:
     - |
-      printf "%s" "$ENV_FILE" > .env
+      cp "$ENV_FILE" .env
       docker compose -f $COMPOSE_FILE down
       docker image prune -f
       echo "cleanup done"
@@ -72,6 +72,6 @@ deploy:
     - fanfam
   script:
     - |
-      printf "%s" "$ENV_FILE" > .env
+      cp "$ENV_FILE" .env
       docker compose -f $COMPOSE_FILE up -d
       echo "deploy completed"
