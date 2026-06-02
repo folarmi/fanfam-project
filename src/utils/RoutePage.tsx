@@ -7,7 +7,7 @@ import {
   ForgotPassword,
   EmailSent,
   LiveStreaming,
-  // LandingPage,
+  LandingPage,
 } from "../pages";
 import DashboardLayout from "../layouts/DashboardLayout";
 import {
@@ -64,8 +64,8 @@ import KycVerification from "@/kyc/Kycverification";
 const RoutePage = () => {
   return (
     <Routes>
-      {/* <Route path="/" element={<LandingPage />} /> */}
-      <Route path="/" element={<SignIn />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<SignIn />} />
       <Route path="/sign-up" element={<Signup />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/reset-password" element={<ResetPassword />} />
