@@ -24,7 +24,7 @@ const HeaderText = ({
   return (
     <span
       className={`
-        text-[64px] font-bold font-clash
+      text-5xl  lg:text-[64px] font-bold font-clash
         ${colorClasses[color]}
         ${className}
       `}

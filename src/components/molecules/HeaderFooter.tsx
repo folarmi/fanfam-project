@@ -9,17 +9,17 @@ import HeaderButton from "../atoms/HeaderButton";
 const HeaderFooter = () => {
   const { control } = useForm();
   return (
-    <div className=" ">
-      <img src={headerFooter} />
+    <div className="w-full">
+      <img src={headerFooter} className="w-full h-auto object-cover" />
 
-      <div className="py-[101px] bg-primaryTwo flex flex-col justify-center items-center">
+      <div className="py-16 px-6 bg-primaryTwo flex flex-col justify-center items-center sm:px-8 md:px-10 lg:px-16">
         <HeaderText text="Be Among the First" />
         <p className="text-lg pt-2 max-w-[420px] text-center text-white_600">
           Join the waitlist and get exclusive early access when we launch. Plus,
           help shape the future of FanFam.
         </p>
 
-        <form className="mt-[30px] w-1/4 flex flex-col gap-y-5">
+        <form className="mt-8 w-full max-w-[460px] flex flex-col gap-y-5">
           <StackedInput
             name="fullName"
             control={control}
@@ -58,24 +58,25 @@ const HeaderFooter = () => {
           />
 
           <HeaderButton
+            className="w-full sm:w-auto"
             label="Get Early Access"
             bg="dark"
             icon={<ArrowRight className="w-4 h-4" />}
           />
 
-          <p className="text-white_600 font-medium text-xs text-center max-w-[408px]">
+          <p className="text-white_600 font-medium text-xs text-center max-w-[408px] mx-auto">
             By joining, you agree to receive updates about FanFam. We respect
             your privacy and won't spam you.
           </p>
         </form>
       </div>
 
-      <footer className="bg-white py-5 px-20 flex justify-between items-center">
+      <footer className="bg-white py-5 px-6 flex flex-col gap-y-4 items-center text-center sm:px-10 md:px-16 lg:px-20 lg:flex-row lg:justify-between lg:text-left">
         <p className="font-black text-base text-primaryTwo">FANFAM</p>
         <p className="font-normal text-sm text-grey_60">
           © 2026 FanFam. All rights reserved.
         </p>
-        <div className="flex items-center gap-x-6">
+        <div className="flex flex-col items-center gap-y-2 sm:flex-row sm:gap-x-6 lg:items-center">
           <p className="font-normal text-sm text-grey_60">Privacy</p>
           <p className="font-normal text-sm text-grey_60">Terms</p>
         </div>

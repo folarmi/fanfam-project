@@ -6,7 +6,7 @@ import HeaderText from "../atoms/HeaderText";
 const Hero = () => {
   return (
     <>
-      <div className="bg-primaryTwo text-white flex flex-col justify-center items-center pt-[85px] pb-[38px]">
+      <div className="bg-primaryTwo text-white flex flex-col justify-center items-center px-6 py-16 sm:px-8 sm:py-[86px]">
         <HeaderText text="Own Your Audience." />
         <HeaderText text="Build Your Community." />
 
@@ -15,16 +15,20 @@ const Hero = () => {
           lasting, meaningful connections with their fans — on their own terms.
         </p>
 
-        <div className="flex items-center gap-x-5">
-          <HeaderButton label="Join the waitlist" />
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-x-5">
           <HeaderButton
+            className="w-full sm:w-auto"
+            label="Join the waitlist"
+          />
+          <HeaderButton
+            className="w-full sm:w-auto"
             label="Learn More"
             icon={<ArrowDown className="w-6 h-6 text-primaryTwo" />}
           />
         </div>
       </div>
       <div className="w-full">
-        <img src={heroImage} className="w-full" />
+        <img src={heroImage} className="w-full h-auto object-cover" />
       </div>
     </>
   );
