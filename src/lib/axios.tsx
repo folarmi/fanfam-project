@@ -38,6 +38,7 @@ api.interceptors.request.use(
       config.url?.includes("auth/login") ||
       config.url?.includes("auth/register") ||
       config.url?.includes("auth/verify") ||
+      config.url?.includes("waitlist/join") ||
       config.url?.includes("auth/refresh") ||
       config.url?.includes("auth/forgot-password") ||
       config.url?.includes(" auth/reset-password");

@@ -77,10 +77,12 @@ export const landingPageMenu = [
   {
     id: 1,
     name: "The Problem",
+    target: "audience",
   },
   {
     id: 2,
     name: "Early Access",
+    target: "footer",
   },
 ];
 
@@ -2232,3 +2234,14 @@ export const pollMinutesOptions = [
   { value: 30, label: "30 min" },
   { value: 45, label: "45 min" },
 ];
+
+export const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+};

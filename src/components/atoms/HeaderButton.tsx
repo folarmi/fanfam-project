@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 
 type BgVariant = "white" | "primary" | "dark";
 
@@ -12,30 +13,46 @@ type HeaderButtonProps = {
   label: string;
   icon?: ReactNode;
   bg?: BgVariant;
+  loading?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const HeaderButton = ({
   label,
   icon,
   bg = "white",
+  loading = false,
+  disabled,
   className = "",
   ...props
 }: HeaderButtonProps) => {
   return (
     <button
+      disabled={disabled || loading}
       className={`
         flex items-center justify-center gap-2
         py-[11px] px-[14px]
         font-medium text-sm
         border
         rounded-3xl
+        transition-all
+        disabled:opacity-60
+        disabled:cursor-not-allowed
         ${bgClasses[bg]}
         ${className}
       `}
       {...props}
     >
-      <span>{label}</span>
-      {icon && <span className="flex items-center">{icon}</span>}
+      {loading ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Loading...</span>
+        </>
+      ) : (
+        <>
+          <span>{label}</span>
+          {icon && <span className="flex items-center">{icon}</span>}
+        </>
+      )}
     </button>
   );
 };

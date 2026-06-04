@@ -2,6 +2,7 @@ import { ArrowDown } from "lucide-react";
 import HeaderButton from "../atoms/HeaderButton";
 import heroImage from "@/assets/heroImage.svg";
 import HeaderText from "../atoms/HeaderText";
+import { scrollToSection } from "@/data";
 
 const Hero = () => {
   return (
@@ -11,7 +12,7 @@ const Hero = () => {
         <HeaderText text="Build Your Community." />
 
         <p className="py-6 text-[18px] max-w-[683px] text-center">
-          FanFam empowers creators to break free from algorithms and build
+          Fan Nation empowers creators to break free from algorithms and build
           lasting, meaningful connections with their fans — on their own terms.
         </p>
 
@@ -19,10 +20,12 @@ const Hero = () => {
           <HeaderButton
             className="w-full sm:w-auto"
             label="Join the waitlist"
+            onClick={() => scrollToSection("footer")}
           />
           <HeaderButton
             className="w-full sm:w-auto"
             label="Learn More"
+            onClick={() => scrollToSection("footer")}
             icon={<ArrowDown className="w-6 h-6 text-primaryTwo" />}
           />
         </div>

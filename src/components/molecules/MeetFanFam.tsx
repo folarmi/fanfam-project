@@ -6,9 +6,9 @@ import markSign from "@/assets/icons/markSign.svg";
 const MeetFanFam = () => {
   return (
     <div className="pt-16 pb-28 px-6 flex flex-col justify-center items-center sm:px-8 md:px-10 lg:px-16">
-      <HeaderText text="Meet FanFam" color="muted" />
+      <HeaderText text="Meet Fan Nation" color="muted" />
       <p className="text-base max-w-[683px] py-4 text-center">
-        FanFam is the all-in-one platform where creators truly own their
+        Fan Nation is the all-in-one platform where creators truly own their
         audience. Build deeper fan relationships, create engaged communities,
         and grow sustainably — all without depending on algorithms or
         third-party platforms.

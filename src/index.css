@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 @font-face {
   font-family: "Clash Display";
   src: url("/fonts/ClashDisplay-Variable.woff") format("woff2");

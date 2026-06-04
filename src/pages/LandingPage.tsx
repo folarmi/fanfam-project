@@ -8,10 +8,22 @@ const LandingPage = () => {
   return (
     <div>
       <Header />
-      <Hero />
-      <OwnYourAudience />
-      <MeetFanFam />
-      <HeaderFooter />
+
+      <section id="home">
+        <Hero />
+      </section>
+
+      <section id="audience">
+        <OwnYourAudience />
+      </section>
+
+      <section id="meet-fanfam">
+        <MeetFanFam />
+      </section>
+
+      <section id="footer">
+        <HeaderFooter />
+      </section>
     </div>
   );
 };
