@@ -1,7 +1,7 @@
 import { landingPageMenu, scrollToSection } from "@/data";
 import { ArrowRight } from "lucide-react";
 import HeaderButton from "../atoms/HeaderButton";
-import logo from "@/assets/icons/fanNation.png";
+import logo from "@/assets/fanNationWhite.svg";
 
 const Header = () => {
   return (

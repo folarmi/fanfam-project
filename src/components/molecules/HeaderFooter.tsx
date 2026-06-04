@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { ArrowRight } from "lucide-react";
 import HeaderButton from "../atoms/HeaderButton";
 import { useCustomMutation } from "@/hooks/apiCalls";
+import logo from "@/assets/icons/fanNation.svg";
 
 const HeaderFooter = () => {
   const { control, handleSubmit } = useForm();
@@ -99,7 +100,11 @@ const HeaderFooter = () => {
       </div>
 
       <footer className="bg-white py-5 px-6 flex flex-col gap-y-4 items-center text-center sm:px-10 md:px-16 lg:px-20 lg:flex-row lg:justify-between lg:text-left">
-        <p className="font-black text-base text-primaryTwo">FAN NATION</p>
+        <img
+          src={logo}
+          alt="Fan Nation"
+          className="h-10 md:h-12 w-auto object-contain"
+        />
         <p className="font-normal text-sm text-grey_60">
           © 2026 Fan Nation. All rights reserved.
         </p>
