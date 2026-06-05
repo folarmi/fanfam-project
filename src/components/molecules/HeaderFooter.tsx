@@ -10,18 +10,27 @@ import { useCustomMutation } from "@/hooks/apiCalls";
 import logo from "@/assets/icons/fanNation.svg";
 
 const HeaderFooter = () => {
-  const { control, handleSubmit } = useForm();
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      userType: "",
+      aspiration: "",
+    },
+  });
 
   const joinWaitListMutation = useCustomMutation({
     endpoint: `waitlist/join`,
     successMessage: (data: any) => data?.message,
-    // successMessage: (data: any) => console.log(data?.message),
-    // errorMessage: (error: any) => error,
-    onSuccessCallback: () => {},
   });
 
   const submitForm = (data: any) => {
-    joinWaitListMutation.mutate(data);
+    joinWaitListMutation.mutate(data, {
+      onSuccess: () => {
+        reset();
+      },
+    });
   };
 
   return (
