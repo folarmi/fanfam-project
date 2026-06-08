@@ -59,12 +59,14 @@ import SettingLayout from "@/layouts/SettingsLayout";
 // import BecomeACreatorLayout from "@/layouts/BecomeACreatorLayout";
 // import KycComplete from "@/kyc/KycComplete";
 import KycVerification from "@/kyc/Kycverification";
+import { LandingPageTwo } from "@/pages/LandingPageTwo";
 // import AuthGate from "@/hooks/AuthGate";
 
 const RoutePage = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/landing-page" element={<LandingPageTwo />} />
       <Route path="/login" element={<SignIn />} />
       <Route path="/sign-up" element={<Signup />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
