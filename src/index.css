@@ -49,13 +49,27 @@ html {
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+/* @layer base {
   body {
     background: #07091a;
     color: #f0f4ff;
     -webkit-font-smoothing: antialiased;
   }
   ::selection {
+    background: #2599f6;
+    color: #fff;
+  }
+} */
+
+@layer base {
+  .landing-page {
+    min-height: 100vh;
+    background: #07091a;
+    color: #f0f4ff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .landing-page ::selection {
     background: #2599f6;
     color: #fff;
   }
@@ -361,6 +375,7 @@ details[open] .faq-body {
     transform: translateY(-400px) rotate(200deg) scale(1.1);
   }
 }
+
 .particle {
   position: absolute;
   opacity: 0;
