@@ -41,7 +41,7 @@ api.interceptors.request.use(
       config.url?.includes("waitlist/join") ||
       config.url?.includes("auth/refresh") ||
       config.url?.includes("auth/forgot-password") ||
-      config.url?.includes(" auth/reset-password");
+      config.url?.includes("auth/reset-password");
 
     if (!isAuthEndpoint) {
       const myTabId = sessionStorage.getItem("tab_id");
