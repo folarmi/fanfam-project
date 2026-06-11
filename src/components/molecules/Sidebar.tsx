@@ -1,39 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Typography from "../forms/Typography";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useCustomMutation } from "../../hooks/apiCalls";
+import { Link, useLocation } from "react-router-dom";
 import { sideBarItems } from "../../data";
-import { useDispatch } from "react-redux";
-import { logout } from "@/lib/features/auth/authSlice";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import DefaultAvatar from "./DefaultAvatar";
 import { LogOutIcon } from "lucide-react";
+import Modal from "../modals/Modal";
+import { useState } from "react";
+import { LogoutModal } from "../modals/LogoutModal";
 
 const Sidebar = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
+
+  const [logoutModal, setLogoutModal] = useState(true);
 
   const userString = localStorage.getItem("userObject");
   const userObject = userString ? JSON.parse(userString) : null;
 
   const { data: profileData } = useFetchProfile(userObject);
 
-  const handleLogout = () => {
-    navigate("/");
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    dispatch(logout());
-    localStorage.clear();
+  const toggleLogoutModal = () => {
+    setLogoutModal(!logoutModal);
   };
-
-  const logOutMutation = useCustomMutation({
-    endpoint: "auth/logout",
-    successMessage: (data: any) => data?.data?.message,
-    errorMessage: (error: any) => error,
-    onSuccessCallback: handleLogout,
-    onError: handleLogout,
-  });
 
   return (
     <div className="hidden h-screen flex-col overflow-y-auto border-r border-grey_10 bg-white px-6 md:flex">
@@ -100,13 +87,19 @@ const Sidebar = () => {
       {/* Logout */}
       <div
         className="flex cursor-pointer items-center py-2 pl-4"
-        onClick={() => logOutMutation.mutate({})}
+        onClick={() => toggleLogoutModal()}
       >
         <LogOutIcon color="#8D8E96" />
         <Typography variant="subtitle2" className="pl-4 text-grey_400">
           Logout
         </Typography>
       </div>
+
+      <Modal show={logoutModal} toggleModal={toggleLogoutModal}>
+        <div className="p-4">
+          <LogoutModal toggleModal={toggleLogoutModal} />
+        </div>
+      </Modal>
     </div>
   );
 };
