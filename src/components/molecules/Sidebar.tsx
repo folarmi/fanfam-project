@@ -11,7 +11,7 @@ import { LogoutModal } from "../modals/LogoutModal";
 const Sidebar = () => {
   const location = useLocation();
 
-  const [logoutModal, setLogoutModal] = useState(true);
+  const [logoutModal, setLogoutModal] = useState(false);
 
   const userString = localStorage.getItem("userObject");
   const userObject = userString ? JSON.parse(userString) : null;

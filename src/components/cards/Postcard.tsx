@@ -287,10 +287,15 @@ const PostCard: React.FC<PostCardProps> = ({
     onSuccessCallback: () => {},
   });
 
-  const handleReaction = (reactionType: string) => {
-    const isActive = userReaction === reactionType;
+  const deleteReactionMutation = useCustomMutation({
+    endpoint: `contents/${publicId}/reactions`,
+    method: "delete",
+    onSuccessCallback: () => {},
+  });
 
-    // Update every ["GetContents", *] cache entry (covers all search terms)
+  const updateReactionInCache = (reactionType?: string | null) => {
+    const shouldRemoveReaction = !reactionType;
+
     const allContentQueries = queryClient.getQueriesData<any>({
       queryKey: ["GetContents"],
     });
@@ -310,48 +315,165 @@ const PostCard: React.FC<PostCardProps> = ({
 
                 const reactions = post?.reactions || [];
 
-                if (isActive) {
-                  // Toggle off
+                if (shouldRemoveReaction) {
                   return {
                     ...post,
                     reactions: reactions.filter(
-                      (r: any) =>
-                        !(
-                          r?.createdBy === userObject?.email &&
-                          r?.type === reactionType
-                        ),
+                      (r: any) => r?.createdBy !== userObject?.email,
                     ),
                   };
-                } else {
-                  // Swap to new reaction
-                  return {
-                    ...post,
-                    reactions: [
-                      ...reactions.filter(
-                        (r: any) => r.createdBy !== userObject?.email,
-                      ),
-                      {
-                        publicId: `temp-${Date.now()}`,
-                        createdBy: userObject?.email,
-                        lastModifiedBy: userObject?.email,
-                        createdDate: new Date().toISOString(),
-                        lastModifiedDate: new Date().toISOString(),
-                        type: reactionType,
-                      },
-                    ],
-                  };
                 }
+
+                return {
+                  ...post,
+                  reactions: [
+                    ...reactions.filter(
+                      (r: any) => r?.createdBy !== userObject?.email,
+                    ),
+                    {
+                      publicId: `temp-${Date.now()}`,
+                      createdBy: userObject?.email,
+                      lastModifiedBy: userObject?.email,
+                      createdDate: new Date().toISOString(),
+                      lastModifiedDate: new Date().toISOString(),
+                      type: reactionType,
+                    },
+                  ],
+                };
               }),
             },
           })),
         };
       });
     });
-
-    reactMutation.mutate({ pubId: publicId, reactionType });
   };
 
+  // const handleReaction = (reactionType: string) => {
+  //   const isActive = userReaction === reactionType;
+
+  //   // Update every ["GetContents", *] cache entry (covers all search terms)
+  //   const allContentQueries = queryClient.getQueriesData<any>({
+  //     queryKey: ["GetContents"],
+  //   });
+
+  //   allContentQueries.forEach(([queryKey]) => {
+  //     queryClient.setQueryData(queryKey, (oldData: any) => {
+  //       if (!oldData?.pages) return oldData;
+
+  //       return {
+  //         ...oldData,
+  //         pages: oldData.pages.map((page: any) => ({
+  //           ...page,
+  //           data: {
+  //             ...page.data,
+  //             content: page.data?.content?.map((post: any) => {
+  //               if (post?.publicId !== publicId) return post;
+
+  //               const reactions = post?.reactions || [];
+
+  //               if (isActive) {
+  //                 // Toggle off
+  //                 return {
+  //                   ...post,
+  //                   reactions: reactions.filter(
+  //                     (r: any) =>
+  //                       !(
+  //                         r?.createdBy === userObject?.email &&
+  //                         r?.type === reactionType
+  //                       ),
+  //                   ),
+  //                 };
+  //               } else {
+  //                 // Swap to new reaction
+  //                 return {
+  //                   ...post,
+  //                   reactions: [
+  //                     ...reactions.filter(
+  //                       (r: any) => r.createdBy !== userObject?.email,
+  //                     ),
+  //                     {
+  //                       publicId: `temp-${Date.now()}`,
+  //                       createdBy: userObject?.email,
+  //                       lastModifiedBy: userObject?.email,
+  //                       createdDate: new Date().toISOString(),
+  //                       lastModifiedDate: new Date().toISOString(),
+  //                       type: reactionType,
+  //                     },
+  //                   ],
+  //                 };
+  //               }
+  //             }),
+  //           },
+  //         })),
+  //       };
+  //     });
+  //   });
+
+  //   reactMutation.mutate({ pubId: publicId, reactionType });
+  // };
+
   // ── "..." modal outside-click close ───────────────────────────
+
+  const handleReaction = (reactionType: string) => {
+    if (!publicId) return;
+
+    const isRemovingCurrentReaction = userReaction === reactionType;
+
+    if (isRemovingCurrentReaction) {
+      updateReactionInCache(null);
+
+      deleteReactionMutation.mutate(
+        {},
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["GetContents"],
+              exact: false,
+            });
+          },
+          onError: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["GetContents"],
+              exact: false,
+            });
+
+            showInlineToast({
+              type: "error",
+              title: "Could not remove reaction, please try again",
+            });
+          },
+        },
+      );
+
+      return;
+    }
+
+    updateReactionInCache(reactionType);
+
+    reactMutation.mutate(
+      { pubId: publicId, reactionType },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["GetContents"],
+            exact: false,
+          });
+        },
+        onError: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["GetContents"],
+            exact: false,
+          });
+
+          showInlineToast({
+            type: "error",
+            title: "Could not update reaction, please try again",
+          });
+        },
+      },
+    );
+  };
+
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -489,7 +611,7 @@ const PostCard: React.FC<PostCardProps> = ({
             )}
 
             {/* Trigger */}
-            <div className="flex items-center gap-1 cursor-pointer">
+            {/* <div className="flex items-center gap-1 cursor-pointer">
               {userReaction ? (
                 <span className="text-xl leading-none transition-transform scale-110">
                   {REACTIONS.find((r) => r.type === userReaction)?.emoji}
@@ -501,6 +623,37 @@ const PostCard: React.FC<PostCardProps> = ({
                 />
                 // " 👍"
               )}
+              {totalReactions > 0 && (
+                <span className="text-sm text-gray-500">{totalReactions}</span>
+              )}
+            </div> */}
+
+            {/* Trigger */}
+            <div
+              className="flex items-center gap-1 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+
+                if (userReaction) {
+                  handleReaction(userReaction);
+                  setPickerOpen(false);
+                  return;
+                }
+
+                openPicker();
+              }}
+            >
+              {userReaction ? (
+                <span className="text-xl leading-none transition-transform scale-110">
+                  {REACTIONS.find((r) => r.type === userReaction)?.emoji}
+                </span>
+              ) : (
+                <ThumbsUp
+                  size={24}
+                  className="text-[#8D8E96] hover:text-gray-700 transition-colors"
+                />
+              )}
+
               {totalReactions > 0 && (
                 <span className="text-sm text-gray-500">{totalReactions}</span>
               )}
