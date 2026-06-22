@@ -226,8 +226,8 @@ export const sideBarItems = [
     name: "Become a Creator",
     image: (isActive: boolean) => <CreatorIcon active={isActive} />,
     link: "/dashboard/become-a-creator",
-    roles: ["VIEWER"],
-    // roles: ["CREATOR", "VIEWER"],
+    // roles: ["VIEWER"],
+    roles: ["CREATOR", "VIEWER"],
   },
 ];
 

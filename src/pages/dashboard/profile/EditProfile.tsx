@@ -292,7 +292,12 @@ const EditProfile = () => {
                 name="fullName"
                 control={control}
                 required
-                rules={{ required: "Fullname is required" }}
+                rules={{
+                  required: "Full name is required",
+                  validate: (value: string) =>
+                    value.trim().split(/\s+/).length >= 2 ||
+                    "Please enter your first and last name",
+                }}
               />
 
               <CustomInput

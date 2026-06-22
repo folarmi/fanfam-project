@@ -196,6 +196,3 @@ const SignIn = () => {
 };
 
 export { SignIn };
-
-// https://fanation.app/api/v1/waitlist/join
-// https://fanation.app/waitlist/join'

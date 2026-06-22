@@ -1,203 +1,418 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-// components/KycVerification.tsx
-import { useEffect, useRef, useState } from "react";
-import { useKyc } from "@/hooks/useKyc";
+// import { useEffect } from "react";
+// import { useForm } from "react-hook-form";
+// import {
+//   CheckCircle2,
+//   FileCheck2,
+//   Loader2,
+//   ScanFace,
+//   ShieldCheck,
+// } from "lucide-react";
+
+// import CustomInput from "@/components/forms/CustomInput";
+// import { useDidit } from "@/hooks/useDidit";
+// import { useAppSelector } from "@/lib/hook";
+// import type { RootState } from "@/lib/store";
+// import { useFetchProfile } from "@/hooks/apiHooks";
+
+// type KycFormValues = {
+//   email: string;
+//   firstname: string;
+//   lastname: string;
+// };
+
+// const KycVerification = () => {
+//   const { userObject } = useAppSelector((state: RootState) => state.auth);
+//   const myProfileQuery = useFetchProfile(userObject, true);
+
+//   console.log(myProfileQuery);
+//   const { startDiditKyc, isStartingDiditKyc } = useDidit();
+
+//   const { control, getValues, reset } = useForm<KycFormValues>({
+//     defaultValues: {
+//       email: "",
+//       firstname: "",
+//       lastname: "",
+//     },
+//   });
+
+//   useEffect(() => {
+//     if (!userObject) return;
+
+//     reset({
+//       email: userObject.email ?? "",
+//       firstname: userObject.firstname ?? "",
+//       lastname: userObject.lastname ?? "",
+//     });
+//   }, [userObject, reset]);
+
+//   const handleStartVerification = () => {
+//     const { email, firstname, lastname } = getValues();
+
+//     if (!email || !firstname || !lastname) return;
+
+//     startDiditKyc({
+//       email,
+//       firstname,
+//       lastname,
+//       cbUrl: `${window.location.origin}${window.location.pathname}`,
+//     });
+//   };
+
+//   const isUserInformationComplete =
+//     Boolean(userObject?.email) &&
+//     Boolean(userObject?.firstname) &&
+//     Boolean(userObject?.lastname);
+
+//   return (
+//     <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+//       <div className="border-b border-gray-100 bg-blue-50 px-6 py-6 sm:px-8">
+//         <div className="flex items-start gap-4">
+//           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white">
+//             <ShieldCheck className="h-6 w-6" />
+//           </div>
+
+//           <div>
+//             <h2 className="text-xl font-semibold text-gray-900">
+//               Identity Verification
+//             </h2>
+
+//             <p className="mt-1 text-sm leading-6 text-gray-600">
+//               Confirm your details and complete a secure identity check to
+//               unlock all account features.
+//             </p>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div className="space-y-7 px-6 py-7 sm:px-8">
+//         <div>
+//           <h3 className="text-sm font-semibold text-gray-900">
+//             Personal information
+//           </h3>
+
+//           <p className="mt-1 text-sm text-gray-500">
+//             These details were retrieved from your profile and cannot be edited
+//             here.
+//           </p>
+//         </div>
+
+//         <div className="grid gap-4 sm:grid-cols-2">
+//           <div className="[&_input]:cursor-not-allowed [&_input]:bg-gray-100 [&_input]:text-gray-500">
+//             <CustomInput
+//               label="First name"
+//               name="firstname"
+//               control={control}
+//               readOnly
+//               rules={{ required: "First name is required" }}
+//             />
+//           </div>
+
+//           <div className="[&_input]:cursor-not-allowed [&_input]:bg-gray-100 [&_input]:text-gray-500">
+//             <CustomInput
+//               label="Last name"
+//               name="lastname"
+//               control={control}
+//               readOnly
+//               rules={{ required: "Last name is required" }}
+//             />
+//           </div>
+
+//           <div className="sm:col-span-2 [&_input]:cursor-not-allowed [&_input]:bg-gray-100 [&_input]:text-gray-500">
+//             <CustomInput
+//               label="Email address"
+//               name="email"
+//               control={control}
+//               readOnly
+//               rules={{ required: "Email is required" }}
+//             />
+//           </div>
+//         </div>
+
+//         {!isUserInformationComplete && (
+//           <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+//             Your first name, last name, and email must be added to your profile
+//             before you can begin verification.
+//           </div>
+//         )}
+
+//         <div className="rounded-lg border border-gray-200 bg-gray-50 p-5">
+//           <h3 className="text-sm font-semibold text-gray-900">
+//             What you will need
+//           </h3>
+
+//           <div className="mt-4 space-y-4">
+//             <div className="flex items-start gap-3">
+//               <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+//               <div>
+//                 <p className="text-sm font-medium text-gray-800">
+//                   A valid government-issued ID
+//                 </p>
+//                 <p className="mt-0.5 text-xs text-gray-500">
+//                   Passport, national ID card, or driving licence.
+//                 </p>
+//               </div>
+//             </div>
+
+//             <div className="flex items-start gap-3">
+//               <ScanFace className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+//               <div>
+//                 <p className="text-sm font-medium text-gray-800">
+//                   A facial verification check
+//                 </p>
+//                 <p className="mt-0.5 text-xs text-gray-500">
+//                   Make sure your face is visible and you are in a well-lit area.
+//                 </p>
+//               </div>
+//             </div>
+
+//             <div className="flex items-start gap-3">
+//               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+//               <div>
+//                 <p className="text-sm font-medium text-gray-800">
+//                   A camera-enabled device
+//                 </p>
+//                 <p className="mt-0.5 text-xs text-gray-500">
+//                   You will be asked to allow camera access.
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         <button
+//           type="button"
+//           onClick={handleStartVerification}
+//           disabled={isStartingDiditKyc || !isUserInformationComplete}
+//           className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+//         >
+//           {isStartingDiditKyc && <Loader2 className="h-4 w-4 animate-spin" />}
+
+//           {isStartingDiditKyc
+//             ? "Preparing verification..."
+//             : "Start identity verification"}
+//         </button>
+
+//         <p className="text-center text-xs text-gray-400">
+//           Your verification is securely processed by Didit.
+//         </p>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default KycVerification;
+
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import {
+  CheckCircle2,
+  FileCheck2,
+  Loader2,
+  ScanFace,
+  ShieldCheck,
+} from "lucide-react";
+
+import CustomInput from "@/components/forms/CustomInput";
+import { useFetchProfile } from "@/hooks/apiHooks";
+import { useDidit } from "@/hooks/useDidit";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 
-type Props = {
-  onSuccess?: () => void;
-  onDeclined?: () => void;
+type KycFormValues = {
+  email: string;
+  firstname: string;
+  lastname: string;
 };
 
-const KycVerification = ({ onSuccess, onDeclined }: Props) => {
+const KycVerification = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
-  const {
-    status,
-    verificationUrl,
-    // reference,
-    error,
-    initiateKyc,
-    checkStatus,
-    reset,
-  } = useKyc();
 
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const myProfileQuery = useFetchProfile(userObject, Boolean(userObject));
+  const profile = myProfileQuery.data?.data;
 
-  // Listen for postMessage events from the Shufti iframe
+  const fullName = profile?.fullName?.trim() ?? "";
+  const nameParts = fullName.split(/\s+/).filter(Boolean);
+
+  const firstname = nameParts[0] ?? "";
+  const lastname = nameParts.slice(1).join(" ");
+
+  const { startDiditKyc, isStartingDiditKyc } = useDidit();
+
+  const { control, getValues, reset } = useForm<KycFormValues>({
+    defaultValues: {
+      email: "",
+      firstname: "",
+      lastname: "",
+    },
+  });
+
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (typeof event.data !== "object" || !event.data?.type) return;
-      const { type, reference: ref } = event.data;
+    if (!profile) return;
 
-      if (type === "verification.accepted") {
-        onSuccess?.();
-      } else if (type === "verification.declined") {
-        onDeclined?.();
-      } else if (type === "request.timeout") {
-        reset();
-      }
+    reset({
+      email: profile.email ?? "",
+      firstname,
+      lastname,
+    });
+  }, [profile, firstname, lastname, reset]);
 
-      if (ref) checkStatus(ref);
-    };
+  const handleStartVerification = () => {
+    const values = getValues();
 
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
+    if (!values.email || !values.firstname || !values.lastname) return;
 
-  const handleStart = () => {
-    if (!userObject) return;
-    initiateKyc(userObject.usid ?? userObject.publicId, userObject.email);
+    startDiditKyc({
+      email: values.email,
+      firstname: values.firstname,
+      lastname: values.lastname,
+      cbUrl: `${window.location.origin}${window.location.pathname}`,
+    });
   };
 
-  // ── Accepted ──────────────────────────────────────────────────────
-  if (status === "accepted") {
+  const isProfileComplete =
+    Boolean(profile?.email) && Boolean(firstname) && Boolean(lastname);
+
+  if (myProfileQuery.isLoading) {
     return (
-      <div className="flex flex-col items-center py-10 gap-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-          <svg
-            className="w-8 h-8 text-green-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-        <h3 className="text-lg font-semibold text-gray-800">
-          Verification Successful
-        </h3>
-        <p className="text-sm text-gray-500">
-          Your identity has been verified.
-        </p>
+      <div className="flex min-h-64 items-center justify-center">
+        <Loader2 className="h-7 w-7 animate-spin text-blue-600" />
       </div>
     );
   }
 
-  // ── Declined ──────────────────────────────────────────────────────
-  if (status === "declined") {
-    return (
-      <div className="flex flex-col items-center py-10 gap-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-          <svg
-            className="w-8 h-8 text-red-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </div>
-        <h3 className="text-lg font-semibold text-gray-800">
-          Verification Failed
-        </h3>
-        <p className="text-sm text-gray-500">
-          We couldn't verify your identity. Please try again.
-        </p>
-        <button
-          onClick={reset}
-          className="mt-2 px-6 py-2 bg-blue-500 text-white rounded-full text-sm font-medium hover:bg-blue-600 transition-colors"
-        >
-          Try Again
-        </button>
-      </div>
-    );
-  }
+  return (
+    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="border-b border-gray-100 bg-blue-50 px-6 py-6 sm:px-8">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
+            <ShieldCheck className="h-6 w-6" />
+          </div>
 
-  // ── Pending — iframe ──────────────────────────────────────────────
-  if (status === "pending" && verificationUrl) {
-    return (
-      <div className="w-full">
-        <div className="relative w-full" style={{ height: 600 }}>
-          {!iframeLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-xl">
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-gray-500">Loading verification...</p>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Identity Verification
+            </h2>
+
+            <p className="mt-1 text-sm leading-6 text-gray-600">
+              Confirm your details and complete a secure identity check to
+              unlock all account features.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-7 px-6 py-7 sm:px-8">
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">
+            Personal information
+          </h3>
+
+          <p className="mt-1 text-sm text-gray-500">
+            These details were retrieved from your profile and cannot be edited
+            here.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="[&_input]:cursor-not-allowed [&_input]:bg-gray-100 [&_input]:text-gray-500">
+            <CustomInput
+              label="First name"
+              name="firstname"
+              control={control}
+              readOnly
+            />
+          </div>
+
+          <div className="[&_input]:cursor-not-allowed [&_input]:bg-gray-100 [&_input]:text-gray-500">
+            <CustomInput
+              label="Last name"
+              name="lastname"
+              control={control}
+              readOnly
+            />
+          </div>
+
+          <div className="sm:col-span-2 [&_input]:cursor-not-allowed [&_input]:bg-gray-100 [&_input]:text-gray-500">
+            <CustomInput
+              label="Email address"
+              name="email"
+              control={control}
+              readOnly
+            />
+          </div>
+        </div>
+
+        {!isProfileComplete && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+            Your first name, last name, and email must be added to your profile
+            before you can begin verification.
+          </div>
+        )}
+
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-5">
+          <h3 className="text-sm font-semibold text-gray-900">
+            What you will need
+          </h3>
+
+          <div className="mt-4 space-y-4">
+            <div className="flex items-start gap-3">
+              <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+
+              <div>
+                <p className="text-sm font-medium text-gray-800">
+                  A valid government-issued ID
+                </p>
+                <p className="mt-0.5 text-xs text-gray-500">
+                  Passport, national ID card, or driving licence.
+                </p>
               </div>
             </div>
-          )}
-          <iframe
-            ref={iframeRef}
-            src={verificationUrl}
-            allow="camera; microphone"
-            onLoad={() => setIframeLoaded(true)}
-            className="w-full h-full rounded-xl border border-gray-200"
-            title="Identity Verification"
-          />
+
+            <div className="flex items-start gap-3">
+              <ScanFace className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+
+              <div>
+                <p className="text-sm font-medium text-gray-800">
+                  A facial verification check
+                </p>
+                <p className="mt-0.5 text-xs text-gray-500">
+                  Make sure your face is visible in a well-lit area.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+
+              <div>
+                <p className="text-sm font-medium text-gray-800">
+                  A camera-enabled device
+                </p>
+                <p className="mt-0.5 text-xs text-gray-500">
+                  You will be asked to allow camera access.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="text-xs text-gray-400 text-center mt-2">
-          Secured by Shufti Pro · Your data is encrypted
-        </p>
-      </div>
-    );
-  }
 
-  // ── Idle / error — start prompt ───────────────────────────────────
-  return (
-    <div className="flex flex-col items-center py-10 gap-5 text-center">
-      <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-        <svg
-          className="w-8 h-8 text-blue-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        <button
+          type="button"
+          onClick={handleStartVerification}
+          disabled={isStartingDiditKyc || !isProfileComplete}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"
-          />
-        </svg>
-      </div>
+          {isStartingDiditKyc && <Loader2 className="h-4 w-4 animate-spin" />}
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800">
-          Identity Verification
-        </h3>
-        <p className="text-sm text-gray-500 mt-1 max-w-xs">
-          Verify your identity to unlock all features. Takes about 2 minutes.
+          {isStartingDiditKyc
+            ? "Preparing verification..."
+            : "Start identity verification"}
+        </button>
+
+        <p className="text-center text-xs text-gray-400">
+          Your verification is securely processed by Didit.
         </p>
       </div>
-
-      <ul className="text-left text-sm text-gray-600 space-y-1.5">
-        <li>✓ Government-issued ID (passport, ID card, driving license)</li>
-        <li>✓ Facial recognition check</li>
-        <li>✓ Results in under 60 seconds</li>
-      </ul>
-
-      {error && (
-        <p className="text-sm text-red-500 bg-red-50 rounded-lg px-4 py-2">
-          {error}
-        </p>
-      )}
-
-      <button
-        onClick={handleStart}
-        disabled={status === "loading"}
-        className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-      >
-        {status === "loading" ? (
-          <>
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Preparing...
-          </>
-        ) : (
-          "Start Verification"
-        )}
-      </button>
     </div>
   );
 };
