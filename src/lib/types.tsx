@@ -635,3 +635,18 @@ export type DeleteButtonProps = {
   commentId: string;
   onDeleted: () => void;
 };
+
+export type KycFormValues = {
+  email: string;
+  firstname: string;
+  lastname: string;
+};
+
+export type KycStatus =
+  | "Not Started"
+  | "In Progress"
+  | "In Review"
+  | "Approved"
+  | "Declined"
+  | "Abandoned"
+  | "Expired";
