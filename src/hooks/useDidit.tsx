@@ -1,78 +1,3 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { useEffect } from "react";
-// import { DiditSdk } from "@didit-protocol/sdk-web";
-// import { toast } from "react-toastify";
-// import { useCustomMutation } from "./apiCalls";
-
-// type StartDiditKycPayload = {
-//   email: string;
-//   firstname: string;
-//   lastname: string;
-//   cbUrl: string;
-// };
-
-// export const useDidit = () => {
-//   useEffect(() => {
-//     DiditSdk.shared.onComplete = (result) => {
-//       if (result.type === "completed") {
-//         toast.success("Verification submitted successfully");
-//       }
-
-//       if (result.type === "cancelled") {
-//         toast.info("Verification was cancelled");
-//       }
-
-//       if (result.type === "failed") {
-//         toast.error(result.error?.message || "Verification failed");
-//       }
-//     };
-
-//     DiditSdk.shared.onStateChange = (sdkState, error) => {
-//       if (sdkState === "error") {
-//         toast.error(error || "Something went wrong with verification");
-//       }
-//     };
-//   }, []);
-
-//   const diditKycMutation = useCustomMutation({
-//     endpoint: "kyc/init",
-
-//     onSuccessCallback: (response: any) => {
-//       // adjust this single line based on what you confirm below
-//       const responseData = response?.body ?? response?.data?.body;
-
-//       const verificationUrl = responseData?.url;
-
-//       if (!verificationUrl) {
-//         console.log("Didit response:", response);
-//         toast.error("Verification link was not returned");
-//         return;
-//       }
-
-//       DiditSdk.shared.startVerification({
-//         url: verificationUrl,
-//         configuration: {
-//           loggingEnabled: true,
-//           zIndex: 99999,
-//           showCloseButton: true,
-//           showExitConfirmation: true,
-//           closeModalOnComplete: false,
-//         },
-//       });
-//     },
-//   });
-
-//   const startDiditKyc = (payload: StartDiditKycPayload) => {
-//     diditKycMutation.mutate(payload);
-//   };
-
-//   return {
-//     startDiditKyc,
-//     isStartingDiditKyc: diditKycMutation.isPending,
-//     diditKycMutation,
-//   };
-// };
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -87,11 +12,16 @@ type StartDiditKycPayload = {
   cbUrl: string;
 };
 
-export const useDidit = () => {
+type UseDiditOptions = {
+  onVerificationSubmitted?: () => void;
+};
+
+export const useDidit = ({ onVerificationSubmitted }: UseDiditOptions = {}) => {
   useEffect(() => {
     DiditSdk.shared.onComplete = (result) => {
       if (result.type === "completed") {
         toast.success("Verification submitted successfully");
+        onVerificationSubmitted?.();
       }
 
       if (result.type === "cancelled") {
@@ -108,6 +38,7 @@ export const useDidit = () => {
         toast.error(error || "Something went wrong with verification");
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const diditKycMutation = useMutation({
@@ -141,12 +72,9 @@ export const useDidit = () => {
     },
   });
 
-  const startDiditKyc = (payload: StartDiditKycPayload) => {
-    diditKycMutation.mutate(payload);
-  };
-
   return {
-    startDiditKyc,
+    startDiditKyc: (payload: StartDiditKycPayload) =>
+      diditKycMutation.mutate(payload),
     isStartingDiditKyc: diditKycMutation.isPending,
     diditKycMutation,
   };
