@@ -7,6 +7,7 @@ import { LogOutIcon } from "lucide-react";
 import Modal from "../modals/Modal";
 import { useState } from "react";
 import { LogoutModal } from "../modals/LogoutModal";
+import { isEmail } from "@/utils/helper";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -49,7 +50,10 @@ const Sidebar = () => {
           </div>
 
           <Typography variant="p2" className="truncate text-grey_400">
-            {profileData?.data?.username || "John Doe"}
+            {/* {profileData?.data?.username || "John Doe"} */}
+            {isEmail(profileData?.data?.username)
+              ? ""
+              : profileData?.data?.username}
           </Typography>
         </div>
       </div>

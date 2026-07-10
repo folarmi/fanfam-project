@@ -97,16 +97,16 @@ export default function Nav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <a
-            href="#"
+          <Link
+            to="/login"
             className="text-sm font-medium transition-colors hover:text-white"
             style={{ color: "#7A8FB8" }}
           >
             Log in
-          </a>
+          </Link>
 
-          <a
-            href="#"
+          <Link
+            to="/sign-up"
             className="text-[13px] font-bold px-5 py-2.5 rounded-full text-white whitespace-nowrap transition-all"
             style={{ background: "#2599F6" }}
             onMouseEnter={(e) => {
@@ -123,7 +123,7 @@ export default function Nav() {
             }}
           >
             Start Creating
-          </a>
+          </Link>
         </div>
 
         {/* Hamburger */}

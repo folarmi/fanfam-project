@@ -14,6 +14,8 @@ import { useSearchParams } from "react-router-dom";
 import { CreatorLiveCard } from "@/components/cards/CreatorLiveCard";
 
 import { FeedPost } from "@/components/molecules/FeedPost";
+import { useFetchProfile } from "@/hooks/apiHooks";
+import { KycStatusBanner } from "@/kyc/KycStatusBanner";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -21,6 +23,12 @@ const Home = () => {
 
   const isCreator = userObject?.role === "CREATOR";
 
+  // Fetch profile to get kycVerified status for the banner.
+  // This query likely already runs in a parent layout — if so,
+  // it'll hit the cache and cost nothing here.
+  const myProfileQuery = useFetchProfile(userObject, Boolean(userObject));
+  const profile = myProfileQuery.data?.data;
+  const isVerified = profile?.kycVerified === true;
   // const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
   // value shown in input (local state)
@@ -109,6 +117,18 @@ const Home = () => {
             onSearch={handleSearch}
             placeholder="Search..."
           /> */}
+
+          {/* KYC banner — shown to unverified non-creators only.
+              Creators are already verified; viewers need to complete KYC. */}
+          {!isCreator && !isVerified && (
+            <div className="mb-4">
+              <KycStatusBanner
+                email={profile?.email}
+                kycVerified={isVerified}
+              />
+            </div>
+          )}
+
           {!isCreator && <CreatorLiveCard />}
 
           {isCreator && <CommentBox ifPoll ifRecord ifGoLive ifSchedule />}
