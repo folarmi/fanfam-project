@@ -247,3 +247,9 @@ export const parseLiveEvent = (body: string): LiveEventPayload | null => {
     return null;
   }
 };
+
+export const isEmail = (value?: string) => {
+  if (!value) return false;
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+};

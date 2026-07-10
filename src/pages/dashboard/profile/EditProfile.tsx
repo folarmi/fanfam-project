@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from "../../../lib/hook";
 import type { RootState } from "../../../lib/store";
@@ -16,9 +16,11 @@ import { Loader } from "@/components/molecules/Loader";
 import CustomSelect from "@/components/forms/CustomSelect";
 import { genderOptions } from "@/data";
 import { showErrorToast } from "@/utils/toastUtils";
+import { isEmail } from "@/utils/helper";
 
 const EditProfile = () => {
   const queryClient = useQueryClient();
+  const [verifiedUsername, setVerifiedUsername] = useState("");
 
   // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -114,16 +116,42 @@ const EditProfile = () => {
     onClick();
   };
 
+  // const setUsernameMutation = useCustomMutation({
+  //   endpoint: `auth/set-username`,
+  //   successMessage: () => {
+  //     clearErrors("username");
+  //     return "Username set successfully";
+  //   },
+  // });
+
   const setUsernameMutation = useCustomMutation({
     endpoint: `auth/set-username`,
-    successMessage: () => {
+
+    successMessage: () => "Username set successfully",
+
+    onSuccessCallback: () => {
       clearErrors("username");
-      return "Username set successfully";
+      setVerifiedUsername(getValues("username"));
     },
-    onError: () => {
+
+    onError: (error: any) => {
+      setVerifiedUsername("");
+
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message;
+
+      if (status === 401) {
+        setError("username", {
+          type: "manual",
+          message: "Your session has expired. Please log in again.",
+        });
+        return;
+      }
+
       setError("username", {
-        message: "Username is already taken",
         type: "manual",
+        message:
+          message || "We could not verify this username. Please try again.",
       });
     },
   });
@@ -161,6 +189,8 @@ const EditProfile = () => {
     const username = getValues("username");
     const email = getValues("email");
 
+    setVerifiedUsername("");
+
     // Only validate if there is a username, if username isn't empty and has changed and is not empty
     if (
       username &&
@@ -179,6 +209,9 @@ const EditProfile = () => {
       reset(defaults);
     }
   }, [data?.data, reset]);
+
+  const username = data?.data?.username;
+  const usernameIsEmail = isEmail(username);
 
   return (
     <>
@@ -306,14 +339,29 @@ const EditProfile = () => {
                 control={control}
               />
 
+              {/* <CustomInput
+                label="User name"
+                name="username"
+                control={control}
+                onBlur={() => handleUserNameBlur()}
+                placeholder="This is your unique username"
+                readOnly={Boolean(username) && !usernameIsEmail}
+                isVerified={setUsernameMutation.isSuccess}
+                rules={{ required: "Username is required" }}
+              /> */}
+
               <CustomInput
                 label="User name"
                 name="username"
                 control={control}
                 onBlur={() => handleUserNameBlur()}
                 placeholder="This is your unique username"
-                readOnly={data?.data?.username ? true : false}
-                isVerified={setUsernameMutation.isSuccess}
+                readOnly={Boolean(username) && !usernameIsEmail}
+                isVerified={
+                  Boolean(verifiedUsername) &&
+                  verifiedUsername === getValues("username") &&
+                  !setUsernameMutation.isPending
+                }
                 rules={{ required: "Username is required" }}
               />
 
