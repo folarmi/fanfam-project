@@ -1,7 +1,7 @@
 import Typography from "@components/forms/Typography";
 import { accountSettingsModules } from "@/data";
 import rightAshArrow from "@/assets/icons/rightAshArrow.svg";
-import MobileBackButton from "@components/molecules/MobileBackButton";
+// import MobileBackButton from "@components/molecules/MobileBackButton";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";

@@ -3,7 +3,7 @@ type CreatorIconProps = {
 };
 
 const CreatorIcon = ({ active }: CreatorIconProps) => {
-  const fillColor = active ? "#2599F6" : "#292D32";
+  const fillColor = active ? "#2599F6" : "#8D8E96";
   return (
     <svg
       width="24"
