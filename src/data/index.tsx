@@ -161,6 +161,7 @@ export const sideBarItems = [
     name: "Home",
     image: (isActive: boolean) => <Home active={isActive} />,
     link: "/dashboard",
+    exact: true,
     roles: ["CREATOR", "VIEWER"],
   },
   {
@@ -168,6 +169,7 @@ export const sideBarItems = [
     name: "Notifications",
     image: (isActive: boolean) => <Notification active={isActive} />,
     link: "/dashboard/notifications",
+    exact: false,
     roles: ["CREATOR", "VIEWER"],
   },
   // {

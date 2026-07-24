@@ -37,12 +37,12 @@ const AccountSettings = () => {
         <Loader />
       ) : (
         <div>
-          <div
+          {/* <div
             className="w-full bg-white h-12 px-4 border
      border-grey_20 shadow-custom-combined mb-2"
           >
             <MobileBackButton moduleName="Account" />
-          </div>
+          </div> */}
 
           {accountSettingsModules?.map(({ groupName, items }) => {
             return (

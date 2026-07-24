@@ -181,17 +181,22 @@ const Profile = () => {
                   {bio && (
                     <Typography
                       variant="p2"
-                      className="text-grey_700 py-4 text-sm"
+                      className="break-words whitespace-normal py-3 text-xs leading-5 text-grey_700 sm:py-4 sm:text-sm sm:leading-6"
                     >
                       {visibleBio}
+
                       {!isExpanded && shouldTruncate && "..."}
+
                       {shouldTruncate && (
-                        <span
-                          onClick={() => setIsExpanded((v) => !v)}
-                          className="font-medium text-sm text-blue_500 cursor-pointer ml-1"
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setIsExpanded((previousValue) => !previousValue)
+                          }
+                          className="ml-1 inline cursor-pointer border-0 bg-transparent p-0 text-xs font-medium text-blue_500 sm:text-sm"
                         >
-                          read {isExpanded ? "less" : "more"}
-                        </span>
+                          Read {isExpanded ? "less" : "more"}
+                        </button>
                       )}
                     </Typography>
                   )}
@@ -200,25 +205,30 @@ const Profile = () => {
             </ProfileHeader>
 
             {/* Tabs */}
-            <div className="flex items-center justify-between bg-grey_20 border-b border-grey_40 mt-2">
-              {TABS.map((name) => (
-                <div
-                  key={name}
-                  className="cursor-pointer"
-                  onClick={() => setIsActiveTab(name)}
-                >
-                  <Typography
-                    variant="subtitle3"
-                    className={`px-12 pt-3 pb-1 ${
-                      isActiveTab === name
-                        ? "text-grey_800 border-b-2 border-grey_800"
-                        : "text-grey_500"
+            <div className="mt-2 flex w-full items-center overflow-x-auto border-b border-grey_40 bg-grey_20">
+              {TABS.map((name) => {
+                const isActive = isActiveTab === name;
+
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => setIsActiveTab(name)}
+                    className={`min-w-0 flex-1 whitespace-nowrap border-b-2 px-3 py-3 text-center transition-colors sm:px-6 ${
+                      isActive ? "border-grey_800" : "border-transparent"
                     }`}
                   >
-                    {name}
-                  </Typography>
-                </div>
-              ))}
+                    <Typography
+                      variant="subtitle3"
+                      className={`text-xs sm:text-sm ${
+                        isActive ? "text-grey_800" : "text-grey_500"
+                      }`}
+                    >
+                      {name}
+                    </Typography>
+                  </button>
+                );
+              })}
             </div>
 
             {isActiveTab === "Post" && <Post {...tabProps} />}
