@@ -17,7 +17,7 @@ export const KycStatusBanner = ({
     email,
     enabled: !kycVerified && Boolean(email),
   });
-
+  console.log(latestSession);
   if (kycVerified || isLoading) return null;
 
   const status = latestSession?.status;

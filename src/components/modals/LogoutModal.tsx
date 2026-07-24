@@ -19,7 +19,7 @@ const LogoutModal = ({ toggleModal }: Prop) => {
     localStorage.clear();
 
     dispatch(logout());
-    navigate("/");
+    navigate("/login");
   };
 
   const logOutMutation = useCustomMutation({

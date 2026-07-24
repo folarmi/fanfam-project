@@ -232,11 +232,9 @@ export const MAX_CHANNEL_LENGTH = 64;
 
 export const getWebSocketUrl = () => {
   if (import.meta.env.DEV) {
-    return "ws://localhost:3000/api/v1/ws";
+    return "ws://localhost:3002/api/v1/ws";
   }
-  return (
-    import.meta.env.VITE_WS_URL || "ws://fanfam.biyartech.com:7639/api/v1/ws"
-  );
+  return import.meta.env.VITE_WS_URL || "ws://fanation.app:7639/api/v1/ws";
 };
 
 export const parseLiveEvent = (body: string): LiveEventPayload | null => {
