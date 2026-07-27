@@ -6,7 +6,7 @@ import Chat from "@/assets/icons/chat";
 import { useAppSelector } from "@/lib/hook";
 import type { RootState } from "@/lib/store";
 import PostHeader from "../molecules/PostHeader";
-import { Bookmark, MoreHorizontal, Repeat, ThumbsUp } from "lucide-react";
+import { Bookmark, MoreHorizontal, ThumbsUp } from "lucide-react";
 import { useCustomMutation } from "@/hooks/apiCalls";
 import AnsweredPoll from "../molecules/AnsweredPoll";
 import { useQueryClient } from "@tanstack/react-query";

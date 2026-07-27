@@ -39,6 +39,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   children,
 }) => {
   const { userObject } = useAppSelector((state) => state.auth);
+  const token = localStorage.getItem("token");
 
   // State for live creators
   const [liveCreators, setLiveCreators] = useState<Map<string, LiveCreator>>(
@@ -106,9 +107,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   }, [refetchLiveHosts]);
 
   // Initialize Custom Hook
-  const { client, isConnected, subscribe, sendMessage } = useStompClient({
-    onConnect: handleConnect,
-  });
+  const { client, isConnected, subscribe, sendMessage } = useStompClient(
+    token,
+    {
+      onConnect: handleConnect,
+    },
+  );
 
   // Subscribe to notifications when connected
   useEffect(() => {

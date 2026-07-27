@@ -10,32 +10,41 @@ interface UseStompClientOptions {
   onError?: (error: any) => void;
 }
 
-export const useStompClient = (options: UseStompClientOptions = {}) => {
+export const useStompClient = (
+  token: string | null,
+  options: UseStompClientOptions = {},
+) => {
   const { onConnect, onDisconnect, onError } = options;
   const clientRef = useRef<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const subscriptionsRef = useRef<Map<string, StompSubscription>>(new Map());
 
+  const disconnect = useCallback(() => {
+    if (clientRef.current) {
+      console.log("⏹️ Deactivating WebSocket");
+      clientRef.current.deactivate();
+      clientRef.current = null;
+      setIsConnected(false);
+      // Clear all tracked subscriptions on disconnect
+      subscriptionsRef.current.clear();
+    }
+  }, []);
+
   const connect = useCallback(() => {
-    const token = localStorage.getItem("token");
+    // const token = localStorage.getItem("token");
     if (!token) {
       console.warn("⚠️ No auth token found, skipping WebSocket connection");
       return;
     }
 
-    if (clientRef.current?.active) {
-      console.log("🔄 WebSocket already active/activating");
-      return;
-    }
+    if (clientRef.current?.active) return;
 
-    const wsUrl = getWebSocketUrl();
-    console.log("🔌 Connecting to WebSocket at", wsUrl);
+    // const wsUrl = getWebSocketUrl();
+    // console.log("🔌 Connecting to WebSocket at", wsUrl);
 
     const client = new Client({
-      brokerURL: wsUrl,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
+      brokerURL: getWebSocketUrl(),
+      connectHeaders: { Authorization: `Bearer ${token}` },
       debug: (_str) => {
         // Only log debug in dev or if specifically needed to avoid noise
         if (process.env.NODE_ENV === "development") {
@@ -73,18 +82,12 @@ export const useStompClient = (options: UseStompClientOptions = {}) => {
 
     client.activate();
     clientRef.current = client;
-  }, [onConnect, onDisconnect, onError]);
+  }, [token, onConnect, onDisconnect, onError]);
 
-  const disconnect = useCallback(() => {
-    if (clientRef.current) {
-      console.log("⏹️ Deactivating WebSocket");
-      clientRef.current.deactivate();
-      clientRef.current = null;
-      setIsConnected(false);
-      // Clear all tracked subscriptions on disconnect
-      subscriptionsRef.current.clear();
-    }
-  }, []);
+  useEffect(() => {
+    connect();
+    return () => disconnect();
+  }, [connect, disconnect]);
 
   const subscribe = useCallback(
     (destination: string, callback: (message: IMessage) => void) => {
