@@ -77,9 +77,9 @@ const PostCard: React.FC<PostCardProps> = ({
   toggleModal,
   TimeLineModal,
   bookmarkers = [],
-  reposters = [],
+  // reposters = [],
   isAlreadyBookmarked,
-  isAlreadyReposted,
+  // isAlreadyReposted,
   createdDate,
   pollDuration,
   ifHorizontal = true,
@@ -111,10 +111,10 @@ const PostCard: React.FC<PostCardProps> = ({
     bookmarkers?.some((b) => b.email === userObject?.email) ?? // derive from array
     false; // fallback
 
-  const isReposted =
-    isAlreadyReposted ??
-    reposters?.some((r) => r.email === userObject?.email) ??
-    false;
+  // const isReposted =
+  //   isAlreadyReposted ??
+  //   reposters?.some((r) => r.email === userObject?.email) ??
+  //   false;
 
   const saveMutation = useCustomMutation({
     endpoint: `contents/saves`,
@@ -244,43 +244,43 @@ const PostCard: React.FC<PostCardProps> = ({
     );
   };
 
-  const handleRepost = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!publicId) return;
-    // optimistic update
-    const allContentQueries = queryClient.getQueriesData<any>({
-      queryKey: ["GetContents"],
-    });
-    allContentQueries.forEach(([queryKey]) => {
-      queryClient.setQueryData(queryKey, (oldData: any) => {
-        if (!oldData?.pages) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            data: {
-              ...page.data,
-              content: page.data?.content?.map((post: any) => {
-                if (post?.publicId !== publicId) return post;
-                const already = post.reposters?.some(
-                  (r: any) => r.email === userObject?.email,
-                );
-                return {
-                  ...post,
-                  reposters: already
-                    ? post.reposters.filter(
-                        (r: any) => r.email !== userObject?.email,
-                      )
-                    : [...(post.reposters ?? []), { email: userObject?.email }],
-                };
-              }),
-            },
-          })),
-        };
-      });
-    });
-    saveMutation.mutate({ contentPublicId: publicId, saveType: "REPOST" });
-  };
+  // const handleRepost = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   if (!publicId) return;
+  //   // optimistic update
+  //   const allContentQueries = queryClient.getQueriesData<any>({
+  //     queryKey: ["GetContents"],
+  //   });
+  //   allContentQueries.forEach(([queryKey]) => {
+  //     queryClient.setQueryData(queryKey, (oldData: any) => {
+  //       if (!oldData?.pages) return oldData;
+  //       return {
+  //         ...oldData,
+  //         pages: oldData.pages.map((page: any) => ({
+  //           ...page,
+  //           data: {
+  //             ...page.data,
+  //             content: page.data?.content?.map((post: any) => {
+  //               if (post?.publicId !== publicId) return post;
+  //               const already = post.reposters?.some(
+  //                 (r: any) => r.email === userObject?.email,
+  //               );
+  //               return {
+  //                 ...post,
+  //                 reposters: already
+  //                   ? post.reposters.filter(
+  //                       (r: any) => r.email !== userObject?.email,
+  //                     )
+  //                   : [...(post.reposters ?? []), { email: userObject?.email }],
+  //               };
+  //             }),
+  //           },
+  //         })),
+  //       };
+  //     });
+  //   });
+  //   saveMutation.mutate({ contentPublicId: publicId, saveType: "REPOST" });
+  // };
 
   const reactMutation = useCustomMutation({
     endpoint: `contents/reactions`,
