@@ -661,7 +661,7 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
 
           {/* Repost */}
-          <Repeat
+          {/* <Repeat
             className={`cursor-pointer transition-colors mr-4 ${
               isReposted
                 ? "text-[#2599F6] fill-[#2599F6]"
@@ -669,7 +669,7 @@ const PostCard: React.FC<PostCardProps> = ({
             }`}
             size={24}
             onClick={handleRepost}
-          />
+          /> */}
 
           {/* Bookmark */}
           <Bookmark
