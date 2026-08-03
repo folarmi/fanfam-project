@@ -1050,6 +1050,23 @@ const LiveStreaming = () => {
   const { creatorId: urlCreatorIdEncoded, sessionId: urlSessionId } =
     useParams();
 
+  // type Car = {
+  //   name: string;
+  //   model: string;
+  //   year: number;
+  // };
+
+  // const corrolla: Car = {
+  //   name: "Corolla",
+  //   model: "Toyota",
+  //   year: 2020,
+  // };
+
+  // const justModel: Pick<Car, "model" | "year"> = {
+  //   model: corrolla.model,
+  //   year: corrolla.year,
+  // };
+
   // Decode the creatorId since it was encoded (contains @ symbol)
   const urlCreatorId = urlCreatorIdEncoded
     ? decodeURIComponent(urlCreatorIdEncoded)
