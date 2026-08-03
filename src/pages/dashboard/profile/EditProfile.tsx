@@ -10,15 +10,17 @@ import Typography from "../../../components/forms/Typography";
 import CustomInput from "../../../components/forms/CustomInput";
 import { useDebouncedCallback } from "use-debounce";
 import CustomTextBox from "../../../components/forms/CustomTextBox";
-import { Camera, MoreVertical } from "lucide-react";
+import { ArrowLeft, Camera, MoreVertical } from "lucide-react";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { Loader } from "@/components/molecules/Loader";
 import CustomSelect from "@/components/forms/CustomSelect";
 import { genderOptions } from "@/data";
 import { showErrorToast } from "@/utils/toastUtils";
 import { isEmail } from "@/utils/helper";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [verifiedUsername, setVerifiedUsername] = useState("");
 
@@ -114,6 +116,10 @@ const EditProfile = () => {
     }
 
     onClick();
+  };
+
+  const handleBackToProfile = () => {
+    navigate("/dashboard/profile");
   };
 
   // const setUsernameMutation = useCustomMutation({
@@ -279,6 +285,24 @@ const EditProfile = () => {
               </div>
 
               <div className="flex items-center justify-end px-6 py-8 bg-gray-50 border-b">
+                <button
+                  type="button"
+                  onClick={handleBackToProfile}
+                  className="group flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 pr-4 shadow-sm transition-all duration-200 hover:border-blue_500/40 hover:shadow-md active:scale-[0.97]"
+                  aria-label="Back to profile"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue_50 transition-all duration-200 group-hover:bg-blue_500 group-hover:-translate-x-0.5">
+                    <ArrowLeft className="h-3.5 w-3.5 text-blue_500 transition-colors duration-200 group-hover:text-white" />
+                  </span>
+
+                  <Typography
+                    variant="subtitle3"
+                    className="text-gray-700 group-hover:text-blue_500 transition-colors"
+                  >
+                    Back to profile
+                  </Typography>
+                </button>
+
                 <div className="flex items-center gap-3">
                   <button
                     className="flex items-center cursor-pointer z-10"

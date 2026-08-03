@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SearchInput from "../../components/SearchInput";
+// import SearchInput from "../../components/SearchInput";
 // import { notificationTabs } from "../../data";
 import Typography from "../../components/forms/Typography";
 import Modal from "../../components/modals/Modal";
@@ -23,7 +23,7 @@ const Notifications = () => {
     setShowRearrangeModal(!showRearrangeModal);
   };
 
-  const test = () => {};
+  // const test = () => {};
 
   // const [isActiveTab, setIsActiveTab] = useState("All");
   return (
@@ -32,12 +32,12 @@ const Notifications = () => {
         <Loader />
       ) : (
         <div>
-          <SearchInput
+          {/* <SearchInput
             ifBlur={false}
             onSearch={test}
             onSearchChange={test}
             searchTerm=""
-          />
+          /> */}
 
           <section className="bg-grey_20 drop-shadow-4xl p-4">
             {/* <div className="flex items-center overflow-x-scroll">
