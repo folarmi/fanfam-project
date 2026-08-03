@@ -27,7 +27,6 @@ build:
   script:
     - |
       echo "Running Build..."
-      npm run build
 
       echo "--- ENV_FILE path ---"
       echo "$ENV_FILE"
