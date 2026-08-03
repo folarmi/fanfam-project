@@ -1,5 +1,5 @@
 services:
-  web-app:
+  fanfam-web:
     image: registry.gitlab.com/biyartech1/fan-fam-apps/fanfam-frontend-react:dev
     container_name: fanfam-web
     env_file:
