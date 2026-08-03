@@ -15,7 +15,7 @@ variables:
 test:
   stage: test
   tags:
-    - fanfam
+    - frontend
   script:
     - echo "Running test"
     - echo "Test passed"
@@ -23,7 +23,7 @@ test:
 build:
   stage: build
   tags:
-    - fanfam
+    - frontend
   script:
     - |
       echo "Running Build..."
@@ -50,7 +50,7 @@ build:
 push:
   stage: push
   tags:
-    - fanfam
+    - frontend
   script:
     - |
       docker info
@@ -61,7 +61,7 @@ push:
 cleanup:
   stage: cleanup
   tags:
-    - fanfam
+    - frontend
   script:
     - |
       cp "$ENV_FILE" .env
@@ -72,7 +72,7 @@ cleanup:
 deploy:
   stage: deploy
   tags:
-    - fanfam
+    - frontend
   script:
     - |
       cp "$ENV_FILE" .env
