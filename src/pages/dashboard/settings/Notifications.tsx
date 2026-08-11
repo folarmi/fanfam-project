@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import AccountBackButton from "@/components/forms/AccountBackButton";
+// import AccountBackButton from "@/components/forms/AccountBackButton";
 import BlueBorderedButton from "@/components/forms/BlueBorderedButton";
 import CustomSwitchButton from "@/components/forms/CustomSwitchButton";
 import Typography from "@/components/forms/Typography";
@@ -64,13 +64,13 @@ const NotificationsSettings = () => {
         <Loader />
       ) : (
         <div>
-          <AccountBackButton
+          {/* <AccountBackButton
             showBack={false}
             showMobileBack
             moduleName="Notifications"
-          />
+          /> */}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-4 ml-4">
+          {/* <form onSubmit={handleSubmit(onSubmit)} className="mt-4 ml-4">
             {buildNotificationSettings(data?.data)?.map(
               ({ id, key, name, desc }) => {
                 return (
@@ -93,7 +93,47 @@ const NotificationsSettings = () => {
                     <CustomSwitchButton name={key} control={control} />
                   </div>
                 );
-              }
+              },
+            )}
+
+            <div className="w-full flex justify-end mt-4">
+              <BlueBorderedButton
+                className="w-fit cursor-pointer"
+                text={
+                  updateNotificationSettingsMutation.isPending
+                    ? "Saving..."
+                    : "Save changes"
+                }
+                type="submit"
+              />
+            </div>
+          </form> */}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-4 mx-4">
+            {buildNotificationSettings(data?.data)?.map(
+              ({ id, key, name, desc }) => (
+                <div
+                  key={id}
+                  className="flex items-center justify-between gap-4 mb-6 border-b border-grey_10 pb-4"
+                >
+                  <div className="flex-1 min-w-0">
+                    <Typography
+                      variant="subtitle2"
+                      className="text-grey_800 pb-[2px]"
+                    >
+                      {name}
+                    </Typography>
+
+                    <Typography variant="p2" className="text-grey_500">
+                      {desc}
+                    </Typography>
+                  </div>
+
+                  <div className="shrink-0">
+                    <CustomSwitchButton name={key} control={control} />
+                  </div>
+                </div>
+              ),
             )}
 
             <div className="w-full flex justify-end mt-4">
