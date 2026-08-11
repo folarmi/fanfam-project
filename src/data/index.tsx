@@ -26,7 +26,7 @@ import Notification from "../components/svgs/Notification";
 // import Messages from "../components/svgs/Messages";
 // import Collections from "../components/svgs/Collections";
 // import Schedule from "../components/svgs/Schedule";
-import MyAccount from "../components/svgs/MyAccount";
+// import MyAccount from "../components/svgs/MyAccount";
 import Profile from "../components/svgs/Profile";
 import all from "../assets/all.svg";
 import africa from "../assets/africa.svg";
@@ -193,13 +193,13 @@ export const sideBarItems = [
   //   link: "/dashboard/schedule",
   //   roles: ["CREATOR", "VIEWER"],
   // },
-  {
-    id: 5,
-    name: "My Account",
-    image: (isActive: boolean) => <MyAccount active={isActive} />,
-    link: "/dashboard/account/settings",
-    roles: ["CREATOR", "VIEWER"],
-  },
+  // {
+  //   id: 5,
+  //   name: "My Account",
+  //   image: (isActive: boolean) => <MyAccount active={isActive} />,
+  //   link: "/dashboard/account/settings",
+  //   roles: ["CREATOR", "VIEWER"],
+  // },
   {
     id: 6,
     name: "Profile",

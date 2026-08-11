@@ -17,7 +17,6 @@ export const KycStatusBanner = ({
     email,
     enabled: !kycVerified && Boolean(email),
   });
-  console.log(latestSession);
   if (kycVerified || isLoading) return null;
 
   const status = latestSession?.status;
@@ -93,7 +92,11 @@ export const KycStatusBanner = ({
       </div>
       <button
         type="button"
-        onClick={() => navigate("/dashboard/kyc-verification")}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          navigate("/dashboard/become-a-creator");
+        }}
         className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
       >
         Complete Verification

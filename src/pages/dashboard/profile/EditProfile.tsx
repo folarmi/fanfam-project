@@ -18,6 +18,7 @@ import { genderOptions } from "@/data";
 import { showErrorToast } from "@/utils/toastUtils";
 import { isEmail } from "@/utils/helper";
 import { useNavigate } from "react-router-dom";
+import DefaultAvatar from "@/components/molecules/DefaultAvatar";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -38,6 +39,9 @@ const EditProfile = () => {
   } = useForm({
     defaultValues: data?.data,
   });
+
+  const isValidImageUrl = (url?: string | null) =>
+    !!url && !["null", "undefined", ""].includes(url.trim().toLowerCase());
 
   const { mutate: uploadProfilePicture, isPending: profilePictureIsPending } =
     useFileUpload({
@@ -129,7 +133,7 @@ const EditProfile = () => {
   //     return "Username set successfully";
   //   },
   // });
-
+  console.log(data?.data);
   const setUsernameMutation = useCustomMutation({
     endpoint: `auth/set-username`,
 
@@ -229,11 +233,19 @@ const EditProfile = () => {
             <div className="sticky top-0 z-50 bg-white">
               <div className="relative">
                 <div className="relative w-full h-[174px] overflow-hidden bg-gray-200">
-                  <img
-                    src={data?.data?.coverImageUrl}
-                    alt="Banner"
-                    className="w-full h-full object-cover"
-                  />
+                  {isValidImageUrl(data?.data?.coverImageUrl) ? (
+                    <img
+                      src={data?.data?.coverImageUrl}
+                      alt="Banner"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <DefaultAvatar
+                      fullName={data?.data?.email}
+                      rounded="none"
+                      className="w-full h-full text-4xl"
+                    />
+                  )}
 
                   {/* Banner Edit Overlay with CustomFileUploader */}
                   <CustomFileUploader
@@ -257,11 +269,18 @@ const EditProfile = () => {
                 <div className="absolute -bottom-16 left-6">
                   <div className="relative w-32 h-32">
                     <div className="w-full h-full rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
-                      <img
-                        src={data?.data?.profileImageUrl}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
+                      {isValidImageUrl(data?.data?.profileImageUrl) ? (
+                        <img
+                          src={data?.data?.profileImageUrl}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar
+                          fullName={data?.data?.email}
+                          className="w-full h-full text-3xl"
+                        />
+                      )}
                     </div>
 
                     <CustomFileUploader
@@ -288,17 +307,10 @@ const EditProfile = () => {
                 <button
                   type="button"
                   onClick={handleBackToProfile}
-                  className="group flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 pr-4 shadow-sm transition-all duration-200 hover:border-blue_500/40 hover:shadow-md active:scale-[0.97]"
-                  aria-label="Back to profile"
+                  className="border border-blue_500 rounded-3xl py-2 px-3 drop-shadow-6xl bg-subscribe-gradient shadow-inner-white cursor-pointer flex items-center gap-2 z-10"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue_50 transition-all duration-200 group-hover:bg-blue_500 group-hover:-translate-x-0.5">
-                    <ArrowLeft className="h-3.5 w-3.5 text-blue_500 transition-colors duration-200 group-hover:text-white" />
-                  </span>
-
-                  <Typography
-                    variant="subtitle3"
-                    className="text-gray-700 group-hover:text-blue_500 transition-colors"
-                  >
+                  <ArrowLeft className="w-4 h-4 text-blue_500" />
+                  <Typography variant="subtitle3" className="text-blue_500">
                     Back to profile
                   </Typography>
                 </button>

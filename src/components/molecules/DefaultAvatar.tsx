@@ -28,8 +28,19 @@ const DefaultAvatar: React.FC<DefaultAvatarProps> = ({
     const parts = trimmedName.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
 
     if (parts.length === 0) return "?";
+    // if (parts.length === 1) {
+    //   const firstChar = parts[0]?.[0];
+    //   return firstChar ? firstChar.toUpperCase() : "?";
+    // }
     if (parts.length === 1) {
-      const firstChar = parts[0]?.[0];
+      const value = parts[0];
+
+      // If email, use first 2 characters before @
+      if (value.includes("@")) {
+        return value.split("@")[0].slice(0, 2).toUpperCase();
+      }
+
+      const firstChar = value?.[0];
       return firstChar ? firstChar.toUpperCase() : "?";
     }
 
