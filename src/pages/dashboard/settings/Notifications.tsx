@@ -70,45 +70,6 @@ const NotificationsSettings = () => {
             moduleName="Notifications"
           /> */}
 
-          {/* <form onSubmit={handleSubmit(onSubmit)} className="mt-4 ml-4">
-            {buildNotificationSettings(data?.data)?.map(
-              ({ id, key, name, desc }) => {
-                return (
-                  <div
-                    key={id}
-                    className="flex items-center justify-between mb-6 border-b border-grey_10 pb-4"
-                  >
-                    <div>
-                      <Typography
-                        variant="subtitle2"
-                        className="text-grey_800 pb-[2px]"
-                      >
-                        {name}
-                      </Typography>
-                      <Typography variant="p2" className="text-grey_500">
-                        {desc}
-                      </Typography>
-                    </div>
-
-                    <CustomSwitchButton name={key} control={control} />
-                  </div>
-                );
-              },
-            )}
-
-            <div className="w-full flex justify-end mt-4">
-              <BlueBorderedButton
-                className="w-fit cursor-pointer"
-                text={
-                  updateNotificationSettingsMutation.isPending
-                    ? "Saving..."
-                    : "Save changes"
-                }
-                type="submit"
-              />
-            </div>
-          </form> */}
-
           <form onSubmit={handleSubmit(onSubmit)} className="mt-4 mx-4">
             {buildNotificationSettings(data?.data)?.map(
               ({ id, key, name, desc }) => (
