@@ -98,6 +98,8 @@ const Poll = ({ setIfUserIsCreatingPoll }: pollProps) => {
         hours,
         minutes,
       },
+      mentions: [],
+      media: [],
     };
     // console.log(formData);
     createContentMutation.mutate(formData);
