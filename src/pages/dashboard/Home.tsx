@@ -16,6 +16,7 @@ import { CreatorLiveCard } from "@/components/cards/CreatorLiveCard";
 import { FeedPost } from "@/components/molecules/FeedPost";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { KycStatusBanner } from "@/kyc/KycStatusBanner";
+import { BecomeCreatorPrompt } from "./become-a-creator/BecomeACreatorPrompt";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -30,7 +31,7 @@ const Home = () => {
   const profile = myProfileQuery.data?.data;
   const isVerified = profile?.kycVerified === true;
   // const [activeSearchTerm, setActiveSearchTerm] = useState("");
-
+  console.log(profile?.email);
   // value shown in input (local state)
   const [localSearchTerm, setLocalSearchTerm] = useState(
     searchParams.get("search") ?? "",
@@ -106,7 +107,6 @@ const Home = () => {
   //   setDebouncedSearchTerm(value);
   //   setSearchParams(value ? { search: value } : {}, { replace: false });
   // };
-
   return (
     <>
       <div className="">
@@ -128,6 +128,16 @@ const Home = () => {
               />
             </div>
           )}
+
+          {!isCreator && isVerified && (
+            <div className="mb-4">
+              <BecomeCreatorPrompt email={profile?.email} />
+            </div>
+          )}
+
+          {/* <div className="mb-4">
+            <KycStatusBanner email={profile?.email} kycVerified={isVerified} />
+          </div> */}
 
           {!isCreator && <CreatorLiveCard />}
 
