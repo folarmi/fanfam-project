@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 import { showInlineToast } from "@/utils/toastUtils";
 
 const BecomeACreator = () => {
+  const MAX_POLL_ATTEMPTS = 3;
+  const POLL_INTERVAL_MS = 60_000;
+
   const queryClient = useQueryClient();
   const [inquiryId, setInquiryId] = useState<string | null>(null);
 
@@ -48,10 +51,27 @@ const BecomeACreator = () => {
   });
 
   useEffect(() => {
-    if (inquiryId) {
+    if (!inquiryId) return;
+
+    let attempts = 0;
+
+    const check = () => {
+      attempts += 1;
       verifyCreatorMutation.mutate({});
-    }
-  }, [inquiryId]);
+    };
+
+    check();
+
+    const intervalId = setInterval(() => {
+      if (attempts >= MAX_POLL_ATTEMPTS || verifyCreatorMutation.isSuccess) {
+        clearInterval(intervalId);
+        return;
+      }
+      check();
+    }, POLL_INTERVAL_MS);
+
+    return () => clearInterval(intervalId);
+  }, [inquiryId, verifyCreatorMutation.isSuccess]);
 
   return (
     <div className="mt-4">
