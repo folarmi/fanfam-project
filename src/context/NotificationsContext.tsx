@@ -99,8 +99,6 @@ export const NotificationsProvider = ({
 
   // Listen for real-time Firebase notifications - FIXED VERSION
   useEffect(() => {
-    console.log("📡 Setting up FCM message listener...");
-
     let isListening = true;
 
     // Recursive function to continuously listen for messages

@@ -39,8 +39,8 @@ export const useStompClient = (
 
     if (clientRef.current?.active) return;
 
-    // const wsUrl = getWebSocketUrl();
-    // console.log("🔌 Connecting to WebSocket at", wsUrl);
+    const wsUrl = getWebSocketUrl();
+    console.log("🔌 Connecting to WebSocket at", wsUrl);
 
     const client = new Client({
       brokerURL: getWebSocketUrl(),
@@ -139,12 +139,12 @@ export const useStompClient = (
   }, []);
 
   // Life cycle management
-  useEffect(() => {
-    connect();
-    return () => {
-      disconnect();
-    };
-  }, [connect, disconnect]);
+  // useEffect(() => {
+  //   connect();
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, [connect, disconnect]);
 
   // Handle token changes - if token changes, we might want to reconnect?
   // Usually covered by component mount/unmount or explicit reconn logic

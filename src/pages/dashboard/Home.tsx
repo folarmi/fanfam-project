@@ -31,7 +31,6 @@ const Home = () => {
   const profile = myProfileQuery.data?.data;
   const isVerified = profile?.kycVerified === true;
   // const [activeSearchTerm, setActiveSearchTerm] = useState("");
-  console.log(profile?.email);
   // value shown in input (local state)
   const [localSearchTerm, setLocalSearchTerm] = useState(
     searchParams.get("search") ?? "",
