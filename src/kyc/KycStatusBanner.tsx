@@ -163,7 +163,6 @@ export const KycStatusBanner = ({
 
   // In Review / Resubmitted — awaiting a decision, user can check for an update
   if (status === "IN_REVIEW" || status === "RESUBMITTED") {
-    // if (status === "APPROVED") {
     return (
       <div className="flex items-start justify-between gap-4 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
         <div className="flex items-start gap-3">

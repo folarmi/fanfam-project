@@ -48,7 +48,7 @@ export const useStompClient = (
       debug: (_str) => {
         // Only log debug in dev or if specifically needed to avoid noise
         if (process.env.NODE_ENV === "development") {
-          // console.log("STOMP Debug:", _str);
+          console.log("STOMP Debug:", _str);
         }
       },
       reconnectDelay: 5000,

@@ -63,10 +63,6 @@ export const useSignIn = ({
       }
 
       if (refreshToken) {
-        console.log(
-          "✅ [useSignIn] Storing refreshToken:",
-          refreshToken.substring(0, 20) + "...",
-        );
         localStorage.setItem("refreshToken", refreshToken);
       }
 

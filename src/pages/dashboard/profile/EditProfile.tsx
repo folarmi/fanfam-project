@@ -133,7 +133,6 @@ const EditProfile = () => {
   //     return "Username set successfully";
   //   },
   // });
-  console.log(data?.data);
   const setUsernameMutation = useCustomMutation({
     endpoint: `auth/set-username`,
 
