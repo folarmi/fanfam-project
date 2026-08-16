@@ -230,10 +230,22 @@ export const getRemainingDays = (dateString: string) => {
 
 export const MAX_CHANNEL_LENGTH = 64;
 
+// export const getWebSocketUrl = () => {
+//   if (import.meta.env.DEV) {
+//     return "ws://localhost:3002/api/v1/ws";
+//   }
+//   return import.meta.env.VITE_WS_URL || "ws://dev.fanation.app:7639/api/v1/ws";
+// };
+
 export const getWebSocketUrl = () => {
-  if (import.meta.env.DEV) {
-    return "ws://localhost:3002/api/v1/ws";
-  }
+  // Previously this returned "ws://localhost:3002/api/v1/ws" in dev
+  // unconditionally — but 3002 is the Vite dev server's own port, not the
+  // backend. Nothing was listening there, so every connection attempt
+  // failed immediately with a 1006 (abnormal closure).
+  //
+  // Now it always resolves the real backend WS endpoint, with VITE_WS_URL
+  // as an override in case you ever run the Spring Boot backend locally
+  // (e.g. on localhost:8080) instead of pointing at staging.
   return import.meta.env.VITE_WS_URL || "ws://dev.fanation.app:7639/api/v1/ws";
 };
 
