@@ -246,7 +246,8 @@ export const getWebSocketUrl = () => {
   // Now it always resolves the real backend WS endpoint, with VITE_WS_URL
   // as an override in case you ever run the Spring Boot backend locally
   // (e.g. on localhost:8080) instead of pointing at staging.
-  return import.meta.env.VITE_WS_URL || "ws://dev.fanation.app:7639/api/v1/ws";
+  // return import.meta.env.VITE_WS_URL || "ws://dev.fanation.app:7639/api/v1/ws";
+  return import.meta.env.VITE_WS_URL || "wss://dev.fanation.app/api/v1/ws";
 };
 
 export const parseLiveEvent = (body: string): LiveEventPayload | null => {
