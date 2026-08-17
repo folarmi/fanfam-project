@@ -2224,6 +2224,8 @@ const LiveStreaming = () => {
         return;
       }
 
+      const reactionKey = reaction.reactionType as keyof ReactionCount;
+
       // NOTE: this previously set the count directly from the backend's
       // `count` field, on the assumption it was a shared running total for
       // this reaction type across all users. Comparing an actual
@@ -2237,7 +2239,7 @@ const LiveStreaming = () => {
       // original creator/viewer desync).
       setReactionCounts((prev) => ({
         ...prev,
-        [reaction.reactionType]: prev[reaction.reactionType] + 1,
+        [reactionKey]: prev[reactionKey] + 1,
       }));
 
       const floatingReaction: FloatingReaction = {
