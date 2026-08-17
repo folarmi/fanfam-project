@@ -40,23 +40,6 @@
 //   const { creatorId: urlCreatorIdEncoded, sessionId: urlSessionId } =
 //     useParams();
 
-//   // type Car = {
-//   //   name: string;
-//   //   model: string;
-//   //   year: number;
-//   // };
-
-//   // const corrolla: Car = {
-//   //   name: "Corolla",
-//   //   model: "Toyota",
-//   //   year: 2020,
-//   // };
-
-//   // const justModel: Pick<Car, "model" | "year"> = {
-//   //   model: corrolla.model,
-//   //   year: corrolla.year,
-//   // };
-
 //   // Decode the creatorId since it was encoded (contains @ symbol)
 //   const urlCreatorId = urlCreatorIdEncoded
 //     ? decodeURIComponent(urlCreatorIdEncoded)
@@ -94,15 +77,10 @@
 //     (comment: any) => {
 //       console.log("📨 Received live comment:", comment);
 
-//       // Filter out our own comments to prevent duplication if we do optimistic updates
-//       // OR if we rely on optimistic updates, we typically ignore the socket echo for self.
 //       const isMe =
 //         comment.userId === userObject?.usid ||
 //         comment.user === userObject?.usid;
 
-//       // However, for comments, it's safer to rely on ID if possible, but distinct filtering works too.
-//       // If we receive our own comment via socket, we should ignore it IF we already added it.
-//       // But since we are adding optimistic updates, we will ignore socket messages from SELF.
 //       if (isMe) {
 //         console.log("Ignoring own comment from socket to avoid double render");
 //         return;
@@ -135,18 +113,22 @@
 
 //   const handleReactionReceived = useCallback(
 //     (reaction: LiveReaction) => {
-//       // Filter out self-reactions from WebSocket to duplicate optimistic update
-//       if (reaction.userId === userObject?.usid) {
+//       // Filter out self-reactions from WebSocket to avoid duplicating the
+//       // optimistic update in handleReaction. Also checks the raw `user`
+//       // field as a fallback since the reaction broadcast payload shape
+//       // isn't guaranteed to include userId in every backend build.
+//       const isMe =
+//         reaction.userId === userObject?.usid ||
+//         (reaction as any).user === userObject?.usid;
+//       if (isMe) {
 //         return;
 //       }
 
-//       // Update counts
 //       setReactionCounts((prev) => ({
 //         ...prev,
 //         [reaction.reactionType]: prev[reaction.reactionType] + 1,
 //       }));
 
-//       // Add floating animation
 //       const floatingReaction: FloatingReaction = {
 //         id: `${reaction.id}-${Date.now()}`,
 //         type: reaction.reactionType,
@@ -156,7 +138,6 @@
 
 //       setFloatingReactions((prev) => [...prev, floatingReaction]);
 
-//       // Remove after 3 seconds
 //       setTimeout(() => {
 //         setFloatingReactions((prev) =>
 //           prev.filter((r) => r.id !== floatingReaction.id),
@@ -176,13 +157,23 @@
 //       onReactionReceived: handleReactionReceived,
 //     });
 
-//   // ✅ Handle reaction clicks
+//   // ✅ Handle reaction clicks — added an isConnected check up front so a tap
+//   // while the socket is down shows a toast instead of doing nothing. The
+//   // sendReaction() call itself already returns a real boolean (see
+//   // useLiveStream), so failures still fall through to the error toast below.
 //   const handleReaction = (reactionType: ReactionType) => {
 //     if (!isStreaming || !sendReaction) return;
 
+//     if (!isConnected) {
+//       showInlineToast({
+//         type: "warning",
+//         title: "Reconnecting — try that again in a moment",
+//       });
+//       return;
+//     }
+
 //     const success = sendReaction(reactionType);
 //     if (success) {
-//       // Optimistically show own reaction and update count
 //       setReactionCounts((prev) => ({
 //         ...prev,
 //         [reactionType]: prev[reactionType] + 1,
@@ -202,6 +193,11 @@
 //           prev.filter((r) => r.id !== floatingReaction.id),
 //         );
 //       }, 3000);
+//     } else {
+//       showInlineToast({
+//         type: "error",
+//         title: "Reaction didn't send — check your connection",
+//       });
 //     }
 //   };
 
@@ -244,16 +240,11 @@
 //       setChannelName(activeSession);
 //       setIsStreaming(true);
 
-//       // pass it directly so we don’t depend on async state updates
 //       joinExistingStream(activeSession);
 //     }
 //   }, [isHost, activeSession, urlCreatorId]);
 
 //   useEffect(() => {
-//     // Initialize preview stream
-//     // Prefer the front camera and request a 16:9 aspect ratio so the source
-//     // stream is already close to the shape we render it at (object-cover
-//     // otherwise has to crop aggressively on mobile portrait streams).
 //     navigator.mediaDevices
 //       .getUserMedia({
 //         video: { facingMode: "user", aspectRatio: 16 / 9 },
@@ -317,7 +308,7 @@
 //       setStreamDuration(elapsed);
 //     };
 
-//     updateDuration(); // Update immediately
+//     updateDuration();
 //     const interval = setInterval(updateDuration, 1000);
 
 //     return () => clearInterval(interval);
@@ -327,7 +318,6 @@
 //   useEffect(() => {
 //     if (isHost) return;
 
-//     // 1. Check explicit End event from socket
 //     if (isStreamEnded) {
 //       showInlineToast({
 //         type: "info",
@@ -339,14 +329,9 @@
 //       return;
 //     }
 
-//     // 2. Fallback: Check if creator is still in the "liveCreators" list from Context
-//     // This handles cases where we missed the specific "END" event but the polling/notification updated the list
 //     if (isConnected && isStreaming && urlCreatorId) {
-//       // const session = getLiveSession(urlCreatorId);
-//       // If we have a valid session ID but the context says this creator is NOT live anymore
-//       // we should probably end it.
-//       // WARNING: We must be careful not to kill it during initial load.
-//       // We'll rely on isStreamEnded mostly, but this serves as a backup.
+//       // Reserved for a future backup check against the live creators list
+//       // if we ever need it — see original notes.
 //     }
 //   }, [
 //     isStreamEnded,
@@ -362,11 +347,9 @@
 //     if (!isStreaming) return;
 //     if (!isConnected) return;
 
-//     // if we’re live and reconnected, ensure heartbeat is running
 //     startHeartbeat();
 //   }, [isConnected, isStreaming, isHost]);
 
-//   // ADD auto-scroll effect
 //   useEffect(() => {
 //     if (chatContainerRef.current) {
 //       chatContainerRef.current.scrollTop =
@@ -375,8 +358,20 @@
 //   }, [chatMessages]);
 
 //   const handleStartLive = async () => {
+//     // ✅ Main fix: block going live if the websocket isn't connected. Before
+//     // this, only APP_ID/channelName were checked — a dead STOMP connection
+//     // meant /app/live/go silently never reached the backend, so the host
+//     // would see their own preview go live locally while the backend (and
+//     // therefore every viewer) never found out.
+//     if (!isConnected) {
+//       showInlineToast({
+//         type: "error",
+//         title: "Not connected to the server yet — please wait and try again",
+//       });
+//       return;
+//     }
+
 //     try {
-//       // Validate App ID
 //       if (!APP_ID) {
 //         showInlineToast({ type: "error", title: "App ID is missing" });
 //         return;
@@ -398,45 +393,45 @@
 //         return;
 //       }
 
-//       // Stop preview stream
 //       if (localStream) {
 //         localStream.getTracks().forEach((track) => track.stop());
 //       }
 
-//       // Initialize Agora Client
 //       const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
 //       agoraClientRef.current = client;
 
-//       // Set client role to host (broadcaster)
 //       await client.setClientRole("host");
-
-//       // Join channel with token
 //       await client.join(APP_ID, channelName, token, userObject?.usid);
 
-//       // Create and publish audio/video tracks
 //       const [audioTrack, videoTrack] =
 //         await AgoraRTC.createMicrophoneAndCameraTracks();
 //       localAudioTrackRef.current = audioTrack;
 //       localVideoTrackRef.current = videoTrack;
 
-//       // Play local video
 //       if (videoRef.current) {
 //         videoTrack.play(videoRef.current);
 //       }
 
-//       // Publish tracks to the channel
 //       await client.publish([audioTrack, videoTrack]);
 
-//       // Listen for remote users joining
 //       client.on("user-joined", (_user) => {});
 //       client.on("user-left", (_user) => {});
 
 //       setIsStreaming(true);
-//       // ✅ Set start time immediately for Host
 //       setStreamStartTime(Date.now());
 
 //       await new Promise((resolve) => setTimeout(resolve, 100));
-//       // Send "go live" message
+
+//       // Re-check right before sending — the Agora token fetch + track setup
+//       // above takes real time, and the socket could have dropped mid-setup.
+//       if (!isConnected) {
+//         showInlineToast({
+//           type: "error",
+//           title: "Lost connection while starting — please retry",
+//         });
+//         return;
+//       }
+
 //       console.log("📡 Sending GO LIVE message");
 
 //       sendMessage("/app/live/go", {
@@ -526,12 +521,10 @@
 //         });
 //       }
 
-//       // ✅ NEW: Remove self from live list immediately
 //       if (userObject?.usid && isHost) {
 //         removeCreatorFromLive(userObject?.usid);
 //       }
 
-//       // ✅ NEW: Force refetch for other users
 //       setTimeout(() => {
 //         refetchLiveHosts();
 //       }, 500);
@@ -594,12 +587,10 @@
 //       return;
 //     }
 
-//     // If streaming, send via WebSocket
 //     if (isStreaming && sendComment) {
 //       const success = sendComment(message);
 
 //       if (success) {
-//         // Optimistically add own message to chat
 //         const newMessage = {
 //           id: Date.now(),
 //           user: "You",
@@ -620,7 +611,6 @@
 //         });
 //       }
 //     } else {
-//       // Fallback: Local only (for pre-stream setup)
 //       setChatMessages((prev) => [
 //         ...prev,
 //         {
@@ -656,10 +646,8 @@
 //   if (!isStreaming && isHost) {
 //     return (
 //       <div className="min-h-screen bg-brown_200 flex flex-col lg:flex-row">
-//         {/* Left Side - Video Preview */}
 //         <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-8">
 //           <div className="w-full max-w-3xl">
-//             {/* Header */}
 //             <div className="flex mb-6">
 //               <ArrowLeft
 //                 className="text-white cursor-pointer"
@@ -672,7 +660,6 @@
 //                 Live Video
 //               </Typography>
 
-//               {/* WebSocket Connection Status */}
 //               <div className="ml-auto">
 //                 {isConnected ? (
 //                   <span className="flex items-center gap-2 text-green-400 text-sm">
@@ -688,7 +675,6 @@
 //               </div>
 //             </div>
 
-//             {/* Video Preview */}
 //             <div className="relative bg-black/40 backdrop-blur rounded-2xl overflow-hidden aspect-video shadow-2xl border border-white/10">
 //               <video
 //                 ref={videoRef}
@@ -698,7 +684,6 @@
 //                 className="w-full h-full object-cover"
 //               />
 
-//               {/* Camera Icon Overlay */}
 //               {!isCameraOn && (
 //                 <div className="absolute inset-0 flex items-center justify-center bg-black/60">
 //                   <div className="bg-white/10 backdrop-blur-md p-8 rounded-full">
@@ -708,9 +693,7 @@
 //               )}
 //             </div>
 
-//             {/* Control Buttons */}
 //             <div className="flex items-center justify-center gap-4 mt-6">
-//               {/* Mic Button */}
 //               <button
 //                 onClick={toggleMic}
 //                 className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
@@ -726,16 +709,19 @@
 //                 )}
 //               </button>
 
-//               {/* Start Live Video Button */}
+//               {/* Disabled (and relabeled) while the socket is down, mirroring
+//                   the guard inside handleStartLive, so the button visibly
+//                   communicates "not ready" instead of looking clickable and
+//                   then silently doing nothing useful. */}
 //               <CustomButton
 //                 className="text-xs w-fit px-6"
 //                 onClick={handleStartLive}
-//                 disabled={!channelName.trim() || isLoadingToken}
+//                 disabled={!channelName.trim() || isLoadingToken || !isConnected}
+//                 title={!isConnected ? "Waiting for connection..." : undefined}
 //               >
-//                 Start Live Video
+//                 {isConnected ? "Start Live Video" : "Connecting..."}
 //               </CustomButton>
 
-//               {/* Camera Button */}
 //               <button
 //                 onClick={toggleCamera}
 //                 className={`backdrop-blur p-4 rounded-full transition-all shadow-lg ${
@@ -762,7 +748,7 @@
 //               onChange={(e) => {
 //                 const value = e.target.value
 //                   .toLowerCase()
-//                   .replace(/[^a-z0-9_]/g, "_"); // Agora-safe
+//                   .replace(/[^a-z0-9_]/g, "_");
 
 //                 if (value.length <= MAX_CHANNEL_LENGTH) {
 //                   setChannelName(value);
@@ -781,7 +767,6 @@
 //             </div>
 //           </div>
 
-//           {/* Stream Description */}
 //           <div className="mb-6">
 //             <textarea
 //               value={streamDescription}
@@ -795,7 +780,6 @@
 //             </div>
 //           </div>
 
-//           {/* Show Tips Toggle */}
 //           <div className="flex items-center justify-between bg-brown_100 border border-white/20 px-4 py-3 rounded-lg">
 //             <p className="text-white font-medium text-sm">
 //               Show Tips collected to viewers
@@ -821,11 +805,8 @@
 //   // Live streaming UI
 //   return (
 //     <div className="min-h-screen bg-gray-900 flex flex-col">
-//       {/* Video + Chat Area */}
 //       <div className="flex-1 flex flex-col lg:flex-row min-h-0">
-//         {/* Main Video Stream */}
 //         <div className="relative bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 aspect-video lg:aspect-auto lg:flex-1">
-//           {/* Top Bar */}
 //           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
 //             <div className="flex items-center gap-3">
 //               <div className="bg-red-600 px-3 py-1 rounded text-white text-sm font-bold flex items-center gap-2">
@@ -833,7 +814,6 @@
 //                 LIVE
 //               </div>
 
-//               {/* ✅ Viewer Count */}
 //               {isStreaming && (
 //                 <div className="bg-black/30 backdrop-blur-md px-3 py-1 rounded text-white text-sm font-medium border border-white/10 flex items-center gap-2">
 //                   <span className="w-2 h-2 bg-green-500 rounded-full" />
@@ -841,19 +821,26 @@
 //                 </div>
 //               )}
 
-//               {/* ✅ Stream Duration */}
 //               {isStreaming && (
 //                 <div className="bg-black/30 backdrop-blur-md px-3 py-1 rounded text-white text-sm font-medium border border-white/10">
 //                   {new Date(_streamDuration * 1000).toISOString().substr(11, 8)}
 //                 </div>
 //               )}
+
+//               {/* Surfaces a dropped connection during an active stream, since
+//                   reactions/comments/heartbeats all silently stop working
+//                   otherwise with no visible indicator. */}
+//               {isStreaming && !isConnected && (
+//                 <div className="bg-yellow-600/80 backdrop-blur-md px-3 py-1 rounded text-white text-sm font-medium border border-white/10 flex items-center gap-2">
+//                   <div className="w-2 h-2 bg-yellow-200 rounded-full animate-pulse" />
+//                   Reconnecting...
+//                 </div>
+//               )}
 //             </div>
 
-//             {/* ✅ Reaction Counter */}
 //             <ReactionCounter counts={reactionCounts} />
 //           </div>
 
-//           {/* Video */}
 //           <div className="w-full h-full flex items-center justify-center">
 //             {isCameraOn ? (
 //               <video
@@ -870,10 +857,8 @@
 //             )}
 //           </div>
 
-//           {/* ✅ Floating Reactions */}
 //           <FloatingReactions reactions={floatingReactions} />
 
-//           {/* ✅ Media Controls (Restored) */}
 //           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
 //             <button
 //               onClick={toggleMic}
@@ -917,9 +902,7 @@
 //           </div>
 //         </div>
 
-//         {/* Chat Sidebar */}
 //         <div className="w-full lg:w-80 bg-white flex flex-col flex-1 lg:flex-none min-h-0">
-//           {/* Chat Header */}
 //           <div className="p-4 border-b">
 //             <h3 className="font-semibold text-lg">Live Chat</h3>
 //             <p className="text-sm text-gray-500">
@@ -927,7 +910,6 @@
 //             </p>
 //           </div>
 
-//           {/* Chat Messages */}
 //           <div
 //             ref={chatContainerRef}
 //             className="flex-1 overflow-y-auto p-4 space-y-3"
@@ -955,7 +937,6 @@
 //             )}
 //           </div>
 
-//           {/* Chat Input */}
 //           <div className="p-4 border-t bg-gray-50">
 //             <div className="flex items-center gap-2">
 //               <input
@@ -990,8 +971,14 @@
 //               </button>
 //             </div>
 
-//             {/* Simple Reaction Buttons for quick access */}
-//             <div className="flex justify-between mt-3 px-2">
+//             {/* Dimmed (not hard-disabled — a tap while offline still gives
+//                 feedback via the toast in handleReaction) when the socket
+//                 is down. */}
+//             <div
+//               className={`flex justify-between mt-3 px-2 ${
+//                 !isConnected ? "opacity-50" : ""
+//               }`}
+//             >
 //               <button
 //                 onClick={() => handleReaction("LIKE")}
 //                 className="text-xl hover:scale-125 transition-transform"
@@ -1105,36 +1092,63 @@ const LiveStreaming = () => {
     LOL: 0,
   });
 
+  // Tracks client-generated ids for comments this tab has sent, so the
+  // broadcast echo of our own message can be recognized and dropped without
+  // depending on the backend's user-identity field names matching what we
+  // expect (see sendComment in useLiveStream — that's what was causing
+  // the sender's own message to double up, and to show as "Anonymous"
+  // with "Invalid Date" instead of being filtered).
+  const sentCommentIdsRef = useRef<Set<string>>(new Set());
+
   const handleCommentReceived = useCallback(
     (comment: any) => {
       console.log("📨 Received live comment:", comment);
 
-      const isMe =
-        comment.userId === userObject?.usid ||
-        comment.user === userObject?.usid;
-
-      if (isMe) {
-        console.log("Ignoring own comment from socket to avoid double render");
+      const echoId = comment.clientMessageId;
+      if (echoId && sentCommentIdsRef.current.has(echoId)) {
+        sentCommentIdsRef.current.delete(echoId);
+        console.log("Ignoring echo of our own comment:", echoId);
         return;
       }
+
+      // Fallback for the case where clientMessageId isn't echoed back at
+      // all (older backend build, or it strips unknown fields).
+      const isMe =
+        comment.userId === userObject?.usid ||
+        comment.user === userObject?.usid ||
+        comment.username === userObject?.usid;
+
+      if (isMe) {
+        return;
+      }
+
+      const rawTimestamp =
+        comment.timestamp || comment.sentAt || comment.createdAt;
+      const parsedDate = rawTimestamp ? new Date(rawTimestamp) : new Date();
+      const time = Number.isNaN(parsedDate.getTime())
+        ? new Date().toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : parsedDate.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
       const newMessage = {
         id:
           typeof comment.id === "string"
             ? parseInt(comment.id)
             : (comment.id as number),
-        user: comment.user || comment.userId || "Anonymous",
+        user:
+          comment.username ||
+          comment.user ||
+          comment.displayName ||
+          comment.senderName ||
+          "Anonymous",
         username: comment.username,
         message: comment.message,
-        time: comment.timestamp
-          ? new Date(comment.timestamp).toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          : new Date().toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
+        time,
         isComment: true,
       };
 
@@ -1620,9 +1634,14 @@ const LiveStreaming = () => {
     }
 
     if (isStreaming && sendComment) {
-      const success = sendComment(message);
+      const clientMessageId = sendComment(message);
 
-      if (success) {
+      if (clientMessageId) {
+        // Remember this id so the broadcast echo of this exact message
+        // gets recognized and skipped in handleCommentReceived instead of
+        // being added a second time.
+        sentCommentIdsRef.current.add(clientMessageId);
+
         const newMessage = {
           id: Date.now(),
           user: "You",

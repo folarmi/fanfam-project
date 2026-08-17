@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/exhaustive-deps */
 // import { useWebSocket } from "@/context/WebSocketContext";
 // import { useAppSelector } from "@/lib/hook";
@@ -33,15 +34,18 @@
 //   const [hasJoined, setHasJoined] = useState(false);
 //   const [isStreamEnded, setIsStreamEnded] = useState(false);
 
-//   // Use strict types for subscriptions
 //   const joinSubRef = useRef<StompSubscription | null>(null);
 //   const leaveSubRef = useRef<StompSubscription | null>(null);
 //   const endSubRef = useRef<StompSubscription | null>(null);
 //   const commentSubRef = useRef<StompSubscription | null>(null);
 //   const reactionSubRef = useRef<StompSubscription | null>(null);
 
-//   // Track current sessionId to detect changes
 //   const currentSessionIdRef = useRef<string | null>(null);
+
+//   // Cancels the auto-join retry loop below on unmount so it can't keep
+//   // firing setTimeout(joinLiveStream, 200) against a stale closure forever
+//   // if the socket never becomes ready while this component is gone.
+//   const joinRetryCancelledRef = useRef(false);
 
 //   const cleanupSubscriptions = useCallback(() => {
 //     joinSubRef.current?.unsubscribe();
@@ -60,7 +64,6 @@
 //   const safeLeaveThenCleanup = useCallback(() => {
 //     if (!sessionId) return;
 
-//     // Only send leave if user had joined and stream isn't ended
 //     if (hasJoined && isConnected && !isStreamEnded) {
 //       sendMessage("/app/live/leave", {
 //         session: sessionId,
@@ -68,7 +71,6 @@
 //       });
 //     }
 
-//     // Unsubscribe immediately to prevent race conditions
 //     cleanupSubscriptions();
 //   }, [
 //     sessionId,
@@ -80,9 +82,7 @@
 //     cleanupSubscriptions,
 //   ]);
 
-//   // Main subscription effect
 //   useEffect(() => {
-//     // DEBUG LOGGING
 //     if (enabled && !isConnected)
 //       console.log("⏳ useLiveStream: Enabled but waiting for connection...");
 //     if (enabled && isConnected && !sessionId)
@@ -98,7 +98,6 @@
 //       return;
 //     }
 
-//     // If session changed, cleanup old subs first
 //     if (currentSessionIdRef.current !== sessionId) {
 //       console.log(
 //         `🔄 Session ID changed from ${currentSessionIdRef.current} to ${sessionId}, cleaning up subs.`,
@@ -110,7 +109,6 @@
 //       setViewerCount(0);
 //     }
 
-//     // Check if already subscribed to THESE topics
 //     if (joinSubRef.current) return;
 
 //     console.log("🔌 Subscribing to live stream topics for:", sessionId);
@@ -122,7 +120,6 @@
 //       const commentTopic = `/topic/live/${sessionId}/comment`;
 //       const reactionTopic = `/topic/live/${sessionId}/reaction`;
 
-//       // JOIN
 //       joinSubRef.current = client.subscribe(joinTopic, (message) => {
 //         try {
 //           const payload = parseLiveEvent(message.body);
@@ -140,7 +137,6 @@
 //         }
 //       });
 
-//       // LEAVE
 //       leaveSubRef.current = client.subscribe(leaveTopic, (message) => {
 //         try {
 //           const payload = parseLiveEvent(message.body);
@@ -158,15 +154,12 @@
 //         }
 //       });
 
-//       // END
 //       endSubRef.current = client.subscribe(endTopic, (message) => {
 //         console.log("🛑 End Topic Message:", message.body);
 //         try {
 //           const payload = parseLiveEvent(message.body);
 //           console.log("🛑 End Payload:", payload);
 
-//           // Check for various forms of END event
-//           // restoring broader check just in case, and logging specific debug info
 //           if (payload?.event === "CREATOR_ENDED_LIVE") {
 //             setIsStreamEnded(true);
 //             setHasJoined(false);
@@ -181,7 +174,6 @@
 //         }
 //       });
 
-//       // COMMENT
 //       commentSubRef.current = client.subscribe(commentTopic, (message) => {
 //         try {
 //           const payload = parseLiveEvent(message.body);
@@ -206,10 +198,8 @@
 //         }
 //       });
 
-//       // REACTION
 //       reactionSubRef.current = client.subscribe(reactionTopic, (message) => {
 //         try {
-//           // Sometimes body is already object? strict mode STOMP usually returns string body
 //           const payload = parseLiveEvent(message.body);
 //           console.log("❤️ Reaction Payload:", payload);
 //           if (!payload) return;
@@ -217,7 +207,7 @@
 //           const reaction: LiveReaction = {
 //             id: payload.id || Date.now(),
 //             session: payload.session || sessionId,
-//             reactionType: payload.reactionType || payload.type, // Fallback
+//             reactionType: payload.reactionType || payload.type,
 //             user: payload.user,
 //             userId: payload.userId,
 //             timestamp: payload.timestamp || Date.now(),
@@ -235,20 +225,6 @@
 //     }
 
 //     return () => {
-//       // Cleanup on unmount or dependency change
-//       // Note: we don't send LEAVE here because we handle it in safeLeaveThenCleanup
-//       // which is called by the component using this hook usually, or we can add it here.
-//       // But adding it here might cause leaving when just re-rendering if deps change.
-//       // The established pattern seems to be relying on cleanup.
-
-//       // Actually, standard hook behavior: if we unmount, we should leave.
-//       // But we need to use a ref to know if we really joined.
-//       // We'll rely on the manual `leaveLiveStream` or explicit unmount logic from parent if needed,
-//       // OR we just cleanup subscriptions here.
-
-//       // Let's just cleanup subscriptions here to be safe and avoid memory leaks.
-//       // We will NOT send the 'leave' message here automatically to avoid accidental leaves on re-renders,
-//       // unless we are sure it's a permanent unmount.
 //       cleanupSubscriptions();
 //       currentSessionIdRef.current = null;
 //     };
@@ -259,16 +235,14 @@
 //     sessionId,
 //     onCommentReceived,
 //     onReactionReceived,
-//   ]); // Added missing deps
+//   ]);
 
-//   // Join the live stream
 //   const joinLiveStream = useCallback(() => {
 //     if (!enabled || !isConnected || !sessionId || hasJoined || role === "HOST")
 //       return;
 
-//     // Check if subs are ready
 //     if (!joinSubRef.current) {
-//       // Retry shortly if subs aren't ready yet (race condition with effect)
+//       if (joinRetryCancelledRef.current) return;
 //       setTimeout(joinLiveStream, 200);
 //       return;
 //     }
@@ -291,15 +265,17 @@
 //     sendMessage,
 //   ]);
 
-//   // Auto-join effect
 //   useEffect(() => {
+//     joinRetryCancelledRef.current = false;
 //     const t = setTimeout(() => {
 //       joinLiveStream();
-//     }, 500); // Small delay to ensure everything is ready
-//     return () => clearTimeout(t);
+//     }, 500);
+//     return () => {
+//       joinRetryCancelledRef.current = true;
+//       clearTimeout(t);
+//     };
 //   }, [joinLiveStream]);
 
-//   // Send comment
 //   const sendComment = useCallback(
 //     (message: string) => {
 //       if (!sessionId || !message.trim() || !isConnected) return false;
@@ -322,16 +298,29 @@
 //     [sessionId, isConnected, sendMessage],
 //   );
 
-//   // Send reaction
+//   // Previously this had no try/catch at all, unlike sendComment right
+//   // above it — if publish() threw, it would go uncaught and the caller
+//   // would never find out the reaction didn't actually send. Brought it in
+//   // line with sendComment's error handling so a failed reaction reports
+//   // back false and shows the same kind of toast instead of failing silently.
 //   const sendReaction = useCallback(
 //     (reactionType: ReactionType) => {
 //       if (!sessionId || !isConnected) return false;
 
-//       sendMessage("/app/live/reaction", {
-//         session: sessionId,
-//         reactionType,
-//       });
-//       return true;
+//       try {
+//         sendMessage("/app/live/reaction", {
+//           session: sessionId,
+//           reactionType,
+//         });
+//         return true;
+//       } catch (error) {
+//         console.error("❌ Error sending reaction:", error);
+//         showInlineToast({
+//           type: "error",
+//           title: "Failed to send reaction",
+//         });
+//         return false;
+//       }
 //     },
 //     [sessionId, isConnected, sendMessage],
 //   );
@@ -341,7 +330,6 @@
 //     setHasJoined(false);
 //   }, [safeLeaveThenCleanup]);
 
-//   // Cleanup on unmount of the hook usage
 //   useEffect(() => {
 //     return () => {
 //       safeLeaveThenCleanup();
@@ -516,28 +504,35 @@ export const useLiveStream = ({
 
       endSubRef.current = client.subscribe(endTopic, (message) => {
         console.log("🛑 End Topic Message:", message.body);
+        // This topic (/topic/live/{sessionId}/end) is scoped to this one
+        // session and only ever carries an end signal — there's no other
+        // reason a message would land here. Previously this only counted
+        // as "ended" if payload.event === "CREATOR_ENDED_LIVE", an assumed
+        // shape that isn't actually guaranteed by the backend. That gate
+        // silently prevented viewers from ever auto-leaving when the host
+        // ended the stream. Now any message here is treated as authoritative.
         try {
           const payload = parseLiveEvent(message.body);
           console.log("🛑 End Payload:", payload);
-
-          if (payload?.event === "CREATOR_ENDED_LIVE") {
-            setIsStreamEnded(true);
-            setHasJoined(false);
-          } else {
-            console.log(
-              "⚠️ Stream End Event received but condition NOT met:",
-              payload,
-            );
-          }
         } catch (e) {
-          console.error("Error parsing end", e);
+          console.error(
+            "Error parsing end payload (treating as end anyway)",
+            e,
+          );
         }
+        setIsStreamEnded(true);
+        setHasJoined(false);
       });
 
       commentSubRef.current = client.subscribe(commentTopic, (message) => {
         try {
           const payload = parseLiveEvent(message.body);
-          console.log("💬 Comment Payload:", payload);
+          console.log(
+            "💬 Comment Payload:",
+            payload,
+            "keys:",
+            payload ? Object.keys(payload) : [],
+          );
           if (!payload || payload.event !== "LIVE_COMMENT") return;
 
           const comment: LiveComment = {
@@ -549,6 +544,10 @@ export const useLiveStream = ({
             username: payload.username || payload.displayName || payload.user,
             timestamp: payload.timestamp || Date.now(),
           };
+          // Carried through so the UI can recognize the echo of its own
+          // optimistically-added message without depending on any
+          // particular user-identity field name (see sendComment below).
+          (comment as any).clientMessageId = payload.clientMessageId;
 
           if (comment.message && onCommentReceived) {
             onCommentReceived(comment);
@@ -636,23 +635,37 @@ export const useLiveStream = ({
     };
   }, [joinLiveStream]);
 
+  // Previously returned a plain boolean and the caller had no reliable way
+  // to recognize its own message when it came back through the comment
+  // broadcast (relying on comment.userId === userObject.usid, which
+  // silently fails if the backend's field name differs — this is what was
+  // causing the sender's own message to double up, and to display as
+  // "Anonymous" instead of being filtered out). Now every outgoing comment
+  // gets a client-generated correlation id; the caller tracks it locally
+  // and drops the echo when it comes back, regardless of what identity
+  // fields the backend does or doesn't include on the broadcast.
   const sendComment = useCallback(
-    (message: string) => {
-      if (!sessionId || !message.trim() || !isConnected) return false;
+    (message: string): string | null => {
+      if (!sessionId || !message.trim() || !isConnected) return null;
+
+      const clientMessageId = `local-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}`;
 
       try {
         sendMessage("/app/live/comment", {
           session: sessionId,
           message: message.trim(),
+          clientMessageId,
         });
-        return true;
+        return clientMessageId;
       } catch (error) {
         console.error("❌ Error sending comment:", error);
         showInlineToast({
           type: "error",
           title: "Failed to send comment",
         });
-        return false;
+        return null;
       }
     },
     [sessionId, isConnected, sendMessage],
