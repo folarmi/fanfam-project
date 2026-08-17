@@ -17,6 +17,7 @@ import { FeedPost } from "@/components/molecules/FeedPost";
 import { useFetchProfile } from "@/hooks/apiHooks";
 import { KycStatusBanner } from "@/kyc/KycStatusBanner";
 import { BecomeCreatorPrompt } from "./become-a-creator/BecomeACreatorPrompt";
+import CreatorDiscoveryRail from "@/components/cards/CreatorDiscoveryRail";
 
 const Home = () => {
   const { userObject } = useAppSelector((state: RootState) => state.auth);
@@ -134,18 +135,38 @@ const Home = () => {
             </div>
           )}
 
-          {/* <div className="mb-4">
-            <KycStatusBanner email={profile?.email} kycVerified={isVerified} />
-          </div> */}
+          {/* ==================================================
+        MOBILE + TABLET
 
-          {!isCreator && <CreatorLiveCard />}
+        Live creators first, followed by suggestions.
+
+        This sits BEFORE the comment box.
+    =================================================== */}
+          <div className="xl:hidden">
+            <CreatorDiscoveryRail />
+          </div>
+
+          {/* ==================================================
+        DESKTOP
+
+        Keep existing live creator component because
+        suggestions already exist in the desktop right rail.
+    =================================================== */}
+
+          {/* Should this be limited to non-creators?? */}
+          {/* {!isCreator && <CreatorLiveCard />} */}
+          <div className="hidden xl:block">
+            <CreatorLiveCard />
+          </div>
 
           {isCreator && <CommentBox ifPoll ifRecord ifGoLive ifSchedule />}
+
           {/* <div className="my-2">
             {userObject.role === UserRole.creator && (
               <StoryUploader onFileUpload={handleFileUpload} />
             )}
           </div> */}
+
           <InfiniteScroll
             onLoader={handleFetchNext}
             isLoading={isFetchingNextPage}
