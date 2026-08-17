@@ -2988,7 +2988,7 @@ const LiveStreaming = () => {
               {isStreaming && (
                 <div className="bg-black/30 backdrop-blur-md px-3 py-1 rounded text-white text-sm font-medium border border-white/10 flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-500 rounded-full" />
-                  {viewerCount} Viewers
+                  {viewerCount} {viewerCount === 1 ? "Viewer" : "Viewers"}
                 </div>
               )}
 

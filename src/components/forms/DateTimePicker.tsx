@@ -1,5 +1,4 @@
-// // DateTimePicker.tsx
-// import { useRef } from "react";
+// import { useRef, type ReactNode } from "react";
 // import {
 //   Controller,
 //   type Control,
@@ -8,7 +7,7 @@
 // } from "react-hook-form";
 
 // const CalendarIcon = () => (
-//   <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+//   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 //     <rect
 //       x="1"
 //       y="3"
@@ -29,7 +28,7 @@
 // );
 
 // const ClockIcon = () => (
-//   <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+//   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 //     <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
 //     <path
 //       d="M8 5v3.5l2 2"
@@ -41,62 +40,63 @@
 //   </svg>
 // );
 
-// const formatDate = (iso: string) => {
-//   if (!iso) return "Pick date";
-//   const d = new Date(iso + "T00:00:00");
-//   return d.toLocaleDateString("en-US", {
+// const formatDate = (value: string) => {
+//   if (!value) return "Pick date";
+
+//   const date = new Date(`${value}T00:00:00`);
+
+//   return date.toLocaleDateString("en-US", {
 //     month: "short",
 //     day: "numeric",
 //     year: "numeric",
 //   });
 // };
 
-// const formatTime = (val: string) => {
-//   if (!val) return "Pick time";
-//   const [h, m] = val.split(":").map(Number);
-//   const ampm = h >= 12 ? "pm" : "am";
-//   const hour = h % 12 || 12;
-//   return `${hour}:${String(m).padStart(2, "0")}${ampm}`;
+// const formatTime = (value: string) => {
+//   if (!value) return "Pick time";
+
+//   const [hourValue, minuteValue] = value.split(":").map(Number);
+
+//   const period = hourValue >= 12 ? "pm" : "am";
+//   const hour = hourValue % 12 || 12;
+
+//   return `${hour}:${String(minuteValue).padStart(2, "0")}${period}`;
 // };
 
 // interface ChipProps {
 //   label: string;
-//   icon: React.ReactNode;
+//   icon: ReactNode;
 //   isEmpty: boolean;
 //   onClick: () => void;
 // }
 
-// const Chip = ({ label, icon, isEmpty, onClick }: ChipProps) => (
-//   <button
-//     type="button"
-//     onClick={onClick}
-//     style={{
-//       display: "inline-flex",
-//       alignItems: "center",
-//       gap: "7px",
-//       padding: "9px 16px",
-//       borderRadius: "6px",
-//       border: "none",
-//       background: "#ECEEFB",
-//       color: isEmpty ? "#8A94B2" : "#1E2A4A",
-//       fontSize: "14px",
-//       fontWeight: 500,
-//       fontFamily: "'Geist', 'DM Sans', 'Helvetica Neue', sans-serif",
-//       cursor: "pointer",
-//       letterSpacing: "-0.01em",
-//       transition: "background 0.15s, transform 0.1s",
-//       outline: "none",
-//       whiteSpace: "nowrap",
-//     }}
-//     onMouseEnter={(e) => (e.currentTarget.style.background = "#D8E2FF")}
-//     onMouseLeave={(e) => (e.currentTarget.style.background = "#E8EEFF")}
-//     onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
-//     onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-//   >
-//     <span style={{ opacity: isEmpty ? 0.5 : 0.7, lineHeight: 0 }}>{icon}</span>
-//     {label}
-//   </button>
-// );
+// const Chip = ({ label, icon, isEmpty, onClick }: ChipProps) => {
+//   return (
+//     <button
+//       type="button"
+//       onClick={onClick}
+//       className={`
+//         flex h-11 w-full min-w-0 items-center justify-center gap-2
+//         rounded-lg bg-[#ECEEFB] px-3
+//         text-sm font-medium transition-colors
+//         hover:bg-[#D8E2FF]
+//         active:bg-[#CBD8FF]
+//         sm:px-4
+//         ${isEmpty ? "text-[#8A94B2]" : "text-[#1E2A4A]"}
+//       `}
+//     >
+//       <span
+//         className={`shrink-0 leading-none ${
+//           isEmpty ? "opacity-50" : "opacity-70"
+//         }`}
+//       >
+//         {icon}
+//       </span>
+
+//       <span className="min-w-0 truncate whitespace-nowrap">{label}</span>
+//     </button>
+//   );
+// };
 
 // interface DateTimePickerProps<T extends FieldValues> {
 //   control: Control<T>;
@@ -114,86 +114,73 @@
 //   const dateInputRef = useRef<HTMLInputElement>(null);
 //   const timeInputRef = useRef<HTMLInputElement>(null);
 
+//   const openPicker = (input: HTMLInputElement | null) => {
+//     if (!input) return;
+
+//     if (typeof input.showPicker === "function") {
+//       input.showPicker();
+//       return;
+//     }
+
+//     input.click();
+//   };
+
 //   return (
-//     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+//     <div className="w-full">
 //       {label && (
-//         <label
-//           style={{
-//             fontSize: "13px",
-//             fontWeight: 600,
-//             color: "#4A5578",
-//             fontFamily: "'Geist', 'DM Sans', 'Helvetica Neue', sans-serif",
-//             letterSpacing: "0.01em",
-//           }}
-//         >
+//         <label className="mb-2 block text-[13px] font-semibold text-[#4A5578]">
 //           {label}
 //         </label>
 //       )}
 
-//       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-//         {/* Date chip */}
+//       <div className="grid w-full grid-cols-2 gap-2">
+//         {/* Date */}
 //         <Controller
 //           control={control}
 //           name={dateName}
 //           render={({ field }) => (
-//             <div style={{ position: "relative" }}>
+//             <div className="relative min-w-0">
 //               <Chip
 //                 label={formatDate(field.value)}
 //                 icon={<CalendarIcon />}
 //                 isEmpty={!field.value}
-//                 onClick={() =>
-//                   dateInputRef.current?.showPicker?.() ??
-//                   dateInputRef.current?.click()
-//                 }
+//                 onClick={() => openPicker(dateInputRef.current)}
 //               />
+
 //               <input
 //                 ref={dateInputRef}
 //                 type="date"
 //                 value={field.value ?? ""}
-//                 onChange={(e) => field.onChange(e.target.value)}
-//                 style={{
-//                   position: "absolute",
-//                   opacity: 0,
-//                   width: "1px",
-//                   height: "1px",
-//                   pointerEvents: "none",
-//                   top: 0,
-//                   left: 0,
-//                 }}
+//                 onChange={(event) => field.onChange(event.target.value)}
+//                 onBlur={field.onBlur}
+//                 className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
+//                 tabIndex={-1}
 //               />
 //             </div>
 //           )}
 //         />
 
-//         {/* Time chip */}
+//         {/* Time */}
 //         <Controller
 //           control={control}
 //           name={timeName}
 //           render={({ field }) => (
-//             <div style={{ position: "relative" }}>
+//             <div className="relative min-w-0">
 //               <Chip
 //                 label={formatTime(field.value)}
 //                 icon={<ClockIcon />}
 //                 isEmpty={!field.value}
-//                 onClick={() =>
-//                   timeInputRef.current?.showPicker?.() ??
-//                   timeInputRef.current?.click()
-//                 }
+//                 onClick={() => openPicker(timeInputRef.current)}
 //               />
+
 //               <input
 //                 ref={timeInputRef}
 //                 type="time"
 //                 value={field.value ?? ""}
-//                 onChange={(e) => field.onChange(e.target.value)}
-//                 style={{
-//                   position: "absolute",
-//                   opacity: 0,
-//                   width: "1px",
-//                   height: "1px",
-//                   pointerEvents: "none",
-//                   top: 0,
-//                   left: 0,
-//                 }}
+//                 onChange={(event) => field.onChange(event.target.value)}
+//                 onBlur={field.onBlur}
+//                 className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
+//                 tabIndex={-1}
 //               />
 //             </div>
 //           )}
@@ -235,6 +222,7 @@ const CalendarIcon = () => (
 const ClockIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+
     <path
       d="M8 5v3.5l2 2"
       stroke="currentColor"
@@ -246,7 +234,7 @@ const ClockIcon = () => (
 );
 
 const formatDate = (value: string) => {
-  if (!value) return "Pick date";
+  if (!value) return "Select Day";
 
   const date = new Date(`${value}T00:00:00`);
 
@@ -258,14 +246,14 @@ const formatDate = (value: string) => {
 };
 
 const formatTime = (value: string) => {
-  if (!value) return "Pick time";
+  if (!value) return "Select Time";
 
   const [hourValue, minuteValue] = value.split(":").map(Number);
 
   const period = hourValue >= 12 ? "pm" : "am";
   const hour = hourValue % 12 || 12;
 
-  return `${hour}:${String(minuteValue).padStart(2, "0")}${period}`;
+  return `${hour}:${String(minuteValue).padStart(2, "0")} ${period}`;
 };
 
 interface ChipProps {
@@ -281,19 +269,40 @@ const Chip = ({ label, icon, isEmpty, onClick }: ChipProps) => {
       type="button"
       onClick={onClick}
       className={`
-        flex h-11 w-full min-w-0 items-center justify-center gap-2
-        rounded-lg bg-[#ECEEFB] px-3
-        text-sm font-medium transition-colors
-        hover:bg-[#D8E2FF]
-        active:bg-[#CBD8FF]
+        flex
+        h-12
+        w-full
+        min-w-0
+        items-center
+        justify-center
+        gap-2
+        rounded-xl
+        bg-[#F1F1FF]
+        px-3
+        text-base
+        font-normal
+        transition-colors
+        hover:bg-[#E8E9FA]
+        active:bg-[#DFE1F7]
+
+        sm:h-11
+        sm:rounded-lg
         sm:px-4
-        ${isEmpty ? "text-[#8A94B2]" : "text-[#1E2A4A]"}
+        sm:text-sm
+        sm:font-medium
+
+        ${isEmpty ? "text-[#4B4B5A]" : "text-[#1E2A4A]"}
       `}
     >
+      {/* Icons hidden on mobile to match QA design */}
       <span
-        className={`shrink-0 leading-none ${
-          isEmpty ? "opacity-50" : "opacity-70"
-        }`}
+        className={`
+          hidden
+          shrink-0
+          leading-none
+          sm:inline-flex
+          ${isEmpty ? "opacity-50" : "opacity-70"}
+        `}
       >
         {icon}
       </span>
@@ -338,58 +347,97 @@ export function DateTimePicker<T extends FieldValues>({
         </label>
       )}
 
-      <div className="grid w-full grid-cols-2 gap-2">
-        {/* Date */}
-        <Controller
-          control={control}
-          name={dateName}
-          render={({ field }) => (
-            <div className="relative min-w-0">
-              <Chip
-                label={formatDate(field.value)}
-                icon={<CalendarIcon />}
-                isEmpty={!field.value}
-                onClick={() => openPicker(dateInputRef.current)}
-              />
+      {/* 
+        Mobile:
+        One bordered container around both controls.
 
-              <input
-                ref={dateInputRef}
-                type="date"
-                value={field.value ?? ""}
-                onChange={(event) => field.onChange(event.target.value)}
-                onBlur={field.onBlur}
-                className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
-                tabIndex={-1}
-              />
-            </div>
-          )}
-        />
+        Desktop:
+        Remove outer border/padding and retain original layout.
+      */}
+      <div
+        className="
+          w-full
+          rounded-xl
+          border
+          border-[#B8B8B8]
+          bg-white
+          p-4
 
-        {/* Time */}
-        <Controller
-          control={control}
-          name={timeName}
-          render={({ field }) => (
-            <div className="relative min-w-0">
-              <Chip
-                label={formatTime(field.value)}
-                icon={<ClockIcon />}
-                isEmpty={!field.value}
-                onClick={() => openPicker(timeInputRef.current)}
-              />
+          sm:rounded-none
+          sm:border-0
+          sm:bg-transparent
+          sm:p-0
+        "
+      >
+        <div className="grid w-full grid-cols-2 gap-4 sm:gap-2">
+          {/* Date */}
+          <Controller
+            control={control}
+            name={dateName}
+            render={({ field }) => (
+              <div className="relative min-w-0">
+                <Chip
+                  label={formatDate(field.value)}
+                  icon={<CalendarIcon />}
+                  isEmpty={!field.value}
+                  onClick={() => openPicker(dateInputRef.current)}
+                />
 
-              <input
-                ref={timeInputRef}
-                type="time"
-                value={field.value ?? ""}
-                onChange={(event) => field.onChange(event.target.value)}
-                onBlur={field.onBlur}
-                className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
-                tabIndex={-1}
-              />
-            </div>
-          )}
-        />
+                <input
+                  ref={dateInputRef}
+                  type="date"
+                  value={field.value ?? ""}
+                  onChange={(event) => field.onChange(event.target.value)}
+                  onBlur={field.onBlur}
+                  className="
+                    pointer-events-none
+                    absolute
+                    left-0
+                    top-0
+                    h-px
+                    w-px
+                    opacity-0
+                  "
+                  tabIndex={-1}
+                />
+              </div>
+            )}
+          />
+
+          {/* Time */}
+          <Controller
+            control={control}
+            name={timeName}
+            render={({ field }) => (
+              <div className="relative min-w-0">
+                <Chip
+                  label={formatTime(field.value)}
+                  icon={<ClockIcon />}
+                  isEmpty={!field.value}
+                  onClick={() => openPicker(timeInputRef.current)}
+                />
+
+                <input
+                  ref={timeInputRef}
+                  type="time"
+                  value={field.value ?? ""}
+                  onChange={(event) => field.onChange(event.target.value)}
+                  onBlur={field.onBlur}
+                  className="
+                    pointer-events-none
+                    absolute
+                    left-0
+                    top-0
+                    h-px
+                    w-px
+                    opacity-0
+                  "
+                  tabIndex={-1}
+                />
+              </div>
+            )}
+          />
+        </div>
       </div>
     </div>
   );

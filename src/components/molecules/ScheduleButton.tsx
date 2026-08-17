@@ -42,7 +42,7 @@ const ScheduleButton: React.FC<ScheduleButtonProps> = ({
             className="rounded-lg px-3"
             onClick={handleClick}
           >
-            {isPost ? "Schedule Post" : "Schedule Message"}{" "}
+            {isPost ? "Schedule Posts" : "Schedule Message"}{" "}
           </CustomButton>
         </div>
       </div>

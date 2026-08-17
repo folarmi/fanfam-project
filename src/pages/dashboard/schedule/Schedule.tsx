@@ -192,10 +192,10 @@ const Schedule = () => {
 
                     <Typography variant="subtitle1" className="pl-1 md:pl-4">
                       {showSchedulePost
-                        ? "Schedule Post"
+                        ? "Schedule Postss"
                         : showMessagePost
-                        ? "Schedule Mass Message"
-                        : ""}
+                          ? "Schedule Mass Message"
+                          : ""}
                     </Typography>
 
                     <div className="md:hidden">

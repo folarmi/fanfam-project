@@ -752,6 +752,7 @@ export const useLiveStream = ({
   const { userObject } = useAppSelector((state) => state.auth);
 
   const { client, isConnected, sendMessage } = useWebSocket();
+  // console.log("is creator a client", client);
 
   const [viewerCount, setViewerCount] = useState(0);
   const [hasJoined, setHasJoined] = useState(false);
@@ -820,7 +821,6 @@ export const useLiveStream = ({
     ) {
       return;
     }
-
     if (currentSessionIdRef.current !== sessionId) {
       console.log(
         `🔄 Session ID changed from ${currentSessionIdRef.current} to ${sessionId}, cleaning up subs.`,
@@ -835,6 +835,7 @@ export const useLiveStream = ({
     if (joinSubRef.current) return;
 
     console.log("🔌 Subscribing to live stream topics for:", sessionId);
+    // console.log("I got hereeeeeee");
 
     try {
       const joinTopic = `/topic/live/${sessionId}/join`;
@@ -842,6 +843,8 @@ export const useLiveStream = ({
       const endTopic = `/topic/live/${sessionId}/end`;
       const commentTopic = `/topic/live/${sessionId}/comment`;
       const reactionTopic = `/topic/live/${sessionId}/reaction`;
+
+      // console.log(joinTopic, leaveTopic, endTopic, commentTopic, reactionTopic);
 
       joinSubRef.current = client.subscribe(joinTopic, (message) => {
         try {

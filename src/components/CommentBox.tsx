@@ -1000,7 +1000,7 @@ const CommentBox = ({
             disabled={createContentMutation.isPending || isUploading}
             loading={createContentMutation.isPending || isUploading}
           >
-            Schedule Post
+            Schedule Postss
           </CustomButton>
         </div>
       )}
