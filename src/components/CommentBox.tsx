@@ -988,7 +988,13 @@ const CommentBox = ({
       </div>
 
       {isPostToBeScheduled && (
-        <div className="mx-4 mb-4 flex items-center justify-between border border-grey_50 rounded-md p-4">
+        <div
+          className="
+      mx-4 mb-4 flex flex-col gap-3
+      sm:flex-row sm:items-center sm:justify-between
+      sm:border sm:border-grey_50 sm:rounded-md sm:p-4
+    "
+        >
           <DateTimePicker
             control={control}
             dateName="eventDate"
@@ -996,11 +1002,11 @@ const CommentBox = ({
             label=""
           />
           <CustomButton
-            className="bg-grey_90 px-6 rounded-full"
+            className="bg-grey_90 px-6 rounded-full w-full sm:w-auto"
             disabled={createContentMutation.isPending || isUploading}
             loading={createContentMutation.isPending || isUploading}
           >
-            Schedule Postss
+            Schedule Post
           </CustomButton>
         </div>
       )}
